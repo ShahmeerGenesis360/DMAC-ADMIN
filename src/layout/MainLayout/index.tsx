@@ -1,11 +1,16 @@
+import { Flex } from 'antd';
 import React from 'react'
 import { Sidebar } from '../../components'
+// import { Outlet } from 'react-router-dom';
+import { TopWallet } from '../../pages';
 
 const MainLayout = () => {
     return (
-        <div>
+        <Flex style={{ overflow: 'hidden' }}>
             <Sidebar />
-        </div>
+            <TopWallet />
+            {/* <Outlet /> */}
+        </Flex>
     )
 }
 
