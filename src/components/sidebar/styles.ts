@@ -25,25 +25,45 @@ export const Logo = styled.div`
   margin-bottom: 40px;
 `;
 
-export const MenuItem = styled(Menu.Item)<{ selected?: boolean }>`
-  && {
-    background-color: ${({ selected }) =>
-      selected ? "#00ffcc" : "transparent"};
-    border-radius: 20px;
-    color: ${({ selected }) => (selected ? "#000" : "#fff")};
-    font-weight: bold;
-    margin: 10px 0;
+export const StyledMenu = styled(Menu)`
+  &.ant-menu{
+    .ant-menu-item {
+      background-color: transparent;
+      border-radius: 20px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      min-height: 45px;
+      gap: 8px;
+      margin: 10px 0;
+      .ant-menu-title-content {
+        display: contents;
+      }
+    
+    &.ant-menu-item:not(.ant-menu-item-selected):hover {
+      background-color: #78da8980 !important;
+    }
+    &.ant-menu-item-selected {
+      background-color: #78da89;
+      color: #242931;
+    }
+  }
   }
 `;
 
+export const Text = styled.div``;
+
 export const LogoutButton = styled.div`
   margin-top: auto;
-  width: 80%;
-  padding: 10px 0;
-  background-color: #ff4d4f;
-  border-radius: 20px;
-  color: #fff;
-  text-align: center;
+  width: 100%;
+  padding: 10px;
+  background-color: rgba(232, 121, 117, 0.05);
+  border-radius: 50px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #e87975;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 16px;
 `;
