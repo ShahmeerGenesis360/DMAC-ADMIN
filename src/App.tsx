@@ -1,11 +1,14 @@
+import { BrowserRouter } from 'react-router-dom'
 import './App.css'
-import { MainLayout } from './layout'
+import Routes from './routes'
 
 function App() {
 
   return (
     <>
-      <MainLayout />
+      <BrowserRouter>
+        <Routes />
+      </BrowserRouter>
     </>
   )
 }
