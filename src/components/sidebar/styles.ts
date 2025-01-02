@@ -35,7 +35,7 @@ export const CustomModalStyle = createGlobalStyle`
     border: 1px solid #FFFFFF !important;
     background-color: transparent !important;
     color: #fff !important;
-    outline:none !important;
+    outline: none !important;
     }
   }
 
@@ -44,7 +44,7 @@ export const CustomModalStyle = createGlobalStyle`
     border: 1px solid #E87975 !important;
     background-color: #E87975 !important;
     color: #fff;
-    outline:none !important;
+    outline: none !important;
     }
   }
 `;
