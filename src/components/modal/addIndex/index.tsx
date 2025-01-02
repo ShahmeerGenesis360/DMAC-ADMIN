@@ -3,6 +3,7 @@ import { Flex, Select } from "antd";
 import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { StyledInput, StyledModal, StyledSelect, StyledTextArea, StyledUpload, Text, UploadText } from "./styles";
 import Button from "../../button";
+import CustomSelect from "../../dropdown";
 
 const { Option } = Select;
 
@@ -55,7 +56,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         <div style={{ marginTop: 16 }}>
           <StyledTextArea style={{ resize: "none" }} showCount rows={4} maxLength={200} placeholder="Description" />
         </div>
-
+        <CustomSelect />
         <div style={{ marginTop: 16 }}>
           <StyledSelect placeholder="Allocations" allowClear>
             <Option value="allocation1">Allocation 1</Option>
