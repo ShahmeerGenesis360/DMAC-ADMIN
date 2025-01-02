@@ -31,18 +31,20 @@ export const CustomModalStyle = createGlobalStyle`
   }
 
   .custom-modal {
-   .ant-btn-default,.ant-btn-default:hover {
+   .ant-btn-default,.ant-btn-default:hover, .ant-btn-default:focus-visible {
     border: 1px solid #FFFFFF !important;
     background-color: transparent !important;
     color: #fff !important;
+    outline:none !important;
     }
   }
 
   .custom-modal {
-   .ant-btn-primary, .ant-btn-primary:hover {
+   .ant-btn-primary, .ant-btn-primary:hover, .ant-btn-primary:focus-visible {
     border: 1px solid #E87975 !important;
     background-color: #E87975 !important;
     color: #fff;
+    outline:none !important;
     }
   }
 `;
