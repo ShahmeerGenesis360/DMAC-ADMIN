@@ -1,4 +1,3 @@
-"use client";
 import React, { useState } from "react";
 import AddIndexModal from "../../components/modal/addIndex";
 

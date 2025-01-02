@@ -1,7 +1,8 @@
 import React from "react";
-import {   Select } from "antd";
-import { CloudUploadOutlined } from "@ant-design/icons";
-import { StyledInput, StyledModal, StyledSelect, StyledTextArea, StyledUpload } from "./styles";
+import { Flex, Select } from "antd";
+import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
+import { StyledInput, StyledModal, StyledSelect, StyledTextArea, StyledUpload, Text, UploadText } from "./styles";
+import Button from "../../button";
 
 const { Option } = Select;
 
@@ -19,9 +20,9 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     setIsModalOpen(false);
   };
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
+  // const handleOpenModal = () => {
+  //   setIsModalOpen(true);
+  // };
 
   return (
     <div>
@@ -29,12 +30,21 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       <StyledModal
         open={isModalOpen}
         onCancel={handleCancel}
-        title="Add Index"
+        title={
+          <Flex justify="space-between" align="center">
+            <Text>Add Index</Text>
+            <Button disabled text="Add Index" icon={<PlusOutlined size={20} />} />
+          </Flex>
+        }
         closable={false}
+        maskStyle={{
+          backdropFilter: "blur(15px)",
+          background: "#1C1C1C1A",
+        }}
       >
         {/* Upload Section */}
-        <StyledUpload className="hello">
-          <CloudUploadOutlined /> Upload Image
+        <StyledUpload>
+          <Flex gap={10} justify="center" align="center"><CloudUploadOutlined style={{ fontSize: '24px', color: '#fff' }} /> <UploadText>Upload Image</UploadText></Flex>
         </StyledUpload>
 
         {/* Input Fields */}
@@ -43,7 +53,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <StyledTextArea rows={4} maxLength={200} placeholder="Description" />
+          <StyledTextArea style={{ resize: "none" }} showCount rows={4} maxLength={200} placeholder="Description" />
         </div>
 
         <div style={{ marginTop: 16 }}>
@@ -55,10 +65,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <StyledTextArea rows={4} maxLength={200} placeholder="Overview" />
+          <StyledTextArea style={{ resize: "none" }} showCount rows={4} maxLength={200} placeholder="Overview" />
         </div>
-
-       
       </StyledModal>
     </div>
   );
