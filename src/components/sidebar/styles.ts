@@ -1,5 +1,53 @@
 import { Menu } from "antd";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
+
+export const CustomModalStyle = createGlobalStyle`
+  .custom-modal {
+    width: 600px !important;
+  }
+  .custom-modal .ant-modal-content {
+    background: #242931;
+    color: #fff;
+    border-radius: 15px;
+    padding: 40px;
+  }
+
+  .custom-modal .ant-modal-confirm-content{
+    color: #fff;
+    text-align:center;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .custom-modal .ant-modal-confirm-btns {
+    margin-top: 25px;
+  }
+
+  .custom-modal .ant-btn-default,.ant-btn-primary {
+    width: calc(50% - 4px);
+    padding: 22px 20px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .custom-modal {
+   .ant-btn-default,.ant-btn-default:hover, .ant-btn-default:focus-visible {
+    border: 1px solid #FFFFFF !important;
+    background-color: transparent !important;
+    color: #fff !important;
+    outline: none !important;
+    }
+  }
+
+  .custom-modal {
+   .ant-btn-primary, .ant-btn-primary:hover, .ant-btn-primary:focus-visible {
+    border: 1px solid #E87975 !important;
+    background-color: #E87975 !important;
+    color: #fff;
+    outline: none !important;
+    }
+  }
+`;
 
 export const SidebarWrapper = styled.div`
   width: 300px;
@@ -26,7 +74,7 @@ export const Logo = styled.div`
 `;
 
 export const StyledMenu = styled(Menu)`
-  &.ant-menu{
+  &.ant-menu {
     .ant-menu-item {
       background-color: transparent;
       border-radius: 20px;
@@ -39,15 +87,15 @@ export const StyledMenu = styled(Menu)`
       .ant-menu-title-content {
         display: contents;
       }
-    
-    &.ant-menu-item:not(.ant-menu-item-selected):hover {
-      background-color: #78da8980 !important;
+
+      &.ant-menu-item:not(.ant-menu-item-selected):hover {
+        background-color: #78da8980 !important;
+      }
+      &.ant-menu-item-selected {
+        background-color: #78da89;
+        color: #242931;
+      }
     }
-    &.ant-menu-item-selected {
-      background-color: #78da89;
-      color: #242931;
-    }
-  }
   }
 `;
 
