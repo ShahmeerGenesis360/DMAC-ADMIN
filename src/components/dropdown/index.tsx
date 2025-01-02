@@ -113,7 +113,7 @@ const CustomSelect: React.FC = () => {
             </div>
           ),
         }))}
-        dropdownRender={(menu) => (
+        dropdownRender={() => (
           <div
             style={{
               padding: "10px",
