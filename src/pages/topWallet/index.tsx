@@ -82,7 +82,7 @@ const TopWallet = () => {
       <SubHeader>Here's Your Wallets Details.</SubHeader>
       <SearchContainer>
         <Title>My Wallet</Title>
-        <TextField />
+        <TextField placeholder='Search your wallet' />
       </SearchContainer>
       <Table
         columns={columns}
