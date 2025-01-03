@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Select, Avatar, Input, message } from "antd";
+import { Avatar, Flex, message } from "antd";
+import { DropdownOption, DropdownOptions, InputNumber, StyledSelect, Text } from "./styles";
+import { DownOutlined, UpOutlined } from "@ant-design/icons";
 
 interface Option {
   value: string;
@@ -38,6 +40,7 @@ const initialOptions: Option[] = [
 const CustomSelect: React.FC = () => {
   const [options, setOptions] = useState<Option[]>(initialOptions);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const getTotalProportion = () =>
     options.reduce((sum, option) => sum + option.proportion, 0);
@@ -70,7 +73,7 @@ const CustomSelect: React.FC = () => {
     }
   };
 
-  const handleDeselect = (value: string) => {
+  const handleDeselect = (value: string | unknown) => {
     setSelectedOptions((prev) => prev.filter((item) => item !== value));
     setOptions((prevOptions) =>
       prevOptions.map((option) =>
@@ -89,78 +92,57 @@ const CustomSelect: React.FC = () => {
   };
 
   return (
-    <div style={{ width: "100%", display: "flex" }}>
-      <Select
+    <Flex>
+      <StyledSelect
+        placeholder="Allocations"
         mode="multiple"
         value={selectedOptions}
-        style={{ width: "100%" }}
         dropdownStyle={{
-          backgroundColor: "#1a1a1a",
-          borderRadius: "8px",
-          padding: "10px",
+          backgroundColor: "#242931",
+          borderRadius: "20px",
+          padding: "0px",
         }}
         onDeselect={handleDeselect}
         options={options.map((option) => ({
           value: option.value,
           label: (
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "10px" }}
-            >
+            <Flex gap={10} align="center" >
               <Avatar src={option.icon} size="small" />
-              <span>
+              <Text>
                 {option.label} - {option.proportion}%
-              </span>
-            </div>
+              </Text>
+            </Flex>
           ),
         }))}
         dropdownRender={() => (
-          <div
-            style={{
-              padding: "10px",
-              backgroundColor: "#1a1a1a",
-              borderRadius: "8px",
-            }}
-          >
+          <DropdownOptions>
             {options.map((option) => (
-              <div
+              <DropdownOption
                 key={option.value}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "8px",
-                  padding: "4px",
-                  borderBottom: "1px solid #333",
-                  cursor: "pointer",
-                }}
                 onClick={() => handleOptionClick(option.value)}
               >
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
-                >
-                  <Avatar src={option.icon} size="small" />
-                  <span>{option.label}</span>
-                </div>
-                <Input
+                <Flex gap={10} align="center" >
+                  <Avatar src={option.icon} size="large" />
+                  <Text>{option.label}</Text>
+                </Flex>
+                <InputNumber
                   type="number"
                   placeholder="Enter %"
                   value={option.proportion}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     handleProportionChange(option.value, Number(e.target.value))
                   }
                   onPressEnter={() => handleProportionSubmit(option.value)}
-                  style={{
-                    width: "80px",
-                    marginLeft: "10px",
-                  }}
                 />
-              </div>
+              </DropdownOption>
             ))}
-          </div>
+          </DropdownOptions>
         )}
         optionLabelProp="label"
+        suffixIcon={isDropdownOpen ? <UpOutlined /> : <DownOutlined />} // Toggle icon
+        onDropdownVisibleChange={(open: boolean) => setIsDropdownOpen(open)} // Track dropdown visibility
       />
-    </div>
+    </Flex>
   );
 };
 
