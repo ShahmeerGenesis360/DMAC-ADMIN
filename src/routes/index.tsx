@@ -14,7 +14,7 @@ export default function Routes(): JSX.Element | null {
           element: <Dashboard />,
         },
         {
-          path: "/top-wallet",
+          path: "top-wallet",
           element: <TopWallet />,
         }
       ],

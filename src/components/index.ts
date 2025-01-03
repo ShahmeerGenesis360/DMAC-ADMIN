@@ -5,5 +5,15 @@ import Table from "./table";
 import Pagination from "./pagination";
 import Button from "./button";
 import { LineChart } from "./Graph";
+import AddIndexModal from "./modal/addIndex";
 
-export { Sidebar, ImageBox, TextField, Table, Pagination, Button, LineChart };
+export {
+  Sidebar,
+  ImageBox,
+  TextField,
+  Table,
+  Pagination,
+  Button,
+  LineChart,
+  AddIndexModal,
+};

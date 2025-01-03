@@ -1,4 +1,4 @@
-import { Modal, Input, Upload, Select } from "antd";
+import { Modal, Input, Upload } from "antd";
 import styled from "styled-components";
 
 const { TextArea } = Input;
@@ -6,14 +6,25 @@ const { TextArea } = Input;
 export const StyledModal = styled(Modal)`
   &.ant-modal {
     width: 70% !important;
-    height: 80vh !important;
   }
   .ant-modal-content {
     background: #242931;
     border-radius: 20px;
+    height: 500px;
+    overflow: hidden;
   }
   .ant-modal-header {
     background: #242931;
+  }
+  .ant-modal-body {
+    height: calc(100% - 48px);
+    overflow-y: scroll;
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  }
+
+  .ant-modal-body::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
   }
   .ant-modal-title {
     color: #828282;
@@ -126,23 +137,7 @@ export const StyledUpload = styled(Upload.Dragger)`
 export const UploadText = styled.span`
   font-size: 16px;
   font-weight: 500;
-  color: #FCFCFC;
-`;
-
-export const StyledSelect = styled(Select)`
-  .ant-select-selector {
-    background: #ffffff0d !important;
-    border: none !important;
-    border-radius: 8px !important;
-    color: #828282 !important;
-    height: 40px !important;
-    display: flex;
-    align-items: center;
-  }
-
-  .ant-select-arrow {
-    color: #828282;
-  }
+  color: #fcfcfc;
 `;
 
 export const Text = styled.span`
