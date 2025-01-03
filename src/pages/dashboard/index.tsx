@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Flex, Space } from 'antd';
+import { Dropdown, Flex, Space } from 'antd';
 import styled from 'styled-components';
 import MonkeyIcon from '../../assets/monkey.svg';
 import { ImageBox, TextField, Table, Pagination, Button, LineChart, AddIndexModal } from '../../components';
-import { MoreOutlined, PlusOutlined } from '@ant-design/icons';
-import { Container, Header, SearchContainer, SubHeader, SubTitle, Title, TotalIndex } from './styles';
+import { EditOutlined, EyeOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
+import { Container, Header, SearchContainer, StyledMenu, SubHeader, SubTitle, Title, TotalIndex } from './styles';
 
 import { Card, Typography, Select } from 'antd';
 
@@ -42,6 +42,12 @@ const IndexName = styled.div`
 const IndexText = styled.span`
   font-weight: 400;
 `;
+
+
+const items = [
+  { key: '1', label: 'Edit', icon: <EditOutlined /> },
+  { key: '2', label: 'View', icon: <EyeOutlined /> },
+];
 
 
 const data = Array.from({ length: 5 }, (_, i) => ({
@@ -94,9 +100,12 @@ const columns = [
       <Flex justify="space-between">
         {text}
         <Space size='middle'>
-          <MoreOutlined
-            style={{ fontSize: '20px', cursor: 'pointer' }}
-          />
+          <Dropdown menu={{ items }} overlayClassName="custom-dropdown">
+            <MoreOutlined
+              style={{ fontSize: '20px', cursor: 'pointer' }}
+            />
+          </Dropdown>
+          <StyledMenu />
         </Space>
       </Flex>
     )

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 
 export const Container = styled.div`
   flex: 1;
@@ -51,4 +51,23 @@ export const TotalIndex = styled.div`
   font-size: 17px;
   font-weight: 400;
   color: #91e8b5;
+`;
+
+export const StyledMenu = createGlobalStyle`
+  &.custom-dropdown.ant-dropdown .ant-dropdown-menu {
+    background-color: #353535;
+    border-radius: 8px;
+    color: #fff;
+    .ant-dropdown-menu-item {
+    color: #fff;
+    &:first-child{
+      border-bottom: 0.6px solid #FFFFFF1A;
+      border-radius: 0;
+    }
+    &:hover{
+    background-color: #767272;
+    border-radius: 4px;
+    }
+    }
+  }
 `;
