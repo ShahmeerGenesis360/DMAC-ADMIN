@@ -2,21 +2,22 @@ import React, { useState } from 'react';
 import { Dropdown, Flex, Space } from 'antd';
 import styled from 'styled-components';
 import MonkeyIcon from '../../assets/monkey.svg';
-import { ImageBox, TextField, Table, Pagination, Button, LineChart, AddIndexModal } from '../../components';
+import { ImageBox, TextField, Table, Pagination, Button, LineChart, AddIndexModal, BarChart } from '../../components';
 import { EditOutlined, EyeOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
 import { Container, Header, SearchContainer, StyledMenu, SubHeader, SubTitle, Title, TotalIndex } from './styles';
 
 import { Card, Typography, Select } from 'antd';
+import { transactionChart, userChart } from '../../constants';
 
-const { Text, Title: AntdTitle } = Typography;
+const { Title: AntdTitle } = Typography;
 const { Option } = Select;
 
 // Styled Components for Cards
 const DashboardContainer = styled.div`
   display: flex;
   gap: 16px;
-  padding: 16px;
   width: 100%;
+  padding-bottom: 20px;
 `;
 
 const StyledCard = styled(Card)`
@@ -41,6 +42,12 @@ const IndexName = styled.div`
 
 const IndexText = styled.span`
   font-weight: 400;
+`;
+
+const CardText = styled.span`
+  color: #979797;
+  font-weight: 600;
+  font-size: 16px;
 `;
 
 
@@ -128,7 +135,7 @@ const Dashboard = () => {
         {/* Card 1: Total Value Locked */}
         <StyledCard>
           <CardHeader>
-            <Text>Total Value Locked</Text>
+            <CardText>Total Value Locked</CardText>
             <Select defaultValue="Monthly" size="small">
               <Option value="monthly">Monthly</Option>
               <Option value="weekly">Weekly</Option>
@@ -137,13 +144,13 @@ const Dashboard = () => {
           <AntdTitle level={4} style={{ color: '#4caf50' }}>
             4,556 <span style={{ fontSize: 12, color: '#7cf97c' }}>+5.2%</span>
           </AntdTitle>
-          <LineChart />
+          <LineChart data={userChart} />
         </StyledCard>
 
         {/* Card 2: Total Users */}
         <StyledCard>
           <CardHeader>
-            <Text>Total Users • 20 new users</Text>
+            <CardText>Total Users • 20 new users</CardText>
             <Select defaultValue="Monthly" size="small">
               <Option value="monthly">Monthly</Option>
               <Option value="weekly">Weekly</Option>
@@ -152,22 +159,38 @@ const Dashboard = () => {
           <AntdTitle level={4} style={{ color: '#fff' }}>
             30,000 users since <span style={{ color: '#4caf50' }}>Jan</span>
           </AntdTitle>
-          <LineChart />
+          <LineChart data={userChart} />
         </StyledCard>
 
         {/* Card 3: Transactions */}
         <StyledCard>
           <CardHeader>
-            <Text>Transactions</Text>
+            <CardText>Transactions</CardText>
             <Select defaultValue="Weekly" size="small">
               <Option value="weekly">Weekly</Option>
               <Option value="daily">Daily</Option>
             </Select>
           </CardHeader>
-          <Text>Transactions in past week</Text>
-          <LineChart />
+          <AntdTitle level={4} style={{ color: '#fff' }}>
+            Transactions in past week <span style={{ color: '#4caf50' }}>Jan</span>
+          </AntdTitle>
+          <LineChart legend={true} data={transactionChart} />
         </StyledCard>
       </DashboardContainer>
+
+      <StyledCard>
+        <CardHeader>
+          <CardText>Total Fee Revenue</CardText>
+          <Select defaultValue="Monthly" size="small">
+            <Option value="monthly">Monthly</Option>
+            <Option value="weekly">Weekly</Option>
+          </Select>
+        </CardHeader>
+        <AntdTitle level={4} style={{ color: '#4caf50' }}>
+          4,556 <span style={{ fontSize: 12, color: '#7cf97c' }}>+5.2%</span>
+        </AntdTitle>
+        <BarChart />
+      </StyledCard>
       <SearchContainer>
         <Title>Indexes</Title>
         <Flex className='ant_flex' align="center" justify="end" gap={15}>
