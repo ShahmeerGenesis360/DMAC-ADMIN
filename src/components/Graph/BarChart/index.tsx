@@ -14,33 +14,12 @@ import { Bar } from "react-chartjs-2";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const BarChart = () => {
-    // Chart data
-    const transactions = [
-        { day: "01", type: "buy", value: 3000 },
-        { day: "01", type: "sell", value: 1000 },
-        { day: "01", type: "buy", value: 2000 },
-        { day: "02", type: "sell", value: 800 },
-        { day: "02", type: "buy", value: 2500 },
-        { day: "02", type: "sell", value: 1200 },
-        { day: "03", type: "buy", value: 5000 },
-        { day: "03", type: "sell", value: 3500 },
-        { day: "04", type: "sell", value: 4000 },
-        { day: "04", type: "buy", value: 4500 },
-        { day: "05", type: "buy", value: 6000 },
-        { day: "05", type: "sell", value: 5500 },
-        { day: "06", type: "buy", value: 8000 },
-        { day: "06", type: "sell", value: 4500 },
-        { day: "07", type: "sell", value: 7000 },
-        { day: "07", type: "buy", value: 7500 },
-    ];
-
-    const labels = [...new Set(transactions.map(t => t.day))];
     const data = {
-        labels,
+        labels: Array.from({ length: 30 }, (_, i) => i + 1), // Days of the month
         datasets: [
             {
                 label: "Buy",
-                data: transactions.map((t) => (t.type === "buy" ? t.value : 0)),
+                data: [500, 600, 700, 0, 0, 0, 800, 900, 1000, 0, 0, 0, 1200, 1300, 1500, 0, 0, 0, 700, 800, 900, 0, 0, 0, 1000, 1100, 1200, 0, 0, 0],
                 backgroundColor: "#78DA89",
                 borderRadius: 2,
                 barPercentage: 0.4,
@@ -50,7 +29,7 @@ const BarChart = () => {
             },
             {
                 label: "Sell",
-                data: transactions.map((t) => (t.type === "sell" ? -t.value : 0)),
+                data: [0, 0, 0, -400, -500, -600, 0, 0, 0, -700, -800, -900, 0, 0, 0, -1000, -1100, -1200, 0, 0, 0, -500, -600, -700, 0, 0, 0, -800, -900, -1000],
                 backgroundColor: "#E87975",
                 borderRadius: 2,
                 barPercentage: 0.4,
@@ -67,7 +46,7 @@ const BarChart = () => {
         maintainAspectRatio: false,
         scales: {
             x: {
-                stacked: false,
+                stacked: true,
                 ticks: {
                     color: "#d1d5db",
                 },
@@ -76,7 +55,7 @@ const BarChart = () => {
                 },
             },
             y: {
-                stacked: false,
+                stacked: true,
                 // type: "logarithmic",
                 ticks: {
                     color: "#fff",
