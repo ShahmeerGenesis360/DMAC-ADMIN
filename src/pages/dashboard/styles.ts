@@ -1,3 +1,4 @@
+import { Select } from "antd";
 import styled, { createGlobalStyle } from "styled-components";
 
 export const Container = styled.div`
@@ -51,6 +52,38 @@ export const TotalIndex = styled.div`
   font-size: 17px;
   font-weight: 400;
   color: #91e8b5;
+`;
+
+export const StyledSelect = styled(Select)`
+  &.ant-select,
+  &.ant-select-outlined,
+  &.ant-select-focused {
+    &:hover,
+    &:active,
+    &:focus-within {
+      .ant-select-selector {
+        border-color: #ffffff1a !important;
+        border: 1px solid #ffffff1a;
+        border-radius: 200px;
+        background: #1d1d1d;
+        color: #fcfcfc;
+        box-shadow: none !important;
+      }
+    }
+    .ant-select-selector {
+      border-color: #ffffff1a;
+      border: 1px solid #ffffff1a;
+      border-radius: 200px;
+      background: #1d1d1d;
+      color: #fcfcfc;
+    }
+    .ant-select-selection-item {
+      color: #fcfcfc !important;
+    }
+    .ant-select-arrow {
+      color: #fff;
+    }
+  }
 `;
 
 export const StyledMenu = createGlobalStyle`
