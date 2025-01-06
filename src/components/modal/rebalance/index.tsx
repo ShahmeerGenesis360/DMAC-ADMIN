@@ -14,6 +14,7 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
   setIsModalOpen,
 }) => {
   const [percentage, setPercentage] = useState(30);
+  console.log(setPercentage)
 
   return (
     <div>
