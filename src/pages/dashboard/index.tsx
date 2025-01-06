@@ -22,6 +22,7 @@ import {
   Header,
   SearchContainer,
   StyledMenu,
+  StyledSelect,
   SubHeader,
   SubTitle,
   Title,
@@ -31,6 +32,7 @@ import {
 import { Card, Typography, Select } from "antd";
 import EditIndexModal from "../../components/modal/editIndex";
 import { transactionChart, userChart } from '../../constants';
+import { BarChart } from "../../components/Graph";
 
 const { Title: AntdTitle } = Typography;
 const { Option } = Select;
