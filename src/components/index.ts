@@ -4,7 +4,7 @@ import TextField from "./textField";
 import Table from "./table";
 import Pagination from "./pagination";
 import Button from "./button";
-import { LineChart } from "./Graph";
+import { LineChart, BarChart } from "./Graph";
 import AddIndexModal from "./modal/addIndex";
 
 export {
@@ -16,4 +16,5 @@ export {
   Button,
   LineChart,
   AddIndexModal,
+  BarChart,
 };
