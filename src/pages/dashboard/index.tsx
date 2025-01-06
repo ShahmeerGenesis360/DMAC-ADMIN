@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dropdown, Flex, MenuProps, Space } from "antd";
 import styled from "styled-components";
 import MonkeyIcon from "../../assets/monkey.svg";
@@ -33,9 +33,18 @@ import { Card, Typography, Select } from "antd";
 import EditIndexModal from "../../components/modal/editIndex";
 import { transactionChart, userChart } from '../../constants';
 import { BarChart } from "../../components/Graph";
+import { getAllIndex } from "../../services/indexGroup";
 
 const { Title: AntdTitle } = Typography;
 const { Option } = Select;
+
+
+interface IProps {
+  data: IGroupCoin[] | [];
+  message?: string;
+  status: boolean;
+}
+
 
 // Styled Components for Cards
 const DashboardContainer = styled.div`
@@ -97,8 +106,8 @@ const data = Array.from({ length: 5 }, (_, i) => ({
 const columns = (editIndex: Function) => [
   {
     title: "Index",
-    dataIndex: "index",
-    key: "index",
+    dataIndex: "name",
+    key: "name",
     render: (text: string) => (
       <IndexName>
         <ImageBox src={MonkeyIcon} />
@@ -110,26 +119,33 @@ const columns = (editIndex: Function) => [
     title: "Rank",
     dataIndex: "rank",
     key: "rank",
+    render: () => ("Loreum")
   },
   {
     title: "Price",
     dataIndex: "price",
     key: "price",
+    render: (text: number) => (
+      <IndexText>
+        {text.toFixed(2)}
+      </IndexText>)
   },
   {
     title: "TVL",
     dataIndex: "tvl",
     key: "tvl",
+    render: () => ("Loreum")
   },
   {
     title: "Holders",
     dataIndex: "holder",
     key: "holder",
+    render: () => ("Loreum")
   },
   {
     title: "Address",
-    dataIndex: "address",
-    key: "address",
+    dataIndex: "_id",
+    key: "_id",
     render: (text: string, record: object) => {
       console.log({ text, record });
       return (
@@ -155,10 +171,19 @@ const Dashboard = () => {
   const [openmodal, setOpenModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState({});
+  const [indexes, setIndexes] = useState<IGroupCoin[] | []>([]);
+
   const editIndex = async (index: object) => {
     setCurrentIndex(index);
     setOpenEditModal(true);
   };
+
+  useEffect(() => {
+    getAllIndex().then((res: IProps) => {
+      setIndexes(res.data)
+    })
+  }, [])
+
   return (
     <Container>
       <Flex justify="space-between">
@@ -242,7 +267,7 @@ const Dashboard = () => {
       </SearchContainer>
       <Table
         columns={columns(editIndex)}
-        dataSource={data.slice((currentPage - 1) * 10, currentPage * 10)}
+        dataSource={indexes}
       />
       <Pagination
         currentPage={currentPage}

@@ -8,11 +8,19 @@ import { WalletIcon } from '../../assets/wallet';
 import ImageBox from '../image';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Modal } from 'antd';
+import { logout } from '../../services/auth';
 
 
 
 const Sidebar = () => {
   const [modal, contextHolder] = Modal.useModal();
+  const navigate = useNavigate();
+  const [selected, setSelected] = useState('')
+  const { pathname } = useLocation();
+  const okHandler = () => {
+    logout();
+    navigate('/login')
+  }
 
   const confirm = () => {
     modal.confirm({
@@ -20,6 +28,7 @@ const Sidebar = () => {
       icon: null,
       content: 'Are you sure you wants to logout?',
       okText: 'Logout',
+      onOk: okHandler,
       cancelText: 'Cancel',
       className: 'custom-modal',
       centered: true,
@@ -29,9 +38,6 @@ const Sidebar = () => {
       }
     });
   };
-  const [selected, setSelected] = useState('')
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
   useEffect(() => {
     setSelected(pathname.split('/')[1])
   }, [pathname])

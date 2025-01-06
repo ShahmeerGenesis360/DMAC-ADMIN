@@ -1,13 +1,14 @@
 import { useRoutes } from "react-router-dom";
-import { MainLayout } from "../layout";
-import { Dashboard, TopWallet } from "../pages";
+import { AuthLayout, MainLayout } from "../layout";
+import { Dashboard, Login, TopWallet } from "../pages";
+import PrivateRoute from "./privateRoute";
 import PublicRoute from "./publicRoute";
 
 export default function Routes(): JSX.Element | null {
   return useRoutes([
     {
       path: "/",
-      element: <PublicRoute component={MainLayout} />,
+      element: <PrivateRoute navLink='/' component={MainLayout} />,
       children: [
         {
           index: true,
@@ -16,6 +17,16 @@ export default function Routes(): JSX.Element | null {
         {
           path: "top-wallet",
           element: <TopWallet />,
+        }
+      ],
+    },
+    {
+      path: "/login",
+      element: <PublicRoute component={AuthLayout} />,
+      children: [
+        {
+          index: true,
+          element: <Login />,
         }
       ],
     }

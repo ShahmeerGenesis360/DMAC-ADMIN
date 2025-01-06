@@ -36,4 +36,6 @@ export const StyledTable = styled(Table)`
   .ant-table-pagination {
     background: #000;
   }
+  .ant-empty-normal {
+    margin-block: 150px;
 `;

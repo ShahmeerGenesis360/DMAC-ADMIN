@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { Flex, Space } from 'antd';
 import styled from 'styled-components';
 import TokenIcon from '../../assets/token.svg';
 import { ImageBox, TextField, Table, Pagination } from '../../components';
 import { MoreOutlined } from '@ant-design/icons';
 import { Container, Header, SearchContainer, SubHeader, Title } from './styles';
+import { getAllWallet } from '../../services/wallet';
 
 
 
@@ -19,24 +20,26 @@ const WalletText = styled.span`
 `;
 
 
-const data = Array.from({ length: 30 }, (_, i) => ({
-  key: i,
-  walletName: `Wallet Name ${i + 1}`,
-  rank: 200 - i * 10,
-  address: 'Lorem',
-  purchasedIndex: 'Lorem',
-  totalWorth: 'Lorem',
-}));
+interface IProps {
+  data: {
+    currentPage: number;
+    totalPages: number;
+    totalUsers: number;
+    users: IWallet[] | [];
+  }
+  status: boolean
+}
+
 
 const columns = [
   {
     title: 'Wallet Name',
-    dataIndex: 'walletName',
-    key: 'walletName',
-    render: (text: string) => (
+    dataIndex: 'name',
+    key: 'name',
+    render: (text: string, record: { username?: string }) => (
       <WalletName>
         <ImageBox src={TokenIcon} />
-        <WalletText>{text}</WalletText>
+        <WalletText>{text || record.username}</WalletText>
       </WalletName>
     ),
   },
@@ -44,24 +47,26 @@ const columns = [
     title: 'Rank',
     dataIndex: 'rank',
     key: 'rank',
+    render: () => ("Loreum")
   },
   {
     title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    dataIndex: 'walletAddress',
+    key: 'walletAddress',
   },
   {
     title: 'Purchased Index',
     dataIndex: 'purchasedIndex',
     key: 'purchasedIndex',
+    render: () => ("Loreum")
   },
   {
     title: 'Total Worth',
     dataIndex: 'totalWorth',
     key: 'totalWorth',
-    render: (text: string) => (
+    render: () => (
       <Flex justify="space-between">
-        {text}
+        {"Loreum"}
         <Space size='middle'>
           <MoreOutlined
             style={{ fontSize: '20px', cursor: 'pointer' }}
@@ -75,6 +80,18 @@ const columns = [
 
 const TopWallet = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [users, setUsers] = useState<IWallet[] | []>([]);
+
+  const [searchValue, setSearchValue] = useState("")
+
+  useEffect(() => {
+    getAllWallet({ page: currentPage, search: searchValue }).then((res: IProps) => {
+      setCurrentPage(res.data.currentPage)
+      setTotalUsers(res.data.totalUsers)
+      setUsers(res.data.users)
+    })
+  }, [currentPage, searchValue])
 
   return (
     <Container>
@@ -82,15 +99,15 @@ const TopWallet = () => {
       <SubHeader>Here's Your Wallets Details.</SubHeader>
       <SearchContainer>
         <Title>My Wallet</Title>
-        <TextField placeholder='Search your wallet' />
+        <TextField placeholder='Search your wallet' onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)} />
       </SearchContainer>
       <Table
         columns={columns}
-        dataSource={data.slice((currentPage - 1) * 10, currentPage * 10)}
+        dataSource={users}
       />
       <Pagination
         currentPage={currentPage}
-        total={data.length}
+        total={totalUsers}
         onChange={(page: number) => setCurrentPage(page)}
       />
     </Container>
