@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import MonkeyIcon from '../../assets/monkey.svg';
 import { ImageBox, TextField, Table, Pagination, Button, LineChart, AddIndexModal, BarChart } from '../../components';
 import { EditOutlined, EyeOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
-import { Container, Header, SearchContainer, StyledMenu, SubHeader, SubTitle, Title, TotalIndex } from './styles';
+import { Container, Header, SearchContainer, StyledMenu, StyledSelect, SubHeader, SubTitle, Title, TotalIndex } from './styles';
 
 import { Card, Typography, Select } from 'antd';
 import { transactionChart, userChart } from '../../constants';
@@ -136,10 +136,10 @@ const Dashboard = () => {
         <StyledCard>
           <CardHeader>
             <CardText>Total Value Locked</CardText>
-            <Select defaultValue="Monthly" size="small">
+            <StyledSelect defaultValue="Monthly" size="small">
               <Option value="monthly">Monthly</Option>
               <Option value="weekly">Weekly</Option>
-            </Select>
+            </StyledSelect>
           </CardHeader>
           <AntdTitle level={4} style={{ color: '#4caf50' }}>
             4,556 <span style={{ fontSize: 12, color: '#7cf97c' }}>+5.2%</span>
@@ -151,10 +151,10 @@ const Dashboard = () => {
         <StyledCard>
           <CardHeader>
             <CardText>Total Users • 20 new users</CardText>
-            <Select defaultValue="Monthly" size="small">
+            <StyledSelect defaultValue="Monthly" size="small">
               <Option value="monthly">Monthly</Option>
               <Option value="weekly">Weekly</Option>
-            </Select>
+            </StyledSelect>
           </CardHeader>
           <AntdTitle level={4} style={{ color: '#fff' }}>
             30,000 users since <span style={{ color: '#4caf50' }}>Jan</span>
@@ -166,10 +166,10 @@ const Dashboard = () => {
         <StyledCard>
           <CardHeader>
             <CardText>Transactions</CardText>
-            <Select defaultValue="Weekly" size="small">
+            <StyledSelect defaultValue="Weekly" size="small">
               <Option value="weekly">Weekly</Option>
               <Option value="daily">Daily</Option>
-            </Select>
+            </StyledSelect>
           </CardHeader>
           <AntdTitle level={4} style={{ color: '#fff' }}>
             Transactions in past week <span style={{ color: '#4caf50' }}>Jan</span>
@@ -181,10 +181,10 @@ const Dashboard = () => {
       <StyledCard>
         <CardHeader>
           <CardText>Total Fee Revenue</CardText>
-          <Select defaultValue="Monthly" size="small">
+          <StyledSelect defaultValue="Monthly" size="small">
             <Option value="monthly">Monthly</Option>
             <Option value="weekly">Weekly</Option>
-          </Select>
+          </StyledSelect>
         </CardHeader>
         <AntdTitle level={4} style={{ color: '#4caf50' }}>
           4,556 <span style={{ fontSize: 12, color: '#7cf97c' }}>+5.2%</span>
