@@ -103,14 +103,21 @@ const data = Array.from({ length: 5 }, (_, i) => ({
   address: "Lorem",
 }));
 
+const BASE_URL = import.meta.env.VITE_UPLOAD_URL;
+
 const columns = (editIndex: Function) => [
   {
     title: "Index",
     dataIndex: "name",
     key: "name",
-    render: (text: string) => (
+    render: (text: string, record: IGroupCoin) => (
       <IndexName>
-        <ImageBox src={MonkeyIcon} />
+        <ImageBox
+          height={34}
+          width={34}
+          style={{ borderRadius: 50 }}
+          src={record.imageUrl ? `${BASE_URL}/uploads/${record?.imageUrl}` : MonkeyIcon}
+        />
         <IndexText>{text}</IndexText>
       </IndexName>
     ),

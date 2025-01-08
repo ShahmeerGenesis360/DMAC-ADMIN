@@ -3,44 +3,18 @@ import { Avatar, Flex, message } from "antd";
 import { DropdownOption, DropdownOptions, InputNumber, StyledSelect, Text } from "./styles";
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
 
-interface Option {
-  value: string;
-  label: string;
-  icon: string;
-  proportion: number;
+
+
+interface IProps {
+  selectedOptions: string[];
+  setSelectedOptions: (item: string[]) => void;
+  options: Option[];
+  setOptions: (item: Option[]) => void;
 }
 
-const initialOptions: Option[] = [
-  {
-    value: "uniswap1",
-    label: "Uniswap",
-    icon: "https://cryptologos.cc/logos/uniswap-uni-logo.png",
-    proportion: 0,
-  },
-  {
-    value: "ghost",
-    label: "Ghost",
-    icon: "https://cryptologos.cc/logos/ghost-logo.png",
-    proportion: 0,
-  },
-  {
-    value: "maker",
-    label: "Maker",
-    icon: "https://cryptologos.cc/logos/maker-mkr-logo.png",
-    proportion: 0,
-  },
-  {
-    value: "other",
-    label: "Other",
-    icon: "https://cryptologos.cc/logos/other-logo.png",
-    proportion: 0,
-  },
-];
-
-const CustomSelect: React.FC = () => {
-  const [options, setOptions] = useState<Option[]>(initialOptions);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, setOptions, options }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  console.log(options, "options")
 
   const getTotalProportion = () =>
     options.reduce((sum, option) => sum + option.proportion, 0);
@@ -59,8 +33,8 @@ const CustomSelect: React.FC = () => {
       return;
     }
 
-    setOptions((prevOptions) =>
-      prevOptions.map((option) =>
+    setOptions(
+      options.map((option) =>
         option.value === value ? { ...option, proportion } : option
       )
     );
@@ -74,9 +48,9 @@ const CustomSelect: React.FC = () => {
   };
 
   const handleDeselect = (value: string | unknown) => {
-    setSelectedOptions((prev) => prev.filter((item) => item !== value));
-    setOptions((prevOptions) =>
-      prevOptions.map((option) =>
+    setSelectedOptions(selectedOptions.filter((item) => item !== value));
+    setOptions(
+      options.map((option) =>
         option.value === value ? { ...option, proportion: 0 } : option
       )
     );
