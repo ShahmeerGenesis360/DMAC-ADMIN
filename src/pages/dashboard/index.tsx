@@ -108,9 +108,12 @@ const columns = (editIndex: Function) => [
     title: "Index",
     dataIndex: "name",
     key: "name",
-    render: (text: string) => (
+    render: (text: string, record: IGroupCoin) => (
       <IndexName>
-        <ImageBox src={MonkeyIcon} />
+        <ImageBox
+          src={record.imageUrl ? `http://localhost:5000/uploads/${record?.imageUrl}` : MonkeyIcon}
+          fallback={MonkeyIcon}
+        />
         <IndexText>{text}</IndexText>
       </IndexName>
     ),
