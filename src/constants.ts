@@ -61,3 +61,42 @@ const getGradient = (ctx: CanvasRenderingContext2D, chartArea: ChartArea) => {
   gradient.addColorStop(1, "#78DA8900");
   return gradient;
 };
+
+export const allocationList = [
+  {
+    label: "POPCAT",
+    value: "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+    icon: "https://cryptologos.cc/logos/uniswap-uni-logo.png",
+    proportion: 0,
+  },
+  {
+    label: "WIF",
+    value: "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+    icon: "https://cryptologos.cc/logos/ghost-logo.png",
+    proportion: 0,
+  },
+  {
+    label: "FWOG",
+    value: "A8C3xuqscfmyLrte3VmTqrAq8kgMASius9AFNANwpump",
+    icon: "https://cryptologos.cc/logos/maker-mkr-logo.png",
+    proportion: 0,
+  },
+  {
+    label: "RETARDIO",
+    value: "6ogzHhzdrQr9Pgv6hZ2MNze7UrzBMAFyBBWUYp1Fhitx",
+    icon: "https://cryptologos.cc/logos/other-logo.png",
+    proportion: 0,
+  },
+  {
+    label: "MICHI",
+    value: "5mbK36SZ7J19An8jFochhQS4of8g6BwUjbeCSxBSoWdp",
+    icon: "https://cryptologos.cc/logos/uniswap-uni-logo.png",
+    proportion: 0,
+  },
+  {
+    label: "MOTHER",
+    value: "3S8qX1MsMqRbiwKg2cQyx7nis1oHMgaCuc9c4VfvVdPN",
+    icon: "https://cryptologos.cc/logos/maker-mkr-logo.png",
+    proportion: 0,
+  },
+];
