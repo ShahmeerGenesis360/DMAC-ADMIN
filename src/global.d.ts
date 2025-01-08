@@ -36,6 +36,21 @@ declare global {
     name: string;
     coins: ICoin[] | [];
     imageUrl?: string;
-    visitCount: number;
+    visitCount?: number;
+    description: string;
+    file: any;
+    faq: IFaq[] | [];
+  }
+
+  interface IFaq {
+    question: string;
+    answer: string;
+  }
+
+  interface Option {
+    value: string;
+    label: string;
+    icon: string;
+    proportion: number;
   }
 }
