@@ -15,11 +15,8 @@
     "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "^1.98.0",
     "antd": "^5.22.7",
-<<<<<<< Updated upstream
     "axios": "^1.7.9",
-=======
     "bs58": "^6.0.0",
->>>>>>> Stashed changes
     "chart.js": "^4.4.7",
     "dotenv": "^16.4.7",
     "node-fetch": "^3.3.2",
