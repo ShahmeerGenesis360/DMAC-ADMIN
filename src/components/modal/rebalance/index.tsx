@@ -1,21 +1,43 @@
-import { Avatar, Flex } from "antd";
-import { StyledModal, Text } from "../addIndex/styles";
+import { Avatar, Flex, UploadFile } from "antd";
+import { StyledModal, StyledTitle, Text } from "../addIndex/styles";
 import { LeftOutlined } from "@ant-design/icons";
 import Button from "../../button";
 import PercentageCard from "./percentageCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { updateIndex } from "../../../services/indexGroup";
 
 interface IRebalanceModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  editIndex: IGroupCoin
+  handleCoinChange: (value: number, position: number) => void
+  faq: IFaq[] | []
 }
 const RebalanceIndex: React.FC<IRebalanceModal> = ({
   isModalOpen,
   setIsModalOpen,
+  editIndex,
+  handleCoinChange,
+  faq,
 }) => {
-  const [percentage, setPercentage] = useState(30);
-  console.log(setPercentage)
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
+  useEffect(() => {
+    let totalProportion = (editIndex.coins as ICoin[] || []).reduce((sum: number, coin: ICoin) => sum + coin.proportion, 0);
+    const isFormValid =
+      editIndex.name.trim() !== "" &&
+      editIndex.description.trim() !== "" &&
+      faq.every((item) => item.answer.trim() !== "") &&
+      totalProportion === 100 &&
+      ((editIndex.file && !(editIndex.file as any)?.status && typeof editIndex.file !== 'undefined') || editIndex.imageUrl !== "")
+
+    setIsButtonDisabled(!isFormValid);
+  }, [editIndex, faq]);
+
+  const handleSubmit = async () => {
+    await updateIndex({ ...editIndex, faq }).then(() => { window.location.reload() })
+
+  }
   return (
     <div>
       <StyledModal
@@ -24,24 +46,14 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
         title={
           <Flex justify="space-between" align="center">
             <Flex align="center" gap={4}>
-              <span
-                style={{
-                  height: "32px",
-                  width: "32px",
-                  background: "#373737",
-                  borderRadius: "50%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  cursor: "pointer",
-                }}
+              <StyledTitle
                 onClick={() => setIsModalOpen(false)}
               >
                 <LeftOutlined />
-              </span>
+              </StyledTitle>
               <Text>Allocations</Text>
             </Flex>
-            <Button text="Save changes" />
+            <Button disabled={isButtonDisabled} onClick={handleSubmit} text="Save changes" />
           </Flex>
         }
         closable={false}
@@ -51,15 +63,23 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
           background: "#1C1C1C1A",
         }}
       >
-        <PercentageCard
-          label="Uniswap"
-          icon={
-            <Avatar src="https://cryptologos.cc/logos/uniswap-uni-logo.png" />
+        <Flex style={{ flexDirection: 'column', paddingTop: 16 }} gap={16}>
+          {
+            editIndex && editIndex?.coins?.length > 0 && editIndex?.coins?.map((item: ICoin, index: number) => (
+              <PercentageCard
+                label={item.coinName}
+                icon={
+                  <Avatar size={57} src="https://cryptologos.cc/logos/uniswap-uni-logo.png" />
+                }
+                percentage={item.proportion}
+                handleCoinChange={handleCoinChange}
+                position={index}
+              />
+            ))
           }
-          percentage={percentage}
-        />
+        </Flex>
       </StyledModal>
-    </div>
+    </div >
   );
 };
 

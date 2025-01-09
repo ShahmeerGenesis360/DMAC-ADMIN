@@ -43,14 +43,12 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   // };
 
   useEffect(() => {
-    console.log(addIndex.file, "hello", (typeof addIndex.file !== 'undefined'))
-    // Check if all required fields are filled
     const isFormValid =
       addIndex.name.trim() !== "" &&
       addIndex.description.trim() !== "" &&
       faq.every((item) => item.answer.trim() !== "") &&
       selectedOptions.length > 0 &&
-      (addIndex.file && !addIndex.file?.status && typeof addIndex.file !== 'undefined')
+      (addIndex.file && !(addIndex.file as any)?.status && typeof addIndex.file !== 'undefined')
 
     setIsButtonDisabled(!isFormValid);
   }, [addIndex, faq]);
@@ -107,7 +105,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     }
   };
 
-  console.log(addIndex, "AddIndex", selectedOptions)
+  const isUploaded = fileList.length > 0;
 
   return (
     <div>
@@ -130,6 +128,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       >
         {/* Upload Section */}
         <StyledUpload
+          isUploaded={isUploaded}
           fileList={fileList}
           listType="picture"
           multiple={false} // Allow single file upload
@@ -141,11 +140,11 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
 
         {/* Input Fields */}
         <div style={{ marginTop: 16 }}>
-          <StyledInput placeholder="Coin Name" showCount maxLength={20} name="name" onChange={handleChange} />
+          <StyledInput placeholder="Coin Name" value={addIndex.name} showCount maxLength={20} name="name" onChange={handleChange} />
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <StyledTextArea style={{ resize: "none" }} showCount rows={4} maxLength={200} placeholder="Description" name="description" onChange={handleChange} />
+          <StyledTextArea style={{ resize: "none" }} value={addIndex.description} showCount rows={4} maxLength={200} placeholder="Description" name="description" onChange={handleChange} />
         </div>
 
         <div style={{ marginTop: 16 }}>
@@ -155,7 +154,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
           {
             faq.map((item, index) => (
               <div style={{ marginTop: 16 }}>
-                <StyledInput placeholder={item.question} value={item.answer} showCount maxLength={20} name="overview" onChange={(e: ChangeEvent<HTMLInputElement>) => handleFaqChange(e, index)} />
+                <StyledInput placeholder={item.question} value={item.answer} showCount maxLength={20} name={item.question} onChange={(e: ChangeEvent<HTMLInputElement>) => handleFaqChange(e, index)} />
               </div>
             ))
           }
