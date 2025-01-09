@@ -115,22 +115,49 @@ export const StyledTextArea = styled(TextArea)`
   }
 `;
 
-export const StyledUpload = styled(Upload.Dragger)`
+export const StyledUpload = styled(Upload.Dragger)<{ isUploaded: boolean }>`
   .ant-upload {
     background: #ffffff0d !important;
     border: 1px dashed #828282;
-    border-radius: 8px;
+    border-radius: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100px;
     color: #828282;
+    display: ${({ isUploaded }) =>
+      isUploaded ? "none !important" : "table !important"};
+  }
+  .ant-upload-btn {
+    border-radius: 20px !important;
   }
   &.ant-upload-wrapper .ant-upload-drag {
     background: #ffffff0d !important;
   }
   .ant-upload .ant-upload-drag:hover {
     border-color: #ffffff0d;
+  }
+
+  .ant-upload-list-item {
+    background: #ffffff0d !important;
+    border: 1px dashed #828282 !important;
+    height: 100px !important;
+    border-radius: 20px !important;
+  }
+  .ant-upload-list-item-thumbnail {
+    width: 85px !important;
+    height: 100% !important;
+    border-radius: 20px !important;
+  }
+  .ant-upload-list-item-image {
+    object-fit: cover !important;
+  }
+  .ant-upload-list-item-name {
+    visibility: hidden !important;
+  }
+  .ant-btn-sm.ant-btn-icon-only .anticon {
+    font-size: 20px !important;
+    color: #ffffff66 !important;
   }
 `;
 
@@ -144,4 +171,47 @@ export const Text = styled.span`
   font-size: 24px;
   font-weight: 600;
   color: #ffffff;
+`;
+
+export const CardText = styled.span`
+  font-size: 20px;
+  font-weight: 400;
+  color: #ffffff;
+`;
+
+export const StyledTitle = styled.span`
+  height: 32px;
+  width: 32px;
+  background: #373737;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+`;
+
+export const InputNumber = styled(Input)`
+  &.ant-input-outlined {
+    background: #FFFFFF1A;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #828282;
+    border-radius: 20px;
+    color: #fff;
+    width: 80px;
+    margin-left: 10px;
+  }
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  &::placeholder {
+    color: #828282 !important; /* Placeholder color */
+  }
+
+  &[type='number'] {
+    -moz-appearance: textfield;
+  }
+  }
 `;

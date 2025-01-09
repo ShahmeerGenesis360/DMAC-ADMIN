@@ -1,45 +1,48 @@
 import React from "react";
-import { Card, InputNumber, Row, Col, Typography } from "antd";
+import { Card, Row, Col } from "antd";
+import { CardText, InputNumber } from "../addIndex/styles";
 
-const { Text } = Typography;
 
 interface PercentageCardProps {
   label: string;
   icon: React.ReactNode;
   percentage: number;
-  //   onPercentageChange: (value: number | null) => void;
+  position: number;
+  handleCoinChange: (value: number, position: number) => void
 }
 
 const PercentageCard: React.FC<PercentageCardProps> = ({
   label,
   icon,
   percentage,
-  //   onPercentageChange,
+  handleCoinChange,
+  position
 }) => {
   return (
     <Card
-      style={{ borderRadius: "8px", background: "#1F1F1F", color: "#FFFFFF" }}
+      style={{ borderRadius: "19px", background: "#FFFFFF0D", color: "#FFFFFF" }}
     >
       <Row align="middle" justify="space-between">
         <Col>
           <Row align="middle" gutter={16}>
             <Col>{icon}</Col>
             <Col>
-              <Text style={{ color: "#FFFFFF", fontSize: "16px" }}>
+              <CardText>
                 {label}
-              </Text>
+              </CardText>
             </Col>
           </Row>
         </Col>
         <Col>
           <InputNumber
-            min={0}
-            max={100}
+            type="number"
+            placeholder="Enter %"
+            defaultValue={0}
             value={percentage}
-            // onChange={onPercentageChange}
-            formatter={(value) => `${value}%`}
-            parser={(value) => Number(value?.replace("%", "") || 0)}
-            style={{ width: "80px" }}
+            name={label}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleCoinChange(Number(e.target.value), position)
+            }
           />
         </Col>
       </Row>
