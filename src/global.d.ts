@@ -30,6 +30,7 @@ declare global {
   interface ICoin {
     coinName: string;
     address: string;
+    proportion: number;
   }
 
   interface IGroupCoin extends IBase {
