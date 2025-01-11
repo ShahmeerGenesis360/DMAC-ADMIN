@@ -9,6 +9,9 @@ import ImageBox from '../image';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Modal } from 'antd';
 import { logout } from '../../services/auth';
+import {
+  WalletMultiButton
+} from '@solana/wallet-adapter-react-ui';
 
 
 
@@ -72,6 +75,7 @@ const Sidebar = () => {
           onClick={handleChange}
           items={menuItems} // Use the `items` array to define menu items
         />
+        <WalletMultiButton />
         <LogoutButton onClick={confirm}>
           <ImageBox src={LogoutIcon} />
           Logout
