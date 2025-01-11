@@ -12,7 +12,8 @@ export function getIndexInfoPda(indexMint: PublicKey) {
 }
 
 export function getProgramId() {
-  const VITE_PUBLIC_PROGRAM_ID = import.meta.env.VITE_PUBLIC_PROGRAM_ID;
+  // const VITE_PUBLIC_PROGRAM_ID = import.meta.env.VITE_PUBLIC_PROGRAM_ID;
+  const VITE_PUBLIC_PROGRAM_ID = process.env.VITE_PUBLIC_PROGRAM_ID;
   return new anchor.web3.PublicKey(VITE_PUBLIC_PROGRAM_ID as string);
 }
 

@@ -36,7 +36,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
-  const { program, provider } = useProgram();
+  // const { program, provider } = useProgram();
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -123,16 +123,16 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       throw new Error("The total allocation percentage must sum up to 100%.");
     }
 
-    const txHash = await createIndexContract(
-      program,
-      provider,
-      mintKeypair,
-      addIndex.name,
-      addIndex.description,
-      tokenAllocations
-    );
+    // const txHash = await createIndexContract(
+    //   program,
+    //   provider,
+    //   mintKeypair,
+    //   addIndex.name,
+    //   addIndex.description,
+    //   tokenAllocations
+    // );
 
-    console.log("Transaction Hash:", txHash);
+    // console.log("Transaction Hash:", txHash);
 
     await createIndex({ ...addIndex, coins, faq });
 
