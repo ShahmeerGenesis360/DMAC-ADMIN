@@ -383,21 +383,13 @@
                     "type": "string"
                 },
                 {
-                    "name": "token_mints",
+                    "name": "index_tokens",
                     "type": {
-                        "array": [
-                            "pubkey",
-                            2
-                        ]
-                    }
-                },
-                {
-                    "name": "target_weights",
-                    "type": {
-                        "array": [
-                            "u64",
-                            2
-                        ]
+                        "vec": {
+                            "defined": {
+                                "name": "IndexToken"
+                            }
+                        }
                     }
                 },
                 {
@@ -542,6 +534,162 @@
             ],
             "accounts": [
                 {
+                    "name": "program_authority",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    97,
+                                    117,
+                                    116,
+                                    104,
+                                    111,
+                                    114,
+                                    105,
+                                    116,
+                                    121
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program_wsol_account",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    119,
+                                    115,
+                                    111,
+                                    108
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user_account",
+                    "signer": true
+                },
+                {
+                    "name": "sol_mint",
+                    "address": "So11111111111111111111111111111111111111112"
+                },
+                {
+                    "name": "jupiter_program",
+                    "address": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                },
+                {
+                    "name": "program_state",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    105,
+                                    110,
+                                    100,
+                                    101,
+                                    120
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "index_mint"
+                },
+                {
+                    "name": "index_info",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    105,
+                                    110,
+                                    100,
+                                    101,
+                                    120,
+                                    95,
+                                    105,
+                                    110,
+                                    102,
+                                    111
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "index_mint"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "rebalance_info",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    101,
+                                    98,
+                                    97,
+                                    108,
+                                    97,
+                                    110,
+                                    99,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "index_mint"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "price_update"
+                }
+            ],
+            "args": [
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "rebalance_index_end",
+            "discriminator": [
+                76,
+                203,
+                153,
+                127,
+                214,
+                176,
+                32,
+                238
+            ],
+            "accounts": [
+                {
                     "name": "program_state",
                     "pda": {
                         "seeds": [
@@ -564,9 +712,167 @@
                 },
                 {
                     "name": "index_mint"
+                },
+                {
+                    "name": "index_info",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    105,
+                                    110,
+                                    100,
+                                    101,
+                                    120,
+                                    95,
+                                    105,
+                                    110,
+                                    102,
+                                    111
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "index_mint"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "rebalance_info",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    101,
+                                    98,
+                                    97,
+                                    108,
+                                    97,
+                                    110,
+                                    99,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "index_mint"
+                            }
+                        ]
+                    }
                 }
             ],
             "args": []
+        },
+        {
+            "name": "rebalance_index_start",
+            "discriminator": [
+                200,
+                9,
+                167,
+                166,
+                249,
+                167,
+                254,
+                9
+            ],
+            "accounts": [
+                {
+                    "name": "program_state",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    105,
+                                    110,
+                                    100,
+                                    101,
+                                    120
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "admin",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "index_mint"
+                },
+                {
+                    "name": "index_info",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    105,
+                                    110,
+                                    100,
+                                    101,
+                                    120,
+                                    95,
+                                    105,
+                                    110,
+                                    102,
+                                    111
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "index_mint"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "rebalance_info",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    101,
+                                    98,
+                                    97,
+                                    108,
+                                    97,
+                                    110,
+                                    99,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "index_mint"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": [
+                {
+                    "name": "weights",
+                    "type": {
+                        "vec": "u64"
+                    }
+                }
+            ]
         },
         {
             "name": "sell_index",
@@ -851,6 +1157,9 @@
                 },
                 {
                     "name": "user"
+                },
+                {
+                    "name": "price_update"
                 }
             ],
             "args": [
@@ -1369,6 +1678,19 @@
             ]
         },
         {
+            "name": "RebalanceInfo",
+            "discriminator": [
+                136,
+                79,
+                124,
+                99,
+                165,
+                26,
+                245,
+                112
+            ]
+        },
+        {
             "name": "SwapToSolInfo",
             "discriminator": [
                 109,
@@ -1423,6 +1745,19 @@
             ]
         },
         {
+            "name": "DmacRebalanceIndexEndEvent",
+            "discriminator": [
+                53,
+                146,
+                220,
+                134,
+                110,
+                126,
+                168,
+                48
+            ]
+        },
+        {
             "name": "DmacRebalanceIndexEvent",
             "discriminator": [
                 75,
@@ -1433,6 +1768,19 @@
                 226,
                 11,
                 27
+            ]
+        },
+        {
+            "name": "DmacRebalanceIndexStartEvent",
+            "discriminator": [
+                19,
+                47,
+                111,
+                28,
+                139,
+                248,
+                180,
+                186
             ]
         },
         {
@@ -1562,14 +1910,34 @@
         },
         {
             "code": 6009,
-            "name": "InvalidReturnData"
+            "name": "AllTokensAlreadyRebalanced",
+            "msg": "All tokens are already rebalanced"
         },
         {
             "code": 6010,
-            "name": "InvalidJupiterProgram"
+            "name": "TokenAlreadyRebalanced",
+            "msg": "Token is already rebalanced"
         },
         {
             "code": 6011,
+            "name": "IncompleteRebalanceCycle",
+            "msg": "Rebalance cycle is not complete"
+        },
+        {
+            "code": 6012,
+            "name": "IncorrectRebalanceWeightsCount",
+            "msg": "Incorrect no of rebalance weights"
+        },
+        {
+            "code": 6013,
+            "name": "InvalidReturnData"
+        },
+        {
+            "code": 6014,
+            "name": "InvalidJupiterProgram"
+        },
+        {
+            "code": 6015,
             "name": "IncorrectOwner"
         }
     ],
@@ -1615,7 +1983,31 @@
             }
         },
         {
+            "name": "DmacRebalanceIndexEndEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "index_mint",
+                        "type": "pubkey"
+                    }
+                ]
+            }
+        },
+        {
             "name": "DmacRebalanceIndexEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "index_mint",
+                        "type": "pubkey"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "DmacRebalanceIndexStartEvent",
             "type": {
                 "kind": "struct",
                 "fields": [
@@ -1736,21 +2128,13 @@
                 "kind": "struct",
                 "fields": [
                     {
-                        "name": "token_mints",
+                        "name": "index_tokens",
                         "type": {
-                            "array": [
-                                "pubkey",
-                                2
-                            ]
-                        }
-                    },
-                    {
-                        "name": "target_weights",
-                        "type": {
-                            "array": [
-                                "u64",
-                                2
-                            ]
+                            "vec": {
+                                "defined": {
+                                    "name": "IndexToken"
+                                }
+                            }
                         }
                     },
                     {
@@ -1784,6 +2168,22 @@
                     {
                         "name": "bump",
                         "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "IndexToken",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "weight",
+                        "type": "u64"
                     }
                 ]
             }
@@ -1917,6 +2317,20 @@
             }
         },
         {
+            "name": "RebalanceInfo",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "weights",
+                        "type": {
+                            "vec": "u64"
+                        }
+                    }
+                ]
+            }
+        },
+        {
             "name": "SwapToSolInfo",
             "type": {
                 "kind": "struct",
@@ -1928,10 +2342,7 @@
                     {
                         "name": "swapped_tokens",
                         "type": {
-                            "array": [
-                                "bool",
-                                7
-                            ]
+                            "vec": "bool"
                         }
                     },
                     {
@@ -1953,10 +2364,7 @@
                     {
                         "name": "swapped_tokens",
                         "type": {
-                            "array": [
-                                "bool",
-                                7
-                            ]
+                            "vec": "bool"
                         }
                     },
                     {

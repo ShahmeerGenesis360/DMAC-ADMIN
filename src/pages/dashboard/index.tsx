@@ -103,7 +103,8 @@ const data = Array.from({ length: 5 }, (_, i) => ({
   address: "Lorem",
 }));
 
-const BASE_URL = import.meta.env.VITE_UPLOAD_URL;
+// const BASE_URL = import.meta.env.VITE_UPLOAD_URL;
+const BASE_URL = process.env.VITE_UPLOAD_URL;
 
 const columns = (editIndex: Function) => [
   {

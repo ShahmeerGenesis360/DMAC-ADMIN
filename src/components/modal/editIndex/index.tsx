@@ -25,7 +25,8 @@ const initialIndex = {
   file: ""
 }
 
-const BASE_URL = import.meta.env.VITE_UPLOAD_URL;
+// const BASE_URL = import.meta.env.VITE_UPLOAD_URL;
+const BASE_URL = process.env.VITE_UPLOAD_URL;
 
 const EditIndexModal: React.FC<IEditIndexModal> = ({
   isModalOpen,
