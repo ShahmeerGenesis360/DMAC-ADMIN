@@ -31,9 +31,10 @@ import {
 
 import { Card, Typography, Select } from "antd";
 import EditIndexModal from "../../components/modal/editIndex";
-import { transactionChart, userChart } from '../../constants';
+import { transactionChart, userCharts, userDataSet } from '../../constants';
 import { BarChart } from "../../components/Graph";
 import { getAllIndex } from "../../services/indexGroup";
+import { userChart } from "../../services/charts";
 
 const { Title: AntdTitle } = Typography;
 const { Option } = Select;
@@ -43,6 +44,22 @@ interface IProps {
   data: IGroupCoin[] | [];
   message?: string;
   status: boolean;
+}
+
+interface ChartData {
+  labels: string[];
+  datasets: {
+    label?: string;
+    data: number[];
+    fill: boolean;
+    tension: number;
+    pointBackgroundColor: string;
+    pointBorderColor: string;
+    pointHoverBorderColor: string;
+    pointHoverBackgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+  }[];
 }
 
 
@@ -180,6 +197,9 @@ const Dashboard = () => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState({});
   const [indexes, setIndexes] = useState<IGroupCoin[] | []>([]);
+  const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [usersInfo, setUsersInfo] = useState<any>(null)
 
   const editIndex = async (index: object) => {
     setCurrentIndex(index);
@@ -191,6 +211,35 @@ const Dashboard = () => {
       setIndexes(res.data)
     })
   }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await userChart('month');
+      const { groupedData, totalUsers, latestMonth, latestMonthCount } = response.data;
+      console.log(groupedData, "groupedData")
+      // setMonths(Object.keys(groupedData)); // Set available months for selection
+      const monthLabels = Object.keys(groupedData);
+      const monthTotals = Object.values(groupedData);
+      console.log('totalUsers', latestMonth)
+      setUsersInfo({ totalUsers, latestMonth, latestMonthCount })
+
+      setChartData({
+        labels: monthLabels, // Months as labels
+        datasets: [
+          {
+            label: 'Total Users',
+            data: monthTotals, // Total user counts for each month
+            ...userDataSet,
+          },
+        ],
+      });
+    };
+
+    fetchData();
+  }, []);
+
+  console.log(chartData, "chartData")
+
 
   return (
     <Container>
@@ -216,22 +265,25 @@ const Dashboard = () => {
           <AntdTitle level={4} style={{ color: "#4caf50" }}>
             4,556 <span style={{ fontSize: 12, color: "#7cf97c" }}>+5.2%</span>
           </AntdTitle>
-          <LineChart data={userChart} />
+          <LineChart data={userCharts || {}} />
         </StyledCard>
 
         {/* Card 2: Total Users */}
         <StyledCard>
           <CardHeader>
-            <CardText>Total Users • 20 new users</CardText>
+            <CardText>Total Users • {usersInfo?.latestMonthCount || 0} new users</CardText>
             <StyledSelect defaultValue="Monthly" size="small">
               <Option value="monthly">Monthly</Option>
               <Option value="weekly">Weekly</Option>
             </StyledSelect>
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#fff" }}>
-            30,000 users since <span style={{ color: "#4caf50" }}>Jan</span>
+            {usersInfo?.totalUsers || 0} users since <span style={{ color: "#4caf50" }}>{usersInfo?.latestMonth || ''}</span>
           </AntdTitle>
-          <LineChart data={userChart} />
+          {
+            chartData &&
+            <LineChart data={chartData || {}} />
+          }
         </StyledCard>
 
         {/* Card 3: Transactions */}
