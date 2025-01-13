@@ -19,6 +19,7 @@ import { createIndex as createIndexContract } from "../../../../services/contrac
 import { useProgram } from "../../../../services/idl";
 import { PublicKey, Keypair } from "@solana/web3.js";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import Select from "../../select";
 
 interface IAddIndexModal {
   isModalOpen: boolean;
@@ -48,6 +49,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [addIndex, setAddIndex] = useState(initialIndex);
   const [options, setOptions] = useState<Option[]>(allocationList);
+  const [selectedOptionTags, setSelectedOptionTags] = useState<string[]>([]);
+  const [optionTags, setOptionTags] = useState<string[] | []>([]);
 
   const [mintKeypair] = useState(Keypair.generate());
 
@@ -238,6 +241,13 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
             setOptions={setOptions}
             options={options}
           />
+        </div>
+        <div>
+          <Select
+            setSelectedOptions={setSelectedOptionTags}
+            selectedOptions={selectedOptionTags}
+            setOptions={setOptionTags}
+            options={optionTags} />
         </div>
         <>
           {faq.map((item, index) => (
