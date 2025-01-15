@@ -5,6 +5,7 @@ import Button from "../../button";
 import PercentageCard from "./percentageCard";
 import { useEffect, useState } from "react";
 import { updateIndex } from "../../../services/indexGroup";
+import { allocationList } from "../../../constants";
 
 interface IRebalanceModal {
   isModalOpen: boolean;
@@ -69,7 +70,7 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
               <PercentageCard
                 label={item.coinName}
                 icon={
-                  <Avatar size={57} src="https://cryptologos.cc/logos/uniswap-uni-logo.png" />
+                  <Avatar size={57} src={allocationList.find((list) => list.label === item.coinName)?.icon} />
                 }
                 percentage={item.proportion}
                 handleCoinChange={handleCoinChange}

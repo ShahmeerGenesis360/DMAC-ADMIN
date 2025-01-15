@@ -266,7 +266,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
             options={options}
           />
         </div>
-        <div>
+        <div style={{ marginTop: 16 }}>
           <Select
             setSelectedOptions={setSelectedOptionTags}
             selectedOptions={selectedOptionTags}

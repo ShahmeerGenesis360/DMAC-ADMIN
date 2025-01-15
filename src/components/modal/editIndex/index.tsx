@@ -16,7 +16,7 @@ import { UploadChangeParam } from "antd/es/upload";
 interface IEditIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  index: IGroupCoin;
+  index: Partial<IGroupCoin>;
 }
 
 const initialIndex = {
@@ -48,7 +48,7 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
     }
     if (Object.keys(index).length > 0) {
       setAddIndex({ ...addIndex, ...index })
-      if (index && index.faq.length > 0) {
+      if (index.faq && index.faq.length > 0) {
         setFaq(index?.faq)
       }
       if (index.imageUrl) {

@@ -50,7 +50,7 @@ interface ChartData {
   labels: string[];
   datasets: {
     label?: string;
-    data: number[];
+    data: number[] | [];
     fill: boolean;
     tension: number;
     pointBackgroundColor: string;
