@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/dmac_contracts.json`.
  */
 export type DmacContracts = {
-  address: "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4";
+  address: "DZp7LvayfWoM99t7KvVCxY4V9Ddm6Rscu7ZcQDh49zM1";
   metadata: {
     name: "dmacContracts";
     version: "0.1.0";

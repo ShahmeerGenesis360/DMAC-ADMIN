@@ -1,5 +1,5 @@
 {
-    "address": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+    "address": "9L9subiVmexGQVUZfCxoWYwbpqZhBfY2RzU4cJ2ZhZvv",
     "metadata": {
         "name": "dmac_contracts",
         "version": "0.1.0",
@@ -388,6 +388,16 @@
                         "vec": {
                             "defined": {
                                 "name": "IndexToken"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "fee_collectors",
+                    "type": {
+                        "vec": {
+                            "defined": {
+                                "name": "FeeCollector"
                             }
                         }
                     }
@@ -1875,69 +1885,79 @@
         },
         {
             "code": 6002,
-            "name": "InvalidWeight",
+            "name": "InvalidTokenWeight",
             "msg": "The target weights must sum to 100%."
         },
         {
             "code": 6003,
+            "name": "InvalidFeeWeight",
+            "msg": "The target weights must sum to 100%."
+        },
+        {
+            "code": 6004,
             "name": "IndexNotActive",
             "msg": "The index is not active."
         },
         {
-            "code": 6004,
+            "code": 6005,
             "name": "InvalidDepositAmount",
             "msg": "Invalid deposit amount."
         },
         {
-            "code": 6005,
+            "code": 6006,
             "name": "IsNotCurrentlyTransferring",
             "msg": "The token is not currently transferring"
         },
         {
-            "code": 6006,
+            "code": 6007,
             "name": "IncorrectTokenMint",
             "msg": "Incorrect Token Mint to swap"
         },
         {
-            "code": 6007,
+            "code": 6008,
             "name": "IncompleteSwapToTokenCycle",
             "msg": "Swap to token cycle is not complete"
         },
         {
-            "code": 6008,
+            "code": 6009,
             "name": "CompletedSwapToTokenCycle",
             "msg": "Swap to token cycle is complete"
         },
         {
-            "code": 6009,
+            "code": 6010,
             "name": "AllTokensAlreadyRebalanced",
             "msg": "All tokens are already rebalanced"
         },
         {
-            "code": 6010,
+            "code": 6011,
             "name": "TokenAlreadyRebalanced",
             "msg": "Token is already rebalanced"
         },
         {
-            "code": 6011,
+            "code": 6012,
             "name": "IncompleteRebalanceCycle",
             "msg": "Rebalance cycle is not complete"
         },
         {
-            "code": 6012,
+            "code": 6013,
             "name": "IncorrectRebalanceWeightsCount",
             "msg": "Incorrect no of rebalance weights"
         },
         {
-            "code": 6013,
-            "name": "InvalidReturnData"
-        },
-        {
             "code": 6014,
-            "name": "InvalidJupiterProgram"
+            "name": "InvalidFeeCollectors",
+            "msg": "Invalid fee collector list"
         },
         {
             "code": 6015,
+            "name": "InvalidReturnData"
+        },
+        {
+            "code": 6016,
+            "name": "InvalidJupiterProgram"
+        },
+        {
+            "code": 6017,
             "name": "IncorrectOwner"
         }
     ],
@@ -2123,6 +2143,22 @@
             }
         },
         {
+            "name": "FeeCollector",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "collector",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "weight",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
             "name": "IndexInfo",
             "type": {
                 "kind": "struct",
@@ -2133,6 +2169,16 @@
                             "vec": {
                                 "defined": {
                                     "name": "IndexToken"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "fee_collectors",
+                        "type": {
+                            "vec": {
+                                "defined": {
+                                    "name": "FeeCollector"
                                 }
                             }
                         }
@@ -2163,6 +2209,10 @@
                     },
                     {
                         "name": "sol_to_swap",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "sol_to_swap_fee",
                         "type": "u64"
                     },
                     {
@@ -2346,6 +2396,10 @@
                         }
                     },
                     {
+                        "name": "sol_to_withdraw_fee",
+                        "type": "u64"
+                    },
+                    {
                         "name": "bump",
                         "type": "u8"
                     }
@@ -2366,6 +2420,10 @@
                         "type": {
                             "vec": "bool"
                         }
+                    },
+                    {
+                        "name": "sol_to_swap_fee",
+                        "type": "u64"
                     },
                     {
                         "name": "bump",

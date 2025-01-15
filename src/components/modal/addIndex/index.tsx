@@ -16,11 +16,12 @@ import { UploadChangeParam, UploadFile } from "antd/es/upload";
 import { allocationList } from "../../../constants";
 import { createIndex } from "../../../services/indexGroup";
 import { createIndex as createIndexContract } from "../../../../services/contract";
-import { useProgram } from "../../../../services/idl";
+import { useProgram, program } from "../../../../services/idl";
 import { PublicKey, Keypair } from "@solana/web3.js";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Select from "../../select";
 
+import { useWallet } from "@solana/wallet-adapter-react";
 interface IAddIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,7 +38,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
-  // const { program, provider } = useProgram();
+  const { provider } = useProgram() || {};
+  const { publicKey, signTransaction } = useWallet();
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -52,7 +54,9 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const [selectedOptionTags, setSelectedOptionTags] = useState<string[]>([]);
   const [optionTags, setOptionTags] = useState<string[] | []>([]);
 
-  const [mintKeypair] = useState(Keypair.generate());
+  const keypair = Keypair.generate();
+
+  const [mintKeypair] = useState(keypair);
 
   // const handleOpenModal = () => {
   //   setIsModalOpen(true);
@@ -126,18 +130,38 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       throw new Error("The total allocation percentage must sum up to 100%.");
     }
 
-    // const txHash = await createIndexContract(
-    //   program,
-    //   provider,
-    //   mintKeypair,
-    //   addIndex.name,
-    //   addIndex.description,
-    //   tokenAllocations
-    // );
+    console.log("we are here");
+    const connection = provider.connection;
 
-    // console.log("Transaction Hash:", txHash);
+    if (!publicKey || !signTransaction) return;
 
-    await createIndex({ ...addIndex, coins, faq });
+    const txHash = await createIndexContract(
+      program,
+      connection,
+      publicKey,
+      mintKeypair,
+      addIndex.name,
+      addIndex.description,
+      tokenAllocations,
+      collectorDetails,
+      feeAmount,
+      signTransaction
+    );
+
+    console.log("Transaction Hash:", txHash);
+
+    const mintPublickey = mintKeypair.publicKey;
+    const mintKeySecret = mintKeypair.secretKey;
+    await createIndex({
+      ...addIndex,
+      coins,
+      faq,
+      mintPublickey,
+      mintKeySecret,
+      tokenAllocations,
+      collectorDetails,
+      feeAmount,
+    });
 
     // Clear the form and close the modal
     setAddIndex(initialIndex);
@@ -247,7 +271,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
             setSelectedOptions={setSelectedOptionTags}
             selectedOptions={selectedOptionTags}
             setOptions={setOptionTags}
-            options={optionTags} />
+            options={optionTags}
+          />
         </div>
         <>
           {faq.map((item, index) => (

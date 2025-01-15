@@ -1,29 +1,38 @@
-import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor";
-import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import * as IDL from "../src/constants/dmac_contract.json";
+import { Program, AnchorProvider, setProvider, Idl } from "@coral-xyz/anchor";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import IDL from "../src/constants/dmac_contract.json";
 import { getProgramId } from "../services/utils";
 import type { DmacContracts } from "../src/constants/dmac_contract";
+import { clusterApiUrl, Connection } from "@solana/web3.js";
+
+export let program: Program<Idl> | null = null; // Store Program instance outside React state
 
 export const useProgram = () => {
-  const { connection } = useConnection();
+  const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+  console.log(IDL);
+
+  console.log(typeof IDL);
 
   const wallet = useAnchorWallet();
-
-  const programId = getProgramId();
+  console.log("wallet", wallet);
 
   if (!wallet) {
-    throw new Error("Wallet not connected!");
+    console.warn("Wallet not connected yet.");
+    return null;
   }
 
-  const provider = new AnchorProvider(
-    connection,
-    wallet,
-    AnchorProvider.defaultOptions()
-  );
+  const provider = new AnchorProvider(connection, wallet, {
+    commitment: "confirmed",
+  });
+
+  console.log("provider", provider);
 
   setProvider(provider);
 
-  const program = new Program(IDL as DmacContracts, provider);
+  if (!program) {
+    program = new Program(IDL as Idl);
+    console.log("program", program);
+  }
 
-  return { connection, provider, program, programId };
+  return { connection, provider };
 };
