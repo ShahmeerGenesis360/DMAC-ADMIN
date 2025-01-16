@@ -55,7 +55,7 @@ declare global {
     proportion: number;
   }
   interface WalletOption {
-    wallet: string;
+    collector: string;
     weight: number;
   }
 }

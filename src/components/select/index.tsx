@@ -19,16 +19,16 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
 
     const handleDeselect = (value: string | unknown) => {
         setSelectedOptions(selectedOptions.filter((item) => item !== value));
-        setOptions(options.filter((item) => item.wallet !== value));
+        setOptions(options.filter((item) => item.collector !== value));
     };
 
     const handleSelect = (value: string) => {
         // Check if the value already exists in options
-        if (!options.find((option) => option.wallet === value)) {
+        if (!options.find((option) => option.collector === value)) {
             // Add new option dynamically
             setOptions([
                 ...options,
-                { wallet: value, weight: 0 }, // Default structure for new options
+                { collector: value, weight: 0 }, // Default structure for new options
             ]);
         }
 
@@ -46,7 +46,7 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
 
         setOptions(
             options.map((option) =>
-                option.wallet === value ? { ...option, weight } : option
+                option.collector === value ? { ...option, weight } : option
             )
         );
     };
@@ -54,7 +54,7 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
     return (
         <Flex>
             <StyledSelect
-                placeholder="Wallets"
+                placeholder="Collectors"
                 mode="tags"
                 value={selectedOptions}
                 tokenSeparators={[',']}
@@ -64,11 +64,11 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
                     padding: "0px",
                 }}
                 options={options.map((option) => ({
-                    value: option.wallet,
+                    value: option.collector,
                     label: (
                         <Flex gap={10} align="center" >
                             <Text>
-                                {option.wallet} - {option.weight}%
+                                {option.collector} - {option.weight}%
                             </Text>
                         </Flex>
                     ),
@@ -79,16 +79,16 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
                     <DropdownOptions>
                         {options.map((option) => (
                             <DropdownOption
-                                key={option.wallet}
+                                key={option.collector}
                             // onClick={() => handleOptionClick(option.value)}
                             >
-                                <Text>{option.wallet}</Text>
+                                <Text>{option.collector}</Text>
                                 <InputNumber
                                     type="number"
                                     placeholder="Enter %"
                                     value={option.weight}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                        handleProportionChange(option.wallet, Number(e.target.value))
+                                        handleProportionChange(option.collector, Number(e.target.value))
                                     }
                                     onPressEnter={() => setIsDropdownOpen(false)}
                                 />
@@ -101,8 +101,8 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
                 onDropdownVisibleChange={(open: boolean) => setIsDropdownOpen(open)} // Track dropdown visibility
             >
                 {(options || []).map((option) => (
-                    <Option key={option.wallet} value={option.wallet}>
-                        {option.wallet}
+                    <Option key={option.collector} value={option.collector}>
+                        {option.collector}
                     </Option>
                 ))}
             </StyledSelect>

@@ -31,6 +31,7 @@ const initialIndex = {
   name: "",
   description: "",
   file: "",
+  feeAmount: ""
 };
 
 const questions = ["Overview", "Maintenance", "Methodology", "Risks", "Fees"];
@@ -51,8 +52,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [addIndex, setAddIndex] = useState(initialIndex);
   const [options, setOptions] = useState<Option[]>(allocationList);
-  const [selectedOptionTags, setSelectedOptionTags] = useState<string[]>([]);
-  const [optionTags, setOptionTags] = useState<string[] | []>([]);
+  const [selectedOptionTags, setSelectedOptionTags] = useState<string[] | []>([]);
+  const [optionTags, setOptionTags] = useState<WalletOption[] | []>([]);
 
   const keypair = Keypair.generate();
 
@@ -97,9 +98,9 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   };
 
   const handleSubmit = async () => {
-    if (!program || !provider) {
-      throw new Error("Program or provider not initialized.");
-    }
+    // if (!program || !provider) {
+    //   throw new Error("Program or provider not initialized.");
+    // }
     const selectedTokens = options.filter((item) =>
       selectedOptions.includes(item.value)
     );
@@ -133,22 +134,22 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     console.log("we are here");
     const connection = provider.connection;
 
-    if (!publicKey || !signTransaction) return;
+    // if (!publicKey || !signTransaction) return;
 
-    const txHash = await createIndexContract(
-      program,
-      connection,
-      publicKey,
-      mintKeypair,
-      addIndex.name,
-      addIndex.description,
-      tokenAllocations,
-      collectorDetails,
-      feeAmount,
-      signTransaction
-    );
+    // const txHash = await createIndexContract(
+    //   program,
+    //   connection,
+    //   publicKey,
+    //   mintKeypair,
+    //   addIndex.name,
+    //   addIndex.description,
+    //   tokenAllocations,
+    //   collectorDetails: optionTags,
+    //   addIndex.feeAmount,
+    //   signTransaction
+    // );
 
-    console.log("Transaction Hash:", txHash);
+    // console.log("Transaction Hash:", txHash);
 
     const mintPublickey = mintKeypair.publicKey;
     const mintKeySecret = mintKeypair.secretKey;
@@ -159,8 +160,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       mintPublickey,
       mintKeySecret,
       tokenAllocations,
-      collectorDetails,
-      feeAmount,
+      collectorDetails: optionTags,
     });
 
     // Clear the form and close the modal
@@ -190,7 +190,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       console.error("File upload failed:", info.file);
     }
   };
-
+ console.log(addIndex,optionTags)
   const isUploaded = fileList.length > 0;
 
   return (
@@ -290,6 +290,17 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
             </div>
           ))}
         </>
+        <div style={{ marginTop: 16 }}>
+          <StyledInput
+            placeholder="Fees Amount"
+            type={'number'}
+            value={addIndex.feeAmount}
+            showCount
+            maxLength={20}
+            name="feeAmount"
+            onChange={handleChange}
+          />
+        </div>
       </StyledModal>
     </div>
   );
