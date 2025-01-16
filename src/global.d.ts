@@ -54,4 +54,8 @@ declare global {
     icon: string;
     proportion: number;
   }
+  interface WalletOption {
+    wallet: string;
+    weight: number;
+  }
 }

@@ -1,4 +1,4 @@
-import { Select } from "antd";
+import { Input, Select } from "antd";
 import styled, { createGlobalStyle } from "styled-components";
 
 export const StyledSelect = styled(Select)`
@@ -50,14 +50,69 @@ export const StyledSelect = styled(Select)`
   }
 `;
 
-export const DropdownOptions = createGlobalStyle`
-.ant-select-dropdown{
-    color: #fff;
+// export const DropdownOptions = createGlobalStyle`
+// .ant-select-dropdown{
+//     color: #fff;
+// }
+//   .ant-select-dropdown .ant-select-item-option-selected {
+//     font-weight: 400;
+//     background-color: #ffffff0d !important;
+//     border-radius: 20px;
+//     color: #fff !important;
+//   }
+// `;
+
+export const DropdownOptions = styled.div`
+  overflow-y: scroll;
+  max-height: 310px;
+  padding: 20px;
+  border: 1px solid #ffffff63;
+  background: #ffffff0d;
+  border-radius: 20px;
+  &::-webkit-scrollbar {
+    display: none;
 }
-  .ant-select-dropdown .ant-select-item-option-selected {
-    font-weight: 400;
-    background-color: #ffffff0d !important;
+`;
+
+export const DropdownOption = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 4px;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  &:hover {
+    background: #ffffff63;
+    border-radius: 100px;
+  }
+`;
+
+export const Text = styled.span`
+  color: #ffffff;
+  font-weight: 400;
+  font-size: 16px;
+`;
+
+export const InputNumber = styled(Input)`
+  &.ant-input-outlined {
+    background: #FFFFFF1A;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #828282;
     border-radius: 20px;
-    color: #fff !important;
+    color: #fff;
+    width: 80px;
+    margin-left: 10px;
+  }
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type='number'] {
+    -moz-appearance: textfield;
+  }
   }
 `;

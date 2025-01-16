@@ -71,6 +71,11 @@ export const StyledInput = styled(Input)`
     color: #828282; /* Optional: add a border color if you want */
     box-shadow: none;
   }
+  ::-webkit-inner-spin-button,
+  ::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 `;
 
 export const StyledTextArea = styled(TextArea)`
