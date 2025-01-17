@@ -16,8 +16,8 @@ import { UploadChangeParam, UploadFile } from "antd/es/upload";
 import { allocationList } from "../../../constants";
 import { createIndex } from "../../../services/indexGroup";
 import { createIndex as createIndexContract } from "../../../../services/contract";
-import { useProgram, program } from "../../../../services/idl";
-import { PublicKey, Keypair } from "@solana/web3.js";
+import { program } from "../../../../services/idl";
+import { PublicKey, Keypair, Connection, clusterApiUrl } from "@solana/web3.js";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Select from "../../select";
 
@@ -31,7 +31,7 @@ const initialIndex = {
   name: "",
   description: "",
   file: "",
-  feeAmount: ""
+  feeAmount: "",
 };
 
 const questions = ["Overview", "Maintenance", "Methodology", "Risks", "Fees"];
@@ -39,7 +39,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
-  const { provider } = useProgram() || {};
+  // const connection = programInfo.connection;
+  const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
   const { publicKey, signTransaction } = useWallet();
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -52,7 +53,9 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [addIndex, setAddIndex] = useState(initialIndex);
   const [options, setOptions] = useState<Option[]>(allocationList);
-  const [selectedOptionTags, setSelectedOptionTags] = useState<string[] | []>([]);
+  const [selectedOptionTags, setSelectedOptionTags] = useState<string[] | []>(
+    []
+  );
   const [optionTags, setOptionTags] = useState<WalletOption[] | []>([]);
 
   const keypair = Keypair.generate();
@@ -98,7 +101,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   };
 
   const handleSubmit = async () => {
-    // if (!program || !provider) {
+    // if (!program || !connection) {
     //   throw new Error("Program or provider not initialized.");
     // }
     const selectedTokens = options.filter((item) =>
@@ -131,10 +134,14 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       throw new Error("The total allocation percentage must sum up to 100%.");
     }
 
-    console.log("we are here");
-    const connection = provider.connection;
+    const collectorDetails = optionTags.map((item) => ({
+      collector: new PublicKey(item.collector),
+      weight: new anchor.BN(item.weight),
+    }));
 
-    // if (!publicKey || !signTransaction) return;
+    console.log("we are here");
+
+    if (!publicKey || !signTransaction) return;
 
     // const txHash = await createIndexContract(
     //   program,
@@ -144,8 +151,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     //   addIndex.name,
     //   addIndex.description,
     //   tokenAllocations,
-    //   collectorDetails: optionTags,
-    //   addIndex.feeAmount,
+    //   collectorDetails,
+    //   parseFloat(addIndex.feeAmount),
     //   signTransaction
     // );
 
@@ -160,7 +167,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       mintPublickey,
       mintKeySecret,
       tokenAllocations,
-      collectorDetails: optionTags,
+      collectorDetails,
     });
 
     // Clear the form and close the modal
@@ -190,7 +197,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       console.error("File upload failed:", info.file);
     }
   };
- console.log(addIndex,optionTags)
+  console.log(addIndex, optionTags);
   const isUploaded = fileList.length > 0;
 
   return (
@@ -293,7 +300,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         <div style={{ marginTop: 16 }}>
           <StyledInput
             placeholder="Fees Amount"
-            type={'number'}
+            type={"number"}
             value={addIndex.feeAmount}
             showCount
             maxLength={20}

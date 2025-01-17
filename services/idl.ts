@@ -5,7 +5,7 @@ import { getProgramId } from "../services/utils";
 import type { DmacContracts } from "../src/constants/dmac_contract";
 import { clusterApiUrl, Connection } from "@solana/web3.js";
 
-export let program: Program<Idl> | null = null; // Store Program instance outside React state
+export let program: Program<Idl>; // Store Program instance outside React state
 
 export const useProgram = () => {
   const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
@@ -26,6 +26,10 @@ export const useProgram = () => {
   });
 
   console.log("provider", provider);
+  if (!provider) {
+    console.warn("Wallet not connected yet.");
+    return null;
+  }
 
   setProvider(provider);
 

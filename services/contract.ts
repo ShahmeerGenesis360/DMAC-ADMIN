@@ -6,7 +6,7 @@ import {
   getAssociatedTokenAddressSync,
   TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
-import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 import { getIndexInfoPda, getProgramState } from "./utils";
 import {
   PYTH_NETWORK_PROGRAM_ID,
@@ -34,12 +34,14 @@ export async function createIndex(
   );
   const { blockhash } = await connection.getLatestBlockhash();
 
+  // --- Single Transaction Object ---
   const transaction = new anchor.web3.Transaction({
     feePayer: walletPublicKey,
     recentBlockhash: blockhash,
   });
 
-  const instruction = await program.methods
+  // --- Instruction 1: Create Index ---
+  const createIndexInstruction = await program.methods
     .createIndex(
       indexName,
       indexDescription,
@@ -66,12 +68,35 @@ export async function createIndex(
     })
     .instruction();
 
-  transaction.add(instruction);
+  transaction.add(createIndexInstruction);
 
-  // Partially sign with the mint keypair
+  // --- Instruction 2: Mint Index ---
+  const mintIndexInstruction = await program.methods
+    .mintIndex()
+    .accounts({
+      programState: getProgramState(),
+      admin: walletPublicKey,
+      indexInfo: getIndexInfoPda(mintKeypair.publicKey),
+      authority: mintKeypair.publicKey,
+      indexMint: mintKeypair.publicKey,
+      adminTokenAccount: getAssociatedTokenAddressSync(
+        mintKeypair.publicKey,
+        walletPublicKey,
+        false,
+        TOKEN_2022_PROGRAM_ID
+      ),
+      tokenProgram: TOKEN_2022_PROGRAM_ID,
+      systemProgram: SYSTEM_PROGRAM_ID,
+      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+    })
+    .instruction();
+
+  transaction.add(mintIndexInstruction);
+
+  // Partially sign the transaction with the mint keypair
   transaction.partialSign(mintKeypair);
 
-  // Use the wallet to sign the transaction
+  // Use the wallet to sign the combined transaction
   const signedTransaction = await signTransaction(transaction);
 
   // Send the signed transaction to the network
