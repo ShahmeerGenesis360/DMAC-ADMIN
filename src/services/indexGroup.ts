@@ -43,6 +43,10 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
     "collectorDetails",
     JSON.stringify(groupIndex.collectorDetails)
   );
+  formData.append(
+    "feeAmount",
+    JSON.stringify(groupIndex.feeAmount)
+  );
   try {
     console.log("calling the API now");
     const response = await apiRequest<GetGroupCoinResponse>(
