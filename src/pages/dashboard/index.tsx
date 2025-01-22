@@ -320,7 +320,7 @@ const Dashboard = () => {
         <Flex className="ant_flex" align="center" justify="end" gap={15}>
           <Flex gap={10}>
             <SubTitle>Total No Of Index:</SubTitle>
-            <TotalIndex>02</TotalIndex>
+            <TotalIndex>{indexes.length || 0}</TotalIndex>
           </Flex>
           <TextField placeholder="Search coin,Indexes etc" />
         </Flex>
