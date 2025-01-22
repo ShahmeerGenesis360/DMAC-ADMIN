@@ -20,8 +20,12 @@ import { program } from "../../../../services/idl";
 import { PublicKey, Keypair, Connection, clusterApiUrl } from "@solana/web3.js";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Select from "../../select";
+import { Select as SelectOptions } from 'antd'
 
+
+import { StyledSelect } from "../../select/styles";
 import { useWallet } from "@solana/wallet-adapter-react";
+import CategorySelect from "../../category";
 interface IAddIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,6 +36,7 @@ const initialIndex = {
   description: "",
   file: "",
   feeAmount: "",
+  category: ""
 };
 
 const questions = ["Overview", "Maintenance", "Methodology", "Risks", "Fees"];
@@ -70,6 +75,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     const isFormValid =
       addIndex.name.trim() !== "" &&
       addIndex.description.trim() !== "" &&
+      addIndex.category.trim() !== "" &&
       faq.every((item) => item.answer.trim() !== "") &&
       selectedOptions.length > 0 &&
       addIndex.file &&
@@ -167,7 +173,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       mintPublickey,
       mintKeySecret,
       tokenAllocations,
-      collectorDetails,
+      collectorDetail: collectorDetails,
     });
 
     // Clear the form and close the modal
@@ -280,6 +286,10 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
             setOptions={setOptionTags}
             options={optionTags}
           />
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <CategorySelect setSelectedOptions={setAddIndex}
+            selectedOptions={addIndex.category} />
         </div>
         <>
           {faq.map((item, index) => (
