@@ -159,7 +159,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     // console.log("Transaction Hash:", txHash);
 
     const mintPublickey = mintKeypair.publicKey;
-    const mintKeySecret = mintKeypair.secretKey;
+    const mintKeySecret = mintKeypair.secretKey.toString();
     await createIndex({
       ...addIndex,
       coins,
