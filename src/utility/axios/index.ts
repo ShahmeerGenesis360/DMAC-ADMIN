@@ -29,6 +29,9 @@ export const apiRequest = async <T>(
     return response.data;
   } catch (error: any) {
     // Handle errors (can be extended for specific needs)
-    throw new Error(error.response?.data?.message || "An error occurred while making the API request");
+    throw new Error(
+      error.response?.data?.message ||
+        "An error occurred while making the API request"
+    );
   }
 };

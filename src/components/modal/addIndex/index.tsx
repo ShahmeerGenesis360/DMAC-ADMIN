@@ -14,14 +14,15 @@ import Button from "../../button";
 import CustomSelect from "../../dropdown";
 import { UploadChangeParam, UploadFile } from "antd/es/upload";
 import { allocationList } from "../../../constants";
-import { createIndex } from "../../../services/indexGroup";
-import { createIndex as createIndexContract } from "../../../../services/contract";
-import { program } from "../../../../services/idl";
-import { PublicKey, Keypair, Connection, clusterApiUrl } from "@solana/web3.js";
+import { createIndex as createIndexToDB } from "../../../services/indexGroup"; // DB Function
+import { createIndex as createIndexContract } from "../../../../services/contract"; // On-chain Function
+import { useProgram } from "../../../../services/idl"; // Custom hook for Anchor program
+import { PublicKey, Keypair, Connection } from "@solana/web3.js";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Select from "../../select";
 
 import { useWallet } from "@solana/wallet-adapter-react";
+
 interface IAddIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -35,16 +36,15 @@ const initialIndex = {
 };
 
 const questions = ["Overview", "Maintenance", "Methodology", "Risks", "Fees"];
+
 const AddIndexModal: React.FC<IAddIndexModal> = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
-  // const connection = programInfo.connection;
-  const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
-  const { publicKey, signTransaction } = useWallet();
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+  const { publicKey, signTransaction } = useWallet(); // Wallet context
+  const { program, connection } = useProgram() || {}; // Use the custom hook
+  const handleCancel = () => setIsModalOpen(false);
+
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [faq, setFaq] = useState(
     questions.map((question) => ({ question, answer: "" }))
@@ -57,14 +57,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     []
   );
   const [optionTags, setOptionTags] = useState<WalletOption[] | []>([]);
-
-  const keypair = Keypair.generate();
-
+  const keypair = Keypair.generate(); // Generate mint keypair
   const [mintKeypair] = useState(keypair);
-
-  // const handleOpenModal = () => {
-  //   setIsModalOpen(true);
-  // };
 
   useEffect(() => {
     const isFormValid =
@@ -101,9 +95,14 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   };
 
   const handleSubmit = async () => {
-    // if (!program || !connection) {
-    //   throw new Error("Program or provider not initialized.");
-    // }
+    if (!program || !connection || !publicKey || !signTransaction) {
+      console.warn(
+        "Program, connection, wallet, or signTransaction not ready."
+      );
+      return;
+    }
+
+    // Filter selected tokens and prepare data
     const selectedTokens = options.filter((item) =>
       selectedOptions.includes(item.value)
     );
@@ -115,7 +114,6 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       weight: item.proportion, // For on-chain
     }));
 
-    // Step 2: Prepare data for DB and on-chain
     const coins = tokenData.map(({ coinName, address, proportion }) => ({
       coinName,
       address,
@@ -139,48 +137,49 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       weight: new anchor.BN(item.weight),
     }));
 
-    console.log("we are here");
+    console.log("Submitting index...");
 
-    if (!publicKey || !signTransaction) return;
+    try {
+      const txHash = await createIndexContract(
+        program,
+        connection,
+        publicKey,
+        mintKeypair,
+        addIndex.name,
+        addIndex.description,
+        tokenAllocations,
+        collectorDetails,
+        parseFloat(addIndex.feeAmount),
+        signTransaction
+      );
 
-    // const txHash = await createIndexContract(
-    //   program,
-    //   connection,
-    //   publicKey,
-    //   mintKeypair,
-    //   addIndex.name,
-    //   addIndex.description,
-    //   tokenAllocations,
-    //   collectorDetails,
-    //   parseFloat(addIndex.feeAmount),
-    //   signTransaction
-    // );
+      console.log("Transaction Hash:", txHash);
 
-    // console.log("Transaction Hash:", txHash);
+      const mintPublickey = mintKeypair.publicKey;
+      const mintKeySecret = mintKeypair.secretKey;
+      await createIndexToDB({
+        ...addIndex,
+        coins,
+        faq,
+        mintPublickey,
+        mintKeySecret,
+        tokenAllocations,
+        collectorDetails,
+      });
 
-    const mintPublickey = mintKeypair.publicKey;
-    const mintKeySecret = Buffer.from(mintKeypair.secretKey).toString("base64");
-    await createIndex({
-      ...addIndex,
-      coins,
-      faq,
-      mintPublickey,
-      mintKeySecret,
-      tokenAllocations,
-      collectorDetails,
-    });
-
-    // Clear the form and close the modal
-    setAddIndex(initialIndex);
-    setFileList([]);
-    setSelectedOptions([]);
-    setFaq(questions.map((question) => ({ question, answer: "" })));
-    setIsModalOpen(false);
+      // Clear the form and close the modal
+      setAddIndex(initialIndex);
+      setFileList([]);
+      setSelectedOptions([]);
+      setFaq(questions.map((question) => ({ question, answer: "" })));
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error submitting index:", error);
+    }
   };
 
   const handleFileRemove = (file: UploadFile) => {
     console.log("Removing file:", file);
-    // Clear the file from the state
     setAddIndex((prev) => ({ ...prev, file: "" }));
     setFileList([]);
   };
@@ -188,21 +187,19 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const handleFile = (info: UploadChangeParam<UploadFile>) => {
     setFileList(info.fileList);
     setAddIndex((prev) => ({ ...prev, file: info?.file as any }));
-    // Get the latest uploaded file (info.file)
+
     if (info.file.status === "done") {
       console.log("File uploaded successfully:", info.file.originFileObj);
-      // setAddIndex((prev) => ({ ...prev, file: info.file.originFileObj as any }));
-      // You can process the uploaded file here
     } else if (info.file.status === "error") {
       console.error("File upload failed:", info.file);
     }
   };
+
   console.log(addIndex, optionTags);
   const isUploaded = fileList.length > 0;
 
   return (
     <div>
-      {/* Modal structure */}
       <StyledModal
         open={isModalOpen}
         onCancel={handleCancel}
@@ -224,13 +221,12 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
           background: "#1C1C1C1A",
         }}
       >
-        {/* Upload Section */}
         <StyledUpload
           isUploaded={isUploaded}
           fileList={fileList}
           listType="picture"
-          multiple={false} // Allow single file upload
-          beforeUpload={() => false} // Prevent auto upload
+          multiple={false}
+          beforeUpload={() => false}
           onChange={handleFile}
           onRemove={handleFileRemove}
         >
@@ -240,74 +236,63 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
           </Flex>
         </StyledUpload>
 
-        {/* Input Fields */}
-        <div style={{ marginTop: 16 }}>
+        <StyledInput
+          placeholder="Coin Name"
+          value={addIndex.name}
+          showCount
+          maxLength={20}
+          name="name"
+          onChange={handleChange}
+        />
+
+        <StyledTextArea
+          style={{ resize: "none" }}
+          value={addIndex.description}
+          showCount
+          rows={4}
+          maxLength={200}
+          placeholder="Description"
+          name="description"
+          onChange={handleChange}
+        />
+
+        <CustomSelect
+          setSelectedOptions={setSelectedOptions}
+          selectedOptions={selectedOptions}
+          setOptions={setOptions}
+          options={options}
+        />
+
+        <Select
+          setSelectedOptions={setSelectedOptionTags}
+          selectedOptions={selectedOptionTags}
+          setOptions={setOptionTags}
+          options={optionTags}
+        />
+
+        {faq.map((item, index) => (
           <StyledInput
-            placeholder="Coin Name"
-            value={addIndex.name}
+            key={index}
+            placeholder={item.question}
+            value={item.answer}
             showCount
             maxLength={20}
-            name="name"
-            onChange={handleChange}
+            name={item.question}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              handleFaqChange(e, index)
+            }
           />
-        </div>
+        ))}
 
-        <div style={{ marginTop: 16 }}>
-          <StyledTextArea
-            style={{ resize: "none" }}
-            value={addIndex.description}
-            showCount
-            rows={4}
-            maxLength={200}
-            placeholder="Description"
-            name="description"
-            onChange={handleChange}
-          />
-        </div>
-
-        <div style={{ marginTop: 16 }}>
-          <CustomSelect
-            setSelectedOptions={setSelectedOptions}
-            selectedOptions={selectedOptions}
-            setOptions={setOptions}
-            options={options}
-          />
-        </div>
-        <div style={{ marginTop: 16 }}>
-          <Select
-            setSelectedOptions={setSelectedOptionTags}
-            selectedOptions={selectedOptionTags}
-            setOptions={setOptionTags}
-            options={optionTags}
-          />
-        </div>
-        <>
-          {faq.map((item, index) => (
-            <div style={{ marginTop: 16 }}>
-              <StyledInput
-                placeholder={item.question}
-                value={item.answer}
-                showCount
-                maxLength={20}
-                name={item.question}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleFaqChange(e, index)
-                }
-              />
-            </div>
-          ))}
-        </>
-        <div style={{ marginTop: 16 }}>
-          <StyledInput
-            placeholder="Fees Amount"
-            type={"number"}
-            value={addIndex.feeAmount}
-            showCount
-            maxLength={20}
-            name="feeAmount"
-            onChange={handleChange}
-          />
-        </div>
+        <StyledInput
+          placeholder="Fees Amount"
+          type={"number"}
+          value={addIndex.feeAmount}
+          showCount
+          maxLength={20}
+          name="feeAmount"
+          onChange={handleChange}
+        />
       </StyledModal>
     </div>
   );
