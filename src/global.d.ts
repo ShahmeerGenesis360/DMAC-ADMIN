@@ -39,8 +39,10 @@ declare global {
     imageUrl?: string;
     visitCount?: number;
     description: string;
+    category: string;
     file: any;
     faq: IFaq[] | [];
+    collectorDetail: WalletOption[] | [];
   }
 
   interface IFaq {
