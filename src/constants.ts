@@ -101,7 +101,7 @@ export const allocationList = [
   {
     label: "FWOG",
     value: "A8C3xuqscfmyLrte3VmTqrAq8kgMASius9AFNANwpump",
-    icon: '/fwog.svg',
+    icon: "/fwog.svg",
     proportion: 0,
   },
   {
@@ -159,3 +159,5 @@ export const allocationList = [
     proportion: 0,
   },
 ];
+
+export const categoriesOption = ["Meme", "Layer 1/2", "Depin", "AI"];
