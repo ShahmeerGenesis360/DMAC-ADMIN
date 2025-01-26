@@ -136,6 +136,10 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       collector: new PublicKey(item.collector),
       weight: new anchor.BN(item.weight),
     }));
+    const collectorDetailApi = optionTags.map((item)=>({
+      collector: item.collector,
+      weight: item.weight,
+    }))
 
     console.log("Submitting index...");
 
@@ -153,8 +157,9 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         signTransaction
       );
 
-      console.log("Transaction Hash:", txHash);
+      // console.log("Transaction Hash:", txHash);
 
+      console.log(addIndex.feeAmount, "feeAmount")
       const mintPublickey = mintKeypair.publicKey;
       const mintKeySecret = mintKeypair.secretKey;
       await createIndexToDB({
@@ -164,7 +169,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         mintPublickey,
         mintKeySecret,
         tokenAllocations,
-        collectorDetails,
+        collectorDetailApi,
       });
 
       // Clear the form and close the modal

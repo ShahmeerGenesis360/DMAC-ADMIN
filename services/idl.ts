@@ -6,7 +6,7 @@ import { clusterApiUrl, Connection } from "@solana/web3.js";
 // Store Program instance outside React state
 
 export const useProgram = () => {
-  const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+  const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=d91bf63d-1cdb-416a-9fb2-ad1c273540fc", "confirmed");
   const wallet = useAnchorWallet();
 
   if (!wallet) {

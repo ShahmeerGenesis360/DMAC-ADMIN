@@ -40,8 +40,8 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
     JSON.stringify(groupIndex.tokenAllocations)
   );
   formData.append(
-    "collectorDetails",
-    JSON.stringify(groupIndex.collectorDetails)
+    "collectorDetailApi",
+    JSON.stringify(groupIndex.collectorDetailApi)
   );
   formData.append(
     "feeAmount",
