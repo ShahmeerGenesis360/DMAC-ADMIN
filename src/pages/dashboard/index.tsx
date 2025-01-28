@@ -34,7 +34,7 @@ import EditIndexModal from "../../components/modal/editIndex";
 import { transactionChart, userCharts, userDataSet } from '../../constants';
 import { BarChart } from "../../components/Graph";
 import { getAllIndex } from "../../services/indexGroup";
-import { userChart } from "../../services/charts";
+import { buySellChart, feesChart, userChart } from "../../services/charts";
 
 const { Title: AntdTitle } = Typography;
 const { Option } = Select;
@@ -198,6 +198,8 @@ const Dashboard = () => {
   const [currentIndex, setCurrentIndex] = useState({});
   const [indexes, setIndexes] = useState<IGroupCoin[] | []>([]);
   const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [transactionData, setTransactionData] = useState<any | null>(null);
+  const [feesData, setFeesData] = useState<any | null>(null);
   const [selectedMonth, setSelectedMonth] = useState('');
   const [usersInfo, setUsersInfo] = useState<any>(null)
 
@@ -220,15 +222,23 @@ const Dashboard = () => {
       // setMonths(Object.keys(groupedData)); // Set available months for selection
       const monthLabels = Object.keys(groupedData);
       const monthTotals = Object.values(groupedData);
-      console.log('totalUsers', latestMonth)
+      console.log('totalUsers', latestMonth, monthTotals)
       setUsersInfo({ totalUsers, latestMonth, latestMonthCount })
+      const formattedLabels = monthLabels.map(label => {
+        const [year, month] = label.split("-"); // Split into year and month
+        const date = new Date(year, month - 1); // Create a Date object
+        return `${date.toLocaleString('en-US', { month: 'short' })} ${year}`; // Format as "Jan 2025"
+      });
 
       setChartData({
-        labels: monthLabels, // Months as labels
+        labels: [
+          ...formattedLabels,
+            `${new Date().toLocaleString('en-US', { month: 'short' })} ${new Date().getFullYear()}`
+        ], // Months as labels
         datasets: [
           {
             label: 'Total Users',
-            data: monthTotals, // Total user counts for each month
+            data: [...monthTotals, 0], // Total user counts for each month
             ...userDataSet,
           },
         ],
@@ -236,8 +246,68 @@ const Dashboard = () => {
     };
 
     fetchData();
+    getTransaction();
+    getFees();
   }, []);
+  // transactionChart
 
+  const getTransaction = async () => {
+    const data = await buySellChart('daily');
+    const formatData = (transactions: any, key: "totaldeposit" | "totalwithdrawl") => {
+      return transactions?.map((txn: any) => ({
+        x: new Date(txn.startDate),
+        y: txn[key],
+      }));
+    };
+
+    setTransactionData({
+      labels: data?.map((item: any) => item.startDate),
+      datasets: [
+        {
+          label: "Buy",
+          data: formatData(data, "totaldeposit"),
+          fill: false,
+          tension: 0,
+          borderColor: "#78DA89",
+          pointBackgroundColor: "#78DA89",
+        },
+        {
+          label: "Sell",
+          data: formatData(data, "totalwithdrawl"),
+          fill: false,
+          borderColor: "#E87975",
+          pointBackgroundColor: "#E87975",
+          tension: 0,
+        },
+      ],
+    });
+  }
+
+  const getFees = async () => {
+    const data = await feesChart();
+    const formatData = (transactions: any, key: "totalAmount") => {
+      return transactions?.map((txn: any) => ({
+        x: new Date(txn.startDate),
+        y: txn[key],
+      }));
+    };
+
+    setFeesData({
+      labels: data?.map((item: any) => item.startDate),
+      datasets: [
+        {
+          label: "Buy",
+          data: formatData(data, "totalAmount"),
+          backgroundColor: "#78DA89",
+          borderRadius: 2,
+          barPercentage: 0.4,
+          categoryPercentage: 0.4,
+          borderColor: "#78DA89",
+          pointBackgroundColor: "#78DA89",
+        }
+      ],
+    });
+  }
   console.log(chartData, "chartData")
 
 
@@ -298,7 +368,10 @@ const Dashboard = () => {
           <AntdTitle level={4} style={{ color: '#fff' }}>
             Transactions in past week <span style={{ color: '#4caf50' }}>Jan</span>
           </AntdTitle>
-          <LineChart legend={true} data={transactionChart} />
+          {
+            transactionData &&
+            <LineChart legend={true} data={transactionData} />
+          }
         </StyledCard>
       </DashboardContainer>
 
@@ -311,9 +384,12 @@ const Dashboard = () => {
           </StyledSelect>
         </CardHeader>
         <AntdTitle level={4} style={{ color: '#4caf50' }}>
-          4,556 <span style={{ fontSize: 12, color: '#7cf97c' }}>+5.2%</span>
+          {feesData && Math.floor(feesData?.datasets[0]?.data?.reduce((acc: number, value: any) => acc + value.y, 0))} <span style={{ fontSize: 12, color: '#7cf97c' }}>+5.2%</span>
         </AntdTitle>
-        <BarChart />
+        {
+          feesData &&
+          <BarChart data={feesData || {}} />
+        }
       </StyledCard>
       <SearchContainer>
         <Title>Indexes</Title>
