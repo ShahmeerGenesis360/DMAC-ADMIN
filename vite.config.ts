@@ -1,16 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import dotenv from 'dotenv';
-import svgr from 'vite-plugin-svgr';
+import dotenv from "dotenv";
+import { nodePolyfills } from "vite-plugin-node-polyfills";import svgr from 'vite-plugin-svgr';
 
 
 dotenv.config();
 
 export default defineConfig({
-  plugins: [react(), svgr()],
+  plugins: [react(), nodePolyfills(), svgr()],
   define: {
     // Inject environment variables into the client
-    'process.env': JSON.stringify(process.env),
+    "process.env": JSON.stringify(process.env),
   },
   base: "/", // Use './' for relative paths if deploying to a subdirectory
   build: {

@@ -36,3 +36,43 @@ export const userChart = async (type: string) => {
     throw error;
   }
 };
+
+export const buySellChart = async (type: string):Promise<any> => {
+  const token = await getAuthToken();
+  try {
+    const response = await apiRequest<any>(
+      `/transaction/transaction-stats?type=${type}`,
+      "GET",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log({response})
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const feesChart = async ():Promise<any> => {
+  const token = await getAuthToken();
+  try {
+    const response = await apiRequest<any>(
+      `/transaction/transaction-monthly`,
+      "GET",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log({response})
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};

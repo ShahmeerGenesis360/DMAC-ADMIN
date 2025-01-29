@@ -14,13 +14,18 @@ import Button from "../../button";
 import CustomSelect from "../../dropdown";
 import { UploadChangeParam, UploadFile } from "antd/es/upload";
 import { allocationList } from "../../../constants";
-import { createIndex } from "../../../services/indexGroup";
-import { createIndex as createIndexContract } from "../../../../services/contract";
-import { useProgram } from "../../../../services/idl";
-import { PublicKey, Keypair } from "@solana/web3.js";
+import { createIndex as createIndexToDB } from "../../../services/indexGroup"; // DB Function
+import { createIndex as createIndexContract } from "../../../../services/contract"; // On-chain Function
+import { useProgram } from "../../../../services/idl"; // Custom hook for Anchor program
+import { PublicKey, Keypair, Connection } from "@solana/web3.js";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Select from "../../select";
+import { Select as SelectOptions } from 'antd'
 
+
+import { StyledSelect } from "../../select/styles";
+import { useWallet } from "@solana/wallet-adapter-react";
+import CategorySelect from "../../category";
 interface IAddIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,17 +35,20 @@ const initialIndex = {
   name: "",
   description: "",
   file: "",
+  feeAmount: "",
+  category: ""
 };
 
 const questions = ["Overview", "Maintenance", "Methodology", "Risks", "Fees"];
+
 const AddIndexModal: React.FC<IAddIndexModal> = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
-  // const { program, provider } = useProgram();
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+  const { publicKey, signTransaction } = useWallet(); // Wallet context
+  const { program, connection } = useProgram() || {}; // Use the custom hook
+  const handleCancel = () => setIsModalOpen(false);
+
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [faq, setFaq] = useState(
     questions.map((question) => ({ question, answer: "" }))
@@ -49,19 +57,18 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [addIndex, setAddIndex] = useState(initialIndex);
   const [options, setOptions] = useState<Option[]>(allocationList);
-  const [selectedOptionTags, setSelectedOptionTags] = useState<string[]>([]);
-  const [optionTags, setOptionTags] = useState<string[] | []>([]);
-
-  const [mintKeypair] = useState(Keypair.generate());
-
-  // const handleOpenModal = () => {
-  //   setIsModalOpen(true);
-  // };
+  const [selectedOptionTags, setSelectedOptionTags] = useState<string[] | []>(
+    []
+  );
+  const [optionTags, setOptionTags] = useState<WalletOption[] | []>([]);
+  const keypair = Keypair.generate(); // Generate mint keypair
+  const [mintKeypair] = useState(keypair);
 
   useEffect(() => {
     const isFormValid =
       addIndex.name.trim() !== "" &&
       addIndex.description.trim() !== "" &&
+      addIndex.category.trim() !== "" &&
       faq.every((item) => item.answer.trim() !== "") &&
       selectedOptions.length > 0 &&
       addIndex.file &&
@@ -93,9 +100,14 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   };
 
   const handleSubmit = async () => {
-    if (!program || !provider) {
-      throw new Error("Program or provider not initialized.");
+    if (!program || !connection || !publicKey || !signTransaction) {
+      console.warn(
+        "Program, connection, wallet, or signTransaction not ready."
+      );
+      return;
     }
+
+    // Filter selected tokens and prepare data
     const selectedTokens = options.filter((item) =>
       selectedOptions.includes(item.value)
     );
@@ -107,7 +119,6 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       weight: item.proportion, // For on-chain
     }));
 
-    // Step 2: Prepare data for DB and on-chain
     const coins = tokenData.map(({ coinName, address, proportion }) => ({
       coinName,
       address,
@@ -126,30 +137,59 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       throw new Error("The total allocation percentage must sum up to 100%.");
     }
 
-    // const txHash = await createIndexContract(
-    //   program,
-    //   provider,
-    //   mintKeypair,
-    //   addIndex.name,
-    //   addIndex.description,
-    //   tokenAllocations
-    // );
+    const collectorDetails = optionTags.map((item) => ({
+      collector: new PublicKey(item.collector),
+      weight: new anchor.BN(item.weight),
+    }));
+    const collectorDetailApi = optionTags.map((item)=>({
+      collector: item.collector,
+      weight: item.weight,
+    }))
 
-    // console.log("Transaction Hash:", txHash);
+    console.log("Submitting index...");
 
-    await createIndex({ ...addIndex, coins, faq });
+    try {
+      const txHash = await createIndexContract(
+        program,
+        connection,
+        publicKey,
+        mintKeypair,
+        addIndex.name,
+        addIndex.description,
+        tokenAllocations,
+        collectorDetails,
+        parseFloat(addIndex.feeAmount),
+        signTransaction
+      );
 
-    // Clear the form and close the modal
-    setAddIndex(initialIndex);
-    setFileList([]);
-    setSelectedOptions([]);
-    setFaq(questions.map((question) => ({ question, answer: "" })));
-    setIsModalOpen(false);
+      // console.log("Transaction Hash:", txHash);
+
+      console.log(addIndex.feeAmount, "feeAmount")
+      const mintPublickey = mintKeypair.publicKey;
+      const mintKeySecret = mintKeypair.secretKey;
+      await createIndexToDB({
+        ...addIndex,
+        coins,
+        faq,
+        mintPublickey,
+        mintKeySecret,
+        tokenAllocations,
+        collectorDetailApi,
+      });
+
+      // Clear the form and close the modal
+      setAddIndex(initialIndex);
+      setFileList([]);
+      setSelectedOptions([]);
+      setFaq(questions.map((question) => ({ question, answer: "" })));
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error submitting index:", error);
+    }
   };
 
   const handleFileRemove = (file: UploadFile) => {
     console.log("Removing file:", file);
-    // Clear the file from the state
     setAddIndex((prev) => ({ ...prev, file: "" }));
     setFileList([]);
   };
@@ -157,21 +197,19 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const handleFile = (info: UploadChangeParam<UploadFile>) => {
     setFileList(info.fileList);
     setAddIndex((prev) => ({ ...prev, file: info?.file as any }));
-    // Get the latest uploaded file (info.file)
+
     if (info.file.status === "done") {
       console.log("File uploaded successfully:", info.file.originFileObj);
-      // setAddIndex((prev) => ({ ...prev, file: info.file.originFileObj as any }));
-      // You can process the uploaded file here
     } else if (info.file.status === "error") {
       console.error("File upload failed:", info.file);
     }
   };
 
+  console.log(addIndex, optionTags);
   const isUploaded = fileList.length > 0;
 
   return (
     <div>
-      {/* Modal structure */}
       <StyledModal
         open={isModalOpen}
         onCancel={handleCancel}
@@ -193,13 +231,12 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
           background: "#1C1C1C1A",
         }}
       >
-        {/* Upload Section */}
         <StyledUpload
           isUploaded={isUploaded}
           fileList={fileList}
           listType="picture"
-          multiple={false} // Allow single file upload
-          beforeUpload={() => false} // Prevent auto upload
+          multiple={false}
+          beforeUpload={() => false}
           onChange={handleFile}
           onRemove={handleFileRemove}
         >
@@ -247,7 +284,12 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
             setSelectedOptions={setSelectedOptionTags}
             selectedOptions={selectedOptionTags}
             setOptions={setOptionTags}
-            options={optionTags} />
+            options={optionTags}
+          />
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <CategorySelect setSelectedOptions={setAddIndex}
+            selectedOptions={addIndex.category} />
         </div>
         <>
           {faq.map((item, index) => (
@@ -265,6 +307,17 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
             </div>
           ))}
         </>
+        <div style={{ marginTop: 16 }}>
+          <StyledInput
+            placeholder="Fees Amount"
+            type={"number"}
+            value={addIndex.feeAmount}
+            showCount
+            maxLength={20}
+            name="feeAmount"
+            onChange={handleChange}
+          />
+        </div>
       </StyledModal>
     </div>
   );

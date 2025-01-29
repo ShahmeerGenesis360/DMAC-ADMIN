@@ -98,8 +98,14 @@ const LineChart = ({ data, legend = false }: IProps) => {
                 ticks: {
                     color: "#fff",
                     font: { family: "Poppins", size: 12 },
-                    callback: (value: number | string) => `$${value}`,
-                    stepSize: 20,
+                    callback: (value: number) => {
+                        if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`; // Convert to billions
+                        if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`; // Convert to millions
+                        if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}k`; // Convert to thousands
+                        return `$${value.toFixed(2)}`; // Default for smaller numbers
+                    },
+                    stepSize: 4,
+                    maxTicksLimit: 3,
                 },
                 grid: {
                     color: "#B1B1B1",

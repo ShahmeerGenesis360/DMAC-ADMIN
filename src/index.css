@@ -6,3 +6,7 @@
   box-sizing: border-box;
   font-family: "Poppins", serif;
 }
+
+.rc-virtual-list-holder-inner, .rc-virtual-list {
+  display: none !important;
+}

@@ -6,7 +6,7 @@ import {
   getAssociatedTokenAddressSync,
   TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
-import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 import { getIndexInfoPda, getProgramState } from "./utils";
 import {
   PYTH_NETWORK_PROGRAM_ID,
@@ -17,65 +17,130 @@ import { PublicKey } from "@solana/web3.js";
 
 export async function createIndex(
   program: Program,
-  provider: anchor.Provider,
+  connection: anchor.web3.Connection,
+  walletPublicKey: PublicKey,
   mintKeypair: Keypair,
   indexName: string,
   indexDescription: string,
-  tokenAllocations: { mint: PublicKey; weight: number }[]
+  tokenAllocations: { mint: PublicKey; weight: anchor.BN }[],
+  collectorDetails: { collector: PublicKey; weight: anchor.BN }[],
+  feeAmount: number,
+  signTransaction: (
+    transaction: anchor.web3.Transaction
+  ) => Promise<anchor.web3.Transaction>
 ) {
-  const mintPublicKey = mintKeypair.publicKey;
+  console.log("----------------------");
 
   const adminKeypair = Keypair.fromSecretKey(
     bs58.decode(NEXT_PUBLIC_ADMIN_PK as string)
   );
 
-  const adminTokenAccount = getAssociatedTokenAddressSync(
-    mintPublicKey,
-    adminKeypair,
-    false,
-    TOKEN_2022_PROGRAM_ID
-  );
+  const { blockhash } = await connection.getLatestBlockhash();
+  console.log("Blockhash:", blockhash);
+
+  // --- Convert Weights in Token Allocations ---
+  const scaledTokenAllocations = tokenAllocations.map((allocation) => ({
+    mint: allocation.mint,
+    weight: allocation.weight.mul(new anchor.BN(100)), // Scale the weight by 100
+  }));
+
+  console.log("Scaled Token Allocations:");
+  scaledTokenAllocations.forEach((allocation, index) => {
+    console.log(
+      `Token ${
+        index + 1
+      }: Mint = ${allocation.mint.toString()}, Weight = ${allocation.weight.toString()}`
+    );
+  });
+
+  const scaledCollectorDetails = collectorDetails.map((collector) => ({
+    collector: collector.collector,
+    weight: collector.weight.mul(new anchor.BN(100)), // Scale collector weights by 100 as well
+  }));
+
+  console.log("Scaled Collector Details:");
+  scaledCollectorDetails.forEach((collector, index) => {
+    console.log(
+      `Collector ${
+        index + 1
+      }: PublicKey = ${collector.collector.toString()}, Weight = ${collector.weight.toString()}`
+    );
+  });
+
+  // --- Single Transaction Object ---
+  const transaction = new anchor.web3.Transaction({
+    feePayer: walletPublicKey,
+    recentBlockhash: blockhash,
+  });
 
   const programState = getProgramState();
 
-  const accounts = {
-    programState: programState,
-    admin: adminKeypair.publicKey,
-    indexInfo: getIndexInfoPda(mintPublicKey),
-    authority: mintPublicKey,
-    indexMint: mintPublicKey,
-    adminTokenAccount: adminTokenAccount,
-    priceUpdate: PYTH_NETWORK_PROGRAM_ID,
-    tokenProgram: TOKEN_2022_PROGRAM_ID,
-    systemProgram: SYSTEM_PROGRAM_ID,
-    associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-  };
+  console.log("Program State:", programState);
 
-  // Convert weights to anchor's BN format
-  const tokenAllocationsBN = tokenAllocations.map((allocation) => ({
-    mint: allocation.mint,
-    weight: new anchor.BN(allocation.weight),
-  }));
+  // --- Instruction 1: Create Index ---
+  const createIndexInstruction = await program.methods
+    .createIndex(
+      indexName,
+      indexDescription,
+      scaledTokenAllocations, // Pass scaled token allocations
+      scaledCollectorDetails, // Pass scaled collector details
+      new anchor.BN(feeAmount * anchor.web3.LAMPORTS_PER_SOL)
+    )
+    .accounts({
+      programState: programState,
+      admin: walletPublicKey,
+      indexInfo: getIndexInfoPda(mintKeypair.publicKey),
+      authority: mintKeypair.publicKey,
+      indexMint: mintKeypair.publicKey,
+      adminTokenAccount: getAssociatedTokenAddressSync(
+        mintKeypair.publicKey,
+        adminKeypair.publicKey,
+        false,
+        TOKEN_2022_PROGRAM_ID
+      ),
+      priceUpdate: PYTH_NETWORK_PROGRAM_ID,
+      tokenProgram: TOKEN_2022_PROGRAM_ID,
+      systemProgram: SYSTEM_PROGRAM_ID,
+      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+    })
+    .instruction();
 
-  // Ensure total weight sums to 100%
-  const totalWeight = tokenAllocations.reduce(
-    (sum, allocation) => sum + allocation.weight,
-    0
+  transaction.add(createIndexInstruction);
+
+  // --- Instruction 2: Mint Index ---
+  const mintIndexInstruction = await program.methods
+    .mintIndex()
+    .accounts({
+      programState: programState,
+      admin: walletPublicKey,
+      indexInfo: getIndexInfoPda(mintKeypair.publicKey),
+      authority: mintKeypair.publicKey,
+      indexMint: mintKeypair.publicKey,
+      adminTokenAccount: getAssociatedTokenAddressSync(
+        mintKeypair.publicKey,
+        walletPublicKey,
+        false,
+        TOKEN_2022_PROGRAM_ID
+      ),
+      tokenProgram: TOKEN_2022_PROGRAM_ID,
+      systemProgram: SYSTEM_PROGRAM_ID,
+      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+    })
+    .instruction();
+
+  transaction.add(mintIndexInstruction);
+
+  // Partially sign the transaction with the mint keypair
+  transaction.partialSign(mintKeypair);
+
+  // Use the wallet to sign the combined transaction
+  const signedTransaction = await signTransaction(transaction);
+
+  // Send the signed transaction to the network
+  const txHash = await connection.sendRawTransaction(
+    signedTransaction.serialize()
   );
-  if (totalWeight !== 100) {
-    throw new Error("The total allocation percentage must sum up to 100%.");
-  }
 
-  const txHash = await program.rpc.createIndex(
-    indexName,
-    indexDescription,
-    tokenAllocationsBN,
-    new anchor.BN(1 * LAMPORTS_PER_SOL),
-    {
-      accounts: accounts,
-      signers: [mintKeypair, adminKeypair],
-    }
-  );
-
+  console.log("Transaction Hash:", txHash);
   return txHash;
 }

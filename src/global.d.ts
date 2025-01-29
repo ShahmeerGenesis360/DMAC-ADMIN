@@ -39,8 +39,10 @@ declare global {
     imageUrl?: string;
     visitCount?: number;
     description: string;
+    category: string;
     file: any;
     faq: IFaq[] | [];
+    collectorDetail?: WalletOption[] | [];
   }
 
   interface IFaq {
@@ -53,5 +55,9 @@ declare global {
     label: string;
     icon: string;
     proportion: number;
+  }
+  interface WalletOption {
+    collector: string;
+    weight: number;
   }
 }

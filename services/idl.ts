@@ -1,29 +1,26 @@
-import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor";
-import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import * as IDL from "../src/constants/dmac_contract.json";
-import { getProgramId } from "../services/utils";
-import type { DmacContracts } from "../src/constants/dmac_contract";
+import { Program, AnchorProvider, setProvider, Idl } from "@coral-xyz/anchor";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import IDL from "../src/constants/dmac_contract.json";
+import { clusterApiUrl, Connection } from "@solana/web3.js";
+
+// Store Program instance outside React state
 
 export const useProgram = () => {
-  const { connection } = useConnection();
-
+  const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=d91bf63d-1cdb-416a-9fb2-ad1c273540fc", "confirmed");
   const wallet = useAnchorWallet();
 
-  const programId = getProgramId();
-
   if (!wallet) {
-    throw new Error("Wallet not connected!");
+    console.warn("Wallet not connected yet.");
+    return null;
   }
 
-  const provider = new AnchorProvider(
-    connection,
-    wallet,
-    AnchorProvider.defaultOptions()
-  );
+  const provider = new AnchorProvider(connection, wallet, {
+    commitment: "confirmed",
+  });
 
   setProvider(provider);
 
-  const program = new Program(IDL as DmacContracts, provider);
+  const program = new Program(IDL as Idl, provider);
 
-  return { connection, provider, program, programId };
+  return { connection, provider, program };
 };
