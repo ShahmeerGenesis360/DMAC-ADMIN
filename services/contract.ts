@@ -29,10 +29,43 @@ export async function createIndex(
     transaction: anchor.web3.Transaction
   ) => Promise<anchor.web3.Transaction>
 ) {
+  console.log("----------------------");
+
   const adminKeypair = Keypair.fromSecretKey(
     bs58.decode(NEXT_PUBLIC_ADMIN_PK as string)
   );
+
   const { blockhash } = await connection.getLatestBlockhash();
+  console.log("Blockhash:", blockhash);
+
+  // --- Convert Weights in Token Allocations ---
+  const scaledTokenAllocations = tokenAllocations.map((allocation) => ({
+    mint: allocation.mint,
+    weight: allocation.weight.mul(new anchor.BN(100)), // Scale the weight by 100
+  }));
+
+  console.log("Scaled Token Allocations:");
+  scaledTokenAllocations.forEach((allocation, index) => {
+    console.log(
+      `Token ${
+        index + 1
+      }: Mint = ${allocation.mint.toString()}, Weight = ${allocation.weight.toString()}`
+    );
+  });
+
+  const scaledCollectorDetails = collectorDetails.map((collector) => ({
+    collector: collector.collector,
+    weight: collector.weight.mul(new anchor.BN(100)), // Scale collector weights by 100 as well
+  }));
+
+  console.log("Scaled Collector Details:");
+  scaledCollectorDetails.forEach((collector, index) => {
+    console.log(
+      `Collector ${
+        index + 1
+      }: PublicKey = ${collector.collector.toString()}, Weight = ${collector.weight.toString()}`
+    );
+  });
 
   // --- Single Transaction Object ---
   const transaction = new anchor.web3.Transaction({
@@ -40,17 +73,21 @@ export async function createIndex(
     recentBlockhash: blockhash,
   });
 
+  const programState = getProgramState();
+
+  console.log("Program State:", programState);
+
   // --- Instruction 1: Create Index ---
   const createIndexInstruction = await program.methods
     .createIndex(
       indexName,
       indexDescription,
-      tokenAllocations,
-      collectorDetails,
+      scaledTokenAllocations, // Pass scaled token allocations
+      scaledCollectorDetails, // Pass scaled collector details
       new anchor.BN(feeAmount * anchor.web3.LAMPORTS_PER_SOL)
     )
     .accounts({
-      programState: getProgramState(),
+      programState: programState,
       admin: walletPublicKey,
       indexInfo: getIndexInfoPda(mintKeypair.publicKey),
       authority: mintKeypair.publicKey,
@@ -74,7 +111,7 @@ export async function createIndex(
   const mintIndexInstruction = await program.methods
     .mintIndex()
     .accounts({
-      programState: getProgramState(),
+      programState: programState,
       admin: walletPublicKey,
       indexInfo: getIndexInfoPda(mintKeypair.publicKey),
       authority: mintKeypair.publicKey,

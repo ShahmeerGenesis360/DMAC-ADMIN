@@ -42,7 +42,7 @@ declare global {
     category: string;
     file: any;
     faq: IFaq[] | [];
-    collectorDetail: WalletOption[] | [];
+    collectorDetail?: WalletOption[] | [];
   }
 
   interface IFaq {
