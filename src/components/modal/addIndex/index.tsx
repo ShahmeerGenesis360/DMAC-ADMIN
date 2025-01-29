@@ -161,7 +161,9 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
 
       console.log(addIndex.feeAmount, "feeAmount")
       const mintPublickey = mintKeypair.publicKey;
-      const mintKeySecret = mintKeypair.secretKey;
+      const mintKeySecret = Buffer.from(mintKeypair.secretKey).toString(
+        "base64"
+      );
       await createIndexToDB({
         ...addIndex,
         coins,
