@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Dropdown, Flex, MenuProps, Space } from "antd";
 import styled from "styled-components";
 import MonkeyIcon from "../../assets/monkey.svg";
@@ -31,19 +31,36 @@ import {
 
 import { Card, Typography, Select } from "antd";
 import EditIndexModal from "../../components/modal/editIndex";
-import { formatNumber, transactionChart, userCharts, userDataSet } from '../../constants';
+import {
+  formatNumber,
+  transactionChart,
+  userCharts,
+  userDataSet,
+} from "../../constants";
 import { BarChart } from "../../components/Graph";
-import { getAllIndex } from "../../services/indexGroup";
+import {
+  getAllIndex,
+  getAllIndexWithPagination,
+} from "../../services/indexGroup";
 import { buySellChart, feesChart, userChart } from "../../services/charts";
 import { socket } from "../../socket";
 
 const { Title: AntdTitle } = Typography;
 const { Option } = Select;
 
+// interface IProps {
+//   data: IGroupCoin[] | [];
+//   message?: string;
+//   status: boolean;
+// }
 
 interface IProps {
-  data: IGroupCoin[] | [];
-  message?: string;
+  data: {
+    currentPage: number;
+    totalPages: number;
+    total: number;
+    index: { index: IGroupCoin[] | [] }[];
+  };
   status: boolean;
 }
 
@@ -62,7 +79,6 @@ interface ChartData {
     borderWidth: number;
   }[];
 }
-
 
 // Styled Components for Cards
 const DashboardContainer = styled.div`
@@ -129,15 +145,19 @@ const columns = (editIndex: Function) => [
     title: "Index",
     dataIndex: "name",
     key: "name",
-    render: (text: string, record: IGroupCoin) => (
+    render: (_: any, record: { index: IGroupCoin }) => (
       <IndexName>
         <ImageBox
           height={34}
           width={34}
           style={{ borderRadius: 50 }}
-          src={record.imageUrl ? `${BASE_URL}/uploads/${record?.imageUrl}` : MonkeyIcon}
+          src={
+            record.index.imageUrl
+              ? `${BASE_URL}/uploads/${record?.index.imageUrl}`
+              : MonkeyIcon
+          }
         />
-        <IndexText>{text}</IndexText>
+        <IndexText>{record.index.name}</IndexText>
       </IndexName>
     ),
   },
@@ -145,22 +165,19 @@ const columns = (editIndex: Function) => [
     title: "Rank",
     dataIndex: "rank",
     key: "rank",
-    render: () => ("Loreum")
+    render: () => "Loreum",
   },
   {
     title: "Price",
     dataIndex: "price",
     key: "price",
-    render: (text: number) => (
-      <IndexText>
-        {text.toFixed(2)}
-      </IndexText>)
+    render: (text: number) => <IndexText>{text.toFixed(2)}</IndexText>,
   },
   {
     title: "TVL",
     dataIndex: "tvl",
-    key: "tvl",
-    render: () => ("Loreum")
+    key: "indexWorth",
+    render: () => "Loreum",
   },
   {
     title: "Holders",
@@ -168,20 +185,22 @@ const columns = (editIndex: Function) => [
     key: "holder",
     render: (_: any, record: any) => (
       <IndexText>
-        {record?.totalBuy && formatNumber(record?.totalBuy - record?.totalSell)}
-      </IndexText>)
+        {record.buyAmount && formatNumber(record.buyAmount)}
+        {/* {record?.totalBuy && formatNumber(record?.totalBuy - record?.totalSell)} */}
+      </IndexText>
+    ),
   },
   {
     title: "Address",
     dataIndex: "_id",
     key: "_id",
-    render: (text: string, record: object) => {
+    render: (_: any, record: { index: IGroupCoin }) => {
       return (
         <Flex justify="space-between">
-          {text}
+          {record.index._id}
           <Space size="middle">
             <Dropdown
-              menu={{ items: items(editIndex, record) }}
+              menu={{ items: items(editIndex, record.index) }}
               overlayClassName="custom-dropdown"
             >
               <MoreOutlined style={{ fontSize: "20px", cursor: "pointer" }} />
@@ -196,31 +215,44 @@ const columns = (editIndex: Function) => [
 
 const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalIndexes, setTotalIndexes] = useState(0);
+  const [searchValue, setSearchValue] = useState("");
   const [openmodal, setOpenModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState({});
-  const [indexes, setIndexes] = useState<IGroupCoin[] | []>([]);
+  const [indexes, setIndexes] = useState<any[] | []>([]);
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [transactionData, setTransactionData] = useState<any | null>(null);
   const [feesData, setFeesData] = useState<any | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState('');
-  const [usersInfo, setUsersInfo] = useState<any>(null)
-
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [usersInfo, setUsersInfo] = useState<any>(null);
+  console.log("indexes", indexes);
   const editIndex = async (index: object) => {
     setCurrentIndex(index);
     setOpenEditModal(true);
   };
 
+  // useEffect(() => {
+  //   getAllIndexWithPagination(1, 1000).then((res: IProps) => {
+  //     console.log({ res });
+  //     setIndexes(res.data.index);
+  //   });
+  // }, []);
+
   useEffect(() => {
-    getAllIndex().then((res: IProps) => {
-      setIndexes(res.data)
-    })
-  }, [])
+    getAllIndexWithPagination(currentPage, 10, searchValue).then(
+      (res: IProps) => {
+        setCurrentPage(res.data.currentPage);
+        setTotalIndexes(res.data.total);
+        setIndexes(res.data.index);
+      }
+    );
+  }, [currentPage, searchValue]);
 
   useEffect(() => {
     // Socket listener for incoming data
     const handleSocketData = ({ info }: any) => {
-      console.log("info", info)
+      console.log("info", info);
       setIndexes((prevIndexes) => {
         const updatedIndexes = prevIndexes.map((index) =>
           index._id === info.id ? { ...index, ...info } : index
@@ -230,7 +262,7 @@ const Dashboard = () => {
     };
     // Listen for updates for each index
     indexes.forEach((item) => {
-      console.log("heheheheh", indexes)
+      console.log("heheheheh", indexes);
       socket.emit("index2", item._id);
       socket.on(`index2:${item._id}`, handleSocketData);
     });
@@ -242,33 +274,34 @@ const Dashboard = () => {
       });
     };
   }, [indexes]);
- 
-
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await userChart('month');
-      const { groupedData, totalUsers, latestMonth, latestMonthCount } = response.data;
-      console.log(groupedData, "groupedData")
+      const response = await userChart("month");
+      const { groupedData, totalUsers, latestMonth, latestMonthCount } =
+        response.data;
+      console.log(groupedData, "groupedData");
       // setMonths(Object.keys(groupedData)); // Set available months for selection
       const monthLabels = Object.keys(groupedData);
       const monthTotals = Object.values(groupedData);
-      console.log('totalUsers', latestMonth, monthTotals)
-      setUsersInfo({ totalUsers, latestMonth, latestMonthCount })
-      const formattedLabels = monthLabels.map(label => {
+      console.log("totalUsers", latestMonth, monthTotals);
+      setUsersInfo({ totalUsers, latestMonth, latestMonthCount });
+      const formattedLabels = monthLabels.map((label) => {
         const [year, month] = label.split("-"); // Split into year and month
         const date = new Date(year, month - 1); // Create a Date object
-        return `${date.toLocaleString('en-US', { month: 'short' })} ${year}`; // Format as "Jan 2025"
+        return `${date.toLocaleString("en-US", { month: "short" })} ${year}`; // Format as "Jan 2025"
       });
 
       setChartData({
         labels: [
           ...formattedLabels,
-          `${new Date().toLocaleString('en-US', { month: 'short' })} ${new Date().getFullYear()}`
+          `${new Date().toLocaleString("en-US", {
+            month: "short",
+          })} ${new Date().getFullYear()}`,
         ], // Months as labels
         datasets: [
           {
-            label: 'Total Users',
+            label: "Total Users",
             data: [...monthTotals, 0], // Total user counts for each month
             ...userDataSet,
           },
@@ -283,8 +316,11 @@ const Dashboard = () => {
   // transactionChart
 
   const getTransaction = async () => {
-    const data = await buySellChart('daily');
-    const formatData = (transactions: any, key: "totaldeposit" | "totalwithdrawl") => {
+    const data = await buySellChart("daily");
+    const formatData = (
+      transactions: any,
+      key: "totaldeposit" | "totalwithdrawl"
+    ) => {
       return transactions?.map((txn: any) => ({
         x: new Date(txn.startDate),
         y: txn[key],
@@ -312,7 +348,7 @@ const Dashboard = () => {
         },
       ],
     });
-  }
+  };
 
   const getFees = async () => {
     const data = await feesChart();
@@ -335,12 +371,11 @@ const Dashboard = () => {
           categoryPercentage: 0.4,
           borderColor: "#78DA89",
           pointBackgroundColor: "#78DA89",
-        }
+        },
       ],
     });
-  }
-  console.log(chartData, "chartData")
-
+  };
+  console.log(chartData, "chartData");
 
   return (
     <Container>
@@ -372,19 +407,21 @@ const Dashboard = () => {
         {/* Card 2: Total Users */}
         <StyledCard>
           <CardHeader>
-            <CardText>Total Users • {usersInfo?.latestMonthCount || 0} new users</CardText>
+            <CardText>
+              Total Users • {usersInfo?.latestMonthCount || 0} new users
+            </CardText>
             <StyledSelect defaultValue="Monthly" size="small">
               <Option value="monthly">Monthly</Option>
               <Option value="weekly">Weekly</Option>
             </StyledSelect>
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#fff" }}>
-            {usersInfo?.totalUsers || 0} users since <span style={{ color: "#4caf50" }}>{usersInfo?.latestMonth || ''}</span>
+            {usersInfo?.totalUsers || 0} users since{" "}
+            <span style={{ color: "#4caf50" }}>
+              {usersInfo?.latestMonth || ""}
+            </span>
           </AntdTitle>
-          {
-            chartData &&
-            <LineChart data={chartData || {}} />
-          }
+          {chartData && <LineChart data={chartData || {}} />}
         </StyledCard>
 
         {/* Card 3: Transactions */}
@@ -396,13 +433,13 @@ const Dashboard = () => {
               <Option value="daily">Daily</Option>
             </StyledSelect>
           </CardHeader>
-          <AntdTitle level={4} style={{ color: '#fff' }}>
-            Transactions in past week <span style={{ color: '#4caf50' }}>Jan</span>
+          <AntdTitle level={4} style={{ color: "#fff" }}>
+            Transactions in past week{" "}
+            <span style={{ color: "#4caf50" }}>Jan</span>
           </AntdTitle>
-          {
-            transactionData &&
+          {transactionData && (
             <LineChart legend={true} data={transactionData} />
-          }
+          )}
         </StyledCard>
       </DashboardContainer>
 
@@ -414,31 +451,37 @@ const Dashboard = () => {
             <Option value="weekly">Weekly</Option>
           </StyledSelect>
         </CardHeader>
-        <AntdTitle level={4} style={{ color: '#4caf50' }}>
-          {feesData && Math.floor(feesData?.datasets[0]?.data?.reduce((acc: number, value: any) => acc + value.y, 0))} <span style={{ fontSize: 12, color: '#7cf97c' }}>+5.2%</span>
+        <AntdTitle level={4} style={{ color: "#4caf50" }}>
+          {feesData &&
+            Math.floor(
+              feesData?.datasets[0]?.data?.reduce(
+                (acc: number, value: any) => acc + value.y,
+                0
+              )
+            )}{" "}
+          <span style={{ fontSize: 12, color: "#7cf97c" }}>+5.2%</span>
         </AntdTitle>
-        {
-          feesData &&
-          <BarChart data={feesData || {}} />
-        }
+        {feesData && <BarChart data={feesData || {}} />}
       </StyledCard>
       <SearchContainer>
         <Title>Indexes</Title>
         <Flex className="ant_flex" align="center" justify="end" gap={15}>
           <Flex gap={10}>
             <SubTitle>Total No Of Index:</SubTitle>
-            <TotalIndex>{indexes.length || 0}</TotalIndex>
+            <TotalIndex>{totalIndexes || 0}</TotalIndex>
           </Flex>
-          <TextField placeholder="Search coin,Indexes etc" />
+          <TextField
+            placeholder="Search coin,Indexes etc"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearchValue(e.target.value)
+            }
+          />
         </Flex>
       </SearchContainer>
-      <Table
-        columns={columns(editIndex)}
-        dataSource={indexes}
-      />
+      <Table columns={columns(editIndex)} dataSource={indexes} />
       <Pagination
         currentPage={currentPage}
-        total={data.length}
+        total={totalIndexes}
         onChange={(page: number) => setCurrentPage(page)}
       />
       <AddIndexModal isModalOpen={openmodal} setIsModalOpen={setOpenModal} />

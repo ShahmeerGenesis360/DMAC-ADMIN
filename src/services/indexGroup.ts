@@ -16,6 +16,35 @@ export const getAllIndex = async () => {
   }
 };
 
+export const getAllIndexWithPagination = async (
+  page: number = 1,
+  limit: number = 10,
+  search: string = ""
+): Promise<any> => {
+  const token = await getAuthToken();
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+    search: search,
+  }).toString();
+
+  try {
+    const response = await apiRequest<any>(
+      `/index/admin?${queryParams}`,
+      "GET",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const createIndex = async (groupIndex: IGroupCoin) => {
   const token = await getAuthToken();
   const formData = new FormData();
@@ -45,10 +74,7 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
     "collectorDetailApi",
     JSON.stringify(groupIndex.collectorDetailApi)
   );
-  formData.append(
-    "feeAmount",
-    JSON.stringify(groupIndex.feeAmount)
-  );
+  formData.append("feeAmount", JSON.stringify(groupIndex.feeAmount));
   try {
     console.log("calling the API now");
     const response = await apiRequest<GetGroupCoinResponse>(
@@ -87,7 +113,10 @@ export const updateIndex = async (groupIndex: IGroupCoin) => {
   formData.append("category", groupIndex.category);
   formData.append("faq", JSON.stringify(groupIndex.faq));
   formData.append("coins", JSON.stringify(groupIndex.coins));
-  formData.append("collectorDetails", JSON.stringify(groupIndex.collectorDetail));
+  formData.append(
+    "collectorDetails",
+    JSON.stringify(groupIndex.collectorDetail)
+  );
   try {
     const response = await apiRequest<GetGroupCoinResponse>(
       `/index/${groupIndex._id}`,
