@@ -13,32 +13,36 @@ import { Bar } from "react-chartjs-2";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const BarChart = () => {
-    const data = {
-        labels: Array.from({ length: 30 }, (_, i) => i + 1), // Days of the month
-        datasets: [
-            {
-                label: "Buy",
-                data: [500, 600, 700, 0, 0, 0, 800, 900, 1000, 0, 0, 0, 1200, 1300, 1500, 0, 0, 0, 700, 800, 900, 0, 0, 0, 1000, 1100, 1200, 0, 0, 0],
-                backgroundColor: "#78DA89",
-                borderRadius: 2,
-                barPercentage: 0.4,
-                categoryPercentage: 0.4,
-                borderColor: "#78DA89",
-                pointBackgroundColor: "#78DA89",
-            },
-            {
-                label: "Sell",
-                data: [0, 0, 0, -400, -500, -600, 0, 0, 0, -700, -800, -900, 0, 0, 0, -1000, -1100, -1200, 0, 0, 0, -500, -600, -700, 0, 0, 0, -800, -900, -1000],
-                backgroundColor: "#E87975",
-                borderRadius: 2,
-                barPercentage: 0.4,
-                categoryPercentage: 0.4,
-                borderColor: "#E87975",
-                pointBackgroundColor: "#E87975",
-            },
-        ],
-    };
+interface IProps {
+    data: any;
+}
+
+const BarChart = ({ data }: IProps) => {
+    // const data = {
+    //     labels: Array.from({ length: 30 }, (_, i) => i + 1), // Days of the month
+    //     datasets: [
+    //         {
+    //             label: "Buy",
+    //             data: [500, 600, 700, 0, 0, 0, 800, 900, 1000, 0, 0, 0, 1200, 1300, 1500, 0, 0, 0, 700, 800, 900, 0, 0, 0, 1000, 1100, 1200, 0, 0, 0],
+    //             backgroundColor: "#78DA89",
+    //             borderRadius: 2,
+    //             barPercentage: 0.4,
+    //             categoryPercentage: 0.4,
+    //             borderColor: "#78DA89",
+    //             pointBackgroundColor: "#78DA89",
+    //         },
+    //         {
+    //             label: "Sell",
+    //             data: [0, 0, 0, -400, -500, -600, 0, 0, 0, -700, -800, -900, 0, 0, 0, -1000, -1100, -1200, 0, 0, 0, -500, -600, -700, 0, 0, 0, -800, -900, -1000],
+    //             backgroundColor: "#E87975",
+    //             borderRadius: 2,
+    //             barPercentage: 0.4,
+    //             categoryPercentage: 0.4,
+    //             borderColor: "#E87975",
+    //             pointBackgroundColor: "#E87975",
+    //         },
+    //     ],
+    // };
 
     // Chart options
     const options: ChartOptions<"bar"> = {
