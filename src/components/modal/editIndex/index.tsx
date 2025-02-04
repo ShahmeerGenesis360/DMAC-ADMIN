@@ -12,6 +12,8 @@ import {
 import Button from "../../button";
 import RebalanceIndex from "../rebalance";
 import { UploadChangeParam } from "antd/es/upload";
+import Select from "../../select";
+import CategorySelect from "../../category";
 
 interface IEditIndexModal {
   isModalOpen: boolean;
@@ -37,6 +39,10 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
   const [faq, setFaq] = useState<IFaq[] | []>([]);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [addIndex, setAddIndex] = useState<Partial<IGroupCoin>>(initialIndex)
+  const [selectedOptionTags, setSelectedOptionTags] = useState<string[] | []>(
+    []
+  );
+  const [optionTags, setOptionTags] = useState<WalletOption[] | []>([]);
 
 
   useEffect(() => {
@@ -48,6 +54,10 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
     }
     if (Object.keys(index).length > 0) {
       setAddIndex({ ...addIndex, ...index })
+      if (index.collectorDetail && index.collectorDetail.length > 0) {
+        setSelectedOptionTags(index.collectorDetail?.map((item) => item.collector))
+        setOptionTags(index.collectorDetail)
+      }
       if (index.faq && index.faq.length > 0) {
         setFaq(index?.faq)
       }
@@ -182,6 +192,19 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
           <StyledTextArea style={{ resize: "none" }} value={addIndex.description} showCount rows={4} maxLength={200} placeholder="Description" name="description" onChange={handleChange} />
         </div>
 
+        <div style={{ marginTop: 16 }}>
+          <Select
+            setSelectedOptions={setSelectedOptionTags}
+            selectedOptions={selectedOptionTags}
+            setOptions={setOptionTags}
+            options={optionTags}
+          />
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <CategorySelect setSelectedOptions={setAddIndex}
+            selectedOptions={addIndex?.category as string} />
+        </div>
+
         <>
           {
             faq.length > 0 && faq.map((item: IFaq, index) => (
@@ -201,6 +224,7 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
           editIndex={addIndex as IGroupCoin}
           handleCoinChange={handleCoinChange}
           faq={faq}
+          collectorDetail={optionTags}
         />
       }
     </div>

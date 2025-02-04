@@ -13,6 +13,7 @@ interface IRebalanceModal {
   editIndex: IGroupCoin
   handleCoinChange: (value: number, position: number) => void
   faq: IFaq[] | []
+  collectorDetail: WalletOption[] | []
 }
 const RebalanceIndex: React.FC<IRebalanceModal> = ({
   isModalOpen,
@@ -20,23 +21,25 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
   editIndex,
   handleCoinChange,
   faq,
+  collectorDetail
 }) => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-
+  console.log("collectorDetail", collectorDetail)
   useEffect(() => {
     let totalProportion = (editIndex.coins as ICoin[] || []).reduce((sum: number, coin: ICoin) => sum + coin.proportion, 0);
     const isFormValid =
       editIndex.name.trim() !== "" &&
       editIndex.description.trim() !== "" &&
       faq.every((item) => item.answer.trim() !== "") &&
+      (collectorDetail.length > 0 && collectorDetail.every((item) => item.weight.toString().trim() !== "")) &&
       totalProportion === 100 &&
       ((editIndex.file && !(editIndex.file as any)?.status && typeof editIndex.file !== 'undefined') || editIndex.imageUrl !== "")
 
     setIsButtonDisabled(!isFormValid);
-  }, [editIndex, faq]);
+  }, [editIndex, faq, collectorDetail]);
 
   const handleSubmit = async () => {
-    await updateIndex({ ...editIndex, faq }).then(() => { window.location.reload() })
+    await updateIndex({ ...editIndex, faq, collectorDetail }).then(() => { window.location.reload() })
 
   }
   return (

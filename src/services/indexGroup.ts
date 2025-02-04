@@ -25,6 +25,7 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
   formData.append("file", groupIndex.file);
   formData.append("name", groupIndex.name);
   formData.append("description", groupIndex.description);
+  formData.append("category", groupIndex.category);
   formData.append("faq", JSON.stringify(groupIndex.faq));
   formData.append("coins", JSON.stringify(groupIndex.coins));
   formData.append(
@@ -81,8 +82,10 @@ export const updateIndex = async (groupIndex: IGroupCoin) => {
   formData.append("name", groupIndex.name);
   formData.append("id", groupIndex._id as string);
   formData.append("description", groupIndex.description);
+  formData.append("category", groupIndex.category);
   formData.append("faq", JSON.stringify(groupIndex.faq));
   formData.append("coins", JSON.stringify(groupIndex.coins));
+  formData.append("collectorDetails", JSON.stringify(groupIndex.collectorDetail));
   try {
     const response = await apiRequest<GetGroupCoinResponse>(
       `/index/${groupIndex._id}`,

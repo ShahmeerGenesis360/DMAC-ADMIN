@@ -20,9 +20,12 @@ import { useProgram } from "../../../../services/idl"; // Custom hook for Anchor
 import { PublicKey, Keypair, Connection } from "@solana/web3.js";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Select from "../../select";
+import { Select as SelectOptions } from 'antd'
 
+
+import { StyledSelect } from "../../select/styles";
 import { useWallet } from "@solana/wallet-adapter-react";
-
+import CategorySelect from "../../category";
 interface IAddIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,6 +36,7 @@ const initialIndex = {
   description: "",
   file: "",
   feeAmount: "",
+  category: ""
 };
 
 const questions = ["Overview", "Maintenance", "Methodology", "Risks", "Fees"];
@@ -64,6 +68,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     const isFormValid =
       addIndex.name.trim() !== "" &&
       addIndex.description.trim() !== "" &&
+      addIndex.category.trim() !== "" &&
       faq.every((item) => item.answer.trim() !== "") &&
       selectedOptions.length > 0 &&
       addIndex.file &&
@@ -243,63 +248,78 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
           </Flex>
         </StyledUpload>
 
-        <StyledInput
-          placeholder="Coin Name"
-          value={addIndex.name}
-          showCount
-          maxLength={20}
-          name="name"
-          onChange={handleChange}
-        />
-
-        <StyledTextArea
-          style={{ resize: "none" }}
-          value={addIndex.description}
-          showCount
-          rows={4}
-          maxLength={200}
-          placeholder="Description"
-          name="description"
-          onChange={handleChange}
-        />
-
-        <CustomSelect
-          setSelectedOptions={setSelectedOptions}
-          selectedOptions={selectedOptions}
-          setOptions={setOptions}
-          options={options}
-        />
-
-        <Select
-          setSelectedOptions={setSelectedOptionTags}
-          selectedOptions={selectedOptionTags}
-          setOptions={setOptionTags}
-          options={optionTags}
-        />
-
-        {faq.map((item, index) => (
+        {/* Input Fields */}
+        <div style={{ marginTop: 16 }}>
           <StyledInput
-            key={index}
-            placeholder={item.question}
-            value={item.answer}
+            placeholder="Coin Name"
+            value={addIndex.name}
             showCount
             maxLength={20}
-            name={item.question}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              handleFaqChange(e, index)
-            }
+            name="name"
+            onChange={handleChange}
           />
-        ))}
+        </div>
 
-        <StyledInput
-          placeholder="Fees Amount"
-          type={"number"}
-          value={addIndex.feeAmount}
-          showCount
-          maxLength={20}
-          name="feeAmount"
-          onChange={handleChange}
-        />
+        <div style={{ marginTop: 16 }}>
+          <StyledTextArea
+            style={{ resize: "none" }}
+            value={addIndex.description}
+            showCount
+            rows={4}
+            maxLength={200}
+            placeholder="Description"
+            name="description"
+            onChange={handleChange}
+          />
+        </div>
+
+        <div style={{ marginTop: 16 }}>
+          <CustomSelect
+            setSelectedOptions={setSelectedOptions}
+            selectedOptions={selectedOptions}
+            setOptions={setOptions}
+            options={options}
+          />
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <Select
+            setSelectedOptions={setSelectedOptionTags}
+            selectedOptions={selectedOptionTags}
+            setOptions={setOptionTags}
+            options={optionTags}
+          />
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <CategorySelect setSelectedOptions={setAddIndex}
+            selectedOptions={addIndex.category} />
+        </div>
+        <>
+          {faq.map((item, index) => (
+            <div style={{ marginTop: 16 }}>
+              <StyledInput
+                placeholder={item.question}
+                value={item.answer}
+                showCount
+                maxLength={20}
+                name={item.question}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleFaqChange(e, index)
+                }
+              />
+            </div>
+          ))}
+        </>
+        <div style={{ marginTop: 16 }}>
+          <StyledInput
+            placeholder="Fees Amount"
+            type={"number"}
+            value={addIndex.feeAmount}
+            showCount
+            maxLength={20}
+            name="feeAmount"
+            onChange={handleChange}
+          />
+        </div>
       </StyledModal>
     </div>
   );
