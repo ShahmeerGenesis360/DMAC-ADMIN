@@ -157,7 +157,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         signTransaction
       );
 
-      // console.log("Transaction Hash:", txHash);
+      console.log("Transaction Hash:", txHash);
 
       console.log(addIndex.feeAmount, "feeAmount")
       const mintPublickey = mintKeypair.publicKey;

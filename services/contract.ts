@@ -14,6 +14,7 @@ import {
 } from "../src/constants/blockchain";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { PublicKey } from "@solana/web3.js";
+import { Descriptions } from "antd";
 
 export async function createIndex(
   program: Program,
@@ -82,6 +83,7 @@ export async function createIndex(
     .createIndex(
       indexName,
       indexDescription,
+      "https://arweave.net/QPC6FYdUn-3V8ytFNuoCS85S2tHAuiDblh6u3CIZLsw",
       scaledTokenAllocations, // Pass scaled token allocations
       scaledCollectorDetails, // Pass scaled collector details
       new anchor.BN(feeAmount * anchor.web3.LAMPORTS_PER_SOL)
