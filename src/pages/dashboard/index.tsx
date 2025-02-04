@@ -31,10 +31,11 @@ import {
 
 import { Card, Typography, Select } from "antd";
 import EditIndexModal from "../../components/modal/editIndex";
-import { transactionChart, userCharts, userDataSet } from '../../constants';
+import { formatNumber, transactionChart, userCharts, userDataSet } from '../../constants';
 import { BarChart } from "../../components/Graph";
 import { getAllIndex } from "../../services/indexGroup";
 import { buySellChart, feesChart, userChart } from "../../services/charts";
+import { socket } from "../../socket";
 
 const { Title: AntdTitle } = Typography;
 const { Option } = Select;
@@ -165,14 +166,16 @@ const columns = (editIndex: Function) => [
     title: "Holders",
     dataIndex: "holder",
     key: "holder",
-    render: () => ("Loreum")
+    render: (_: any, record: any) => (
+      <IndexText>
+        {record?.totalBuy && formatNumber(record?.totalBuy - record?.totalSell)}
+      </IndexText>)
   },
   {
     title: "Address",
     dataIndex: "_id",
     key: "_id",
     render: (text: string, record: object) => {
-      console.log({ text, record });
       return (
         <Flex justify="space-between">
           {text}
@@ -215,6 +218,34 @@ const Dashboard = () => {
   }, [])
 
   useEffect(() => {
+    // Socket listener for incoming data
+    const handleSocketData = ({ info }: any) => {
+      console.log("info", info)
+      setIndexes((prevIndexes) => {
+        const updatedIndexes = prevIndexes.map((index) =>
+          index._id === info.id ? { ...index, ...info } : index
+        );
+        return updatedIndexes;
+      });
+    };
+    // Listen for updates for each index
+    indexes.forEach((item) => {
+      console.log("heheheheh", indexes)
+      socket.emit("index2", item._id);
+      socket.on(`index2:${item._id}`, handleSocketData);
+    });
+
+    // Clean up socket listeners
+    return () => {
+      indexes.forEach((item) => {
+        socket.off(`index2:${item._id}`, handleSocketData);
+      });
+    };
+  }, [indexes]);
+ 
+
+
+  useEffect(() => {
     const fetchData = async () => {
       const response = await userChart('month');
       const { groupedData, totalUsers, latestMonth, latestMonthCount } = response.data;
@@ -233,7 +264,7 @@ const Dashboard = () => {
       setChartData({
         labels: [
           ...formattedLabels,
-            `${new Date().toLocaleString('en-US', { month: 'short' })} ${new Date().getFullYear()}`
+          `${new Date().toLocaleString('en-US', { month: 'short' })} ${new Date().getFullYear()}`
         ], // Months as labels
         datasets: [
           {
