@@ -44,15 +44,22 @@ import {
 } from "../../services/indexGroup";
 import { buySellChart, feesChart, userChart } from "../../services/charts";
 import { socket } from "../../socket";
+import { Text } from "../../components/dropdown/styles";
 
 const { Title: AntdTitle } = Typography;
 const { Option } = Select;
 
-// interface IProps {
-//   data: IGroupCoin[] | [];
-//   message?: string;
-//   status: boolean;
-// }
+enum TimeRange {
+  Monthly = "month",
+  Weekly = "week",
+  Daily = "daily",
+}
+
+enum TransactionRange {
+  Monthly = "monthly",
+  Weekly = "weekly",
+  Daily = "daily",
+}
 
 interface IProps {
   data: {
@@ -224,9 +231,17 @@ const Dashboard = () => {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [transactionData, setTransactionData] = useState<any | null>(null);
   const [feesData, setFeesData] = useState<any | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState('Monthly');
+  const [selectedTransactions, setSelectedTransactions] = useState('Weekly');
+  const [selectedRevenue, setSelectedRevenue] = useState('Monthly');
+  const [selectedLocked, setSelectedLocked] = useState('Monthly');
   const [usersInfo, setUsersInfo] = useState<any>(null);
-  console.log("indexes", indexes);
+  const [isLockedOpen, setIsLockedOpen] = useState(false);
+  const [isUserOpen, setIsUserOpen] = useState(false);
+  const [isTransactionOpen, setIsTransactionOpen] = useState(false);
+  const [isRevenueOpen, setIsRevenueOpen] = useState(false);
+
+
   const editIndex = async (index: object) => {
     setCurrentIndex(index);
     setOpenEditModal(true);
@@ -275,9 +290,11 @@ const Dashboard = () => {
     };
   }, [indexes]);
 
+
+
   useEffect(() => {
     const fetchData = async () => {
-      const response = await userChart("month");
+      const response = await userChart(TimeRange[selectedUsers as keyof typeof TimeRange]);
       const { groupedData, totalUsers, latestMonth, latestMonthCount } =
         response.data;
       console.log(groupedData, "groupedData");
@@ -293,12 +310,12 @@ const Dashboard = () => {
       });
 
       setChartData({
-        labels: [
+        labels: selectedUsers==="month"? [ 
           ...formattedLabels,
           `${new Date().toLocaleString("en-US", {
             month: "short",
-          })} ${new Date().getFullYear()}`,
-        ], // Months as labels
+          })} ${new Date().getFullYear()}` ,
+        ]: monthLabels, // Months as labels
         datasets: [
           {
             label: "Total Users",
@@ -310,13 +327,19 @@ const Dashboard = () => {
     };
 
     fetchData();
+  }, [selectedUsers]);
+
+  useEffect(() => {
     getTransaction();
+  }, [selectedTransactions])
+
+  useEffect(() => {
     getFees();
-  }, []);
+  }, [selectedRevenue])
   // transactionChart
 
   const getTransaction = async () => {
-    const data = await buySellChart("daily");
+    const data = await buySellChart(TransactionRange[selectedTransactions as keyof typeof TransactionRange]);
     const formatData = (
       transactions: any,
       key: "totaldeposit" | "totalwithdrawl"
@@ -393,10 +416,18 @@ const Dashboard = () => {
         <StyledCard>
           <CardHeader>
             <CardText>Total Value Locked</CardText>
-            <StyledSelect defaultValue="Monthly" size="small">
-              <Option value="monthly">Monthly</Option>
-              <Option value="weekly">Weekly</Option>
-            </StyledSelect>
+            <StyledSelect open={isLockedOpen} value={selectedLocked} size="small" dropdownClassName="range_popup" dropdownRender={() => (
+              <Flex vertical>
+                {["Monthly", "Weekly", "Daily"].map((item) => (
+                  <Text key={item} style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setSelectedLocked(item)
+                      setIsLockedOpen(false)
+                    }}>{item}</Text>
+                ))}
+              </Flex>
+            )}
+              onDropdownVisibleChange={(open: boolean) => setIsLockedOpen(open)} />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#4caf50" }}>
             4,556 <span style={{ fontSize: 12, color: "#7cf97c" }}>+5.2%</span>
@@ -407,13 +438,19 @@ const Dashboard = () => {
         {/* Card 2: Total Users */}
         <StyledCard>
           <CardHeader>
-            <CardText>
-              Total Users • {usersInfo?.latestMonthCount || 0} new users
-            </CardText>
-            <StyledSelect defaultValue="Monthly" size="small">
-              <Option value="monthly">Monthly</Option>
-              <Option value="weekly">Weekly</Option>
-            </StyledSelect>
+            <CardText>Total Users • {usersInfo?.latestMonthCount || 0} new users</CardText>
+            <StyledSelect open={isUserOpen} value={selectedUsers} size="small" dropdownClassName="range_popup" dropdownRender={() => (
+              <Flex vertical>
+                {["Monthly", "Weekly"].map((item) => (
+                  <Text key={item} style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setSelectedUsers(item)
+                      setIsUserOpen(false)
+                    }}>{item}</Text>
+                ))}
+              </Flex>
+            )}
+              onDropdownVisibleChange={(open: boolean) => setIsUserOpen(open)} />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#fff" }}>
             {usersInfo?.totalUsers || 0} users since{" "}
@@ -428,10 +465,18 @@ const Dashboard = () => {
         <StyledCard>
           <CardHeader>
             <CardText>Transactions</CardText>
-            <StyledSelect defaultValue="Weekly" size="small">
-              <Option value="weekly">Weekly</Option>
-              <Option value="daily">Daily</Option>
-            </StyledSelect>
+            <StyledSelect open={isTransactionOpen} value={selectedTransactions} size="small" dropdownClassName="range_popup" dropdownRender={() => (
+              <Flex vertical>
+                {["Monthly", "Weekly", "Daily"].map((item) => (
+                  <Text key={item} style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setSelectedTransactions(item)
+                      setIsTransactionOpen(false)
+                    }}>{item}</Text>
+                ))}
+              </Flex>
+            )}
+              onDropdownVisibleChange={(open: boolean) => setIsTransactionOpen(open)} />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#fff" }}>
             Transactions in past week{" "}
@@ -446,10 +491,18 @@ const Dashboard = () => {
       <StyledCard>
         <CardHeader>
           <CardText>Total Fee Revenue</CardText>
-          <StyledSelect defaultValue="Monthly" size="small">
-            <Option value="monthly">Monthly</Option>
-            <Option value="weekly">Weekly</Option>
-          </StyledSelect>
+          <StyledSelect open={isRevenueOpen} value={selectedRevenue} size="small" dropdownClassName="range_popup" dropdownRender={() => (
+            <Flex vertical>
+              {["Monthly", "Weekly", "Daily"].map((item) => (
+                <Text key={item} style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    setSelectedRevenue(item)
+                    setIsRevenueOpen(false)
+                  }}>{item}</Text>
+              ))}
+            </Flex>
+          )}
+            onDropdownVisibleChange={(open: boolean) => setIsRevenueOpen(open)} />
         </CardHeader>
         <AntdTitle level={4} style={{ color: "#4caf50" }}>
           {feesData &&
