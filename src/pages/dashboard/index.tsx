@@ -182,17 +182,21 @@ const columns = (editIndex: Function) => [
   },
   {
     title: "TVL",
-    dataIndex: "tvl",
-    key: "indexWorth",
-    render: () => "Loreum",
+    dataIndex: "totalValueLocked",
+    key: "totalValueLocked",
+    render: (text: number) => (
+      <IndexText>
+        {text && formatNumber(text)}
+      </IndexText>
+    ),
   },
   {
     title: "Holders",
-    dataIndex: "holder",
-    key: "holder",
-    render: (_: any, record: any) => (
+    dataIndex: "totalHolder",
+    key: "totalHolder",
+    render: (text: number) => (
       <IndexText>
-        {record.buyAmount && formatNumber(record.buyAmount)}
+        {text && formatNumber(text)}
         {/* {record?.totalBuy && formatNumber(record?.totalBuy - record?.totalSell)} */}
       </IndexText>
     ),
@@ -310,12 +314,12 @@ const Dashboard = () => {
       });
 
       setChartData({
-        labels: selectedUsers==="month"? [ 
+        labels: selectedUsers === "month" ? [
           ...formattedLabels,
           `${new Date().toLocaleString("en-US", {
             month: "short",
-          })} ${new Date().getFullYear()}` ,
-        ]: monthLabels, // Months as labels
+          })} ${new Date().getFullYear()}`,
+        ] : monthLabels, // Months as labels
         datasets: [
           {
             label: "Total Users",
