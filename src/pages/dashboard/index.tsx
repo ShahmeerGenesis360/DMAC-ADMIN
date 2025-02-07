@@ -42,7 +42,7 @@ import {
   getAllIndex,
   getAllIndexWithPagination,
 } from "../../services/indexGroup";
-import { buySellChart, feesChart, userChart } from "../../services/charts";
+import { buySellChart, feesChart, LockedChart, userChart } from "../../services/charts";
 import { socket } from "../../socket";
 import { Text } from "../../components/dropdown/styles";
 
@@ -186,7 +186,7 @@ const columns = (editIndex: Function) => [
     key: "totalValueLocked",
     render: (text: number) => (
       <IndexText>
-        {text && formatNumber(text)}
+        {text && formatNumber(Math.max(0, text))}
       </IndexText>
     ),
   },
@@ -235,6 +235,7 @@ const Dashboard = () => {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [transactionData, setTransactionData] = useState<any | null>(null);
   const [feesData, setFeesData] = useState<any | null>(null);
+  const [lockedData, setLockedData] = useState<any | null>(null);
   const [selectedUsers, setSelectedUsers] = useState('Monthly');
   const [selectedTransactions, setSelectedTransactions] = useState('Weekly');
   const [selectedRevenue, setSelectedRevenue] = useState('Monthly');
@@ -340,6 +341,10 @@ const Dashboard = () => {
   useEffect(() => {
     getFees();
   }, [selectedRevenue])
+
+  useEffect(() => {
+    getLocked();
+  }, [selectedLocked])
   // transactionChart
 
   const getTransaction = async () => {
@@ -402,7 +407,37 @@ const Dashboard = () => {
       ],
     });
   };
-  console.log(chartData, "chartData");
+
+  const getLocked = async () => {
+    const data = await LockedChart(TransactionRange[selectedLocked as keyof typeof TransactionRange]);
+    const formatData = (transactions: any[]) => {
+      return transactions.flatMap((txn: any) => {
+        return Object.values(txn) // Extract all indexed entries (0,1,2,3,...)
+          .filter((entry: any) => entry.startDate) // Ensure it has valid data
+          .map((entry: any) => ({
+            x: entry.startDate,
+            y: Math.max(0, entry.totalDeposit - entry.totalWithdrawal),
+          }));
+      });
+    };
+
+    setLockedData({
+      labels:  formatData(data).map((entry) => entry.x),
+      datasets: [
+        {
+          label: "Locked",
+          data: formatData(data),
+          backgroundColor: "#78DA89",
+          borderRadius: 2,
+          barPercentage: 0.4,
+          categoryPercentage: 0.4,
+          borderColor: "#78DA89",
+          pointBackgroundColor: "#78DA89",
+        },
+      ],
+    });
+  };
+  console.log(lockedData, "lockedData");
 
   return (
     <Container>
@@ -436,7 +471,7 @@ const Dashboard = () => {
           <AntdTitle level={4} style={{ color: "#4caf50" }}>
             4,556 <span style={{ fontSize: 12, color: "#7cf97c" }}>+5.2%</span>
           </AntdTitle>
-          <LineChart data={userCharts || {}} />
+          {lockedData && <LineChart data={lockedData || {}} />}
         </StyledCard>
 
         {/* Card 2: Total Users */}
