@@ -27,12 +27,12 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
   console.log("collectorDetail", collectorDetail)
   useEffect(() => {
     let totalProportion = (editIndex.coins as ICoin[] || []).reduce((sum: number, coin: ICoin) => sum + coin.proportion, 0);
-   // @ts-ignore
+    // @ts-ignore
     const isFormValid =
       editIndex.name.trim() !== "" &&
       editIndex.description.trim() !== "" &&
-      faq.every((item) => item.answer.trim() !== "") &&
-      (collectorDetail.length > 0 && collectorDetail.every((item) => item.weight.toString().trim() !== "")) &&
+      faq.every((item) => (item.answer as any).trim() !== "") &&
+      (collectorDetail.length > 0 && collectorDetail.every((item) => (item.weight as any).toString().trim() !== "")) &&
       totalProportion === 100 &&
       ((editIndex.file && !(editIndex.file as any)?.status && typeof editIndex.file !== 'undefined') || editIndex.imageUrl !== "")
 

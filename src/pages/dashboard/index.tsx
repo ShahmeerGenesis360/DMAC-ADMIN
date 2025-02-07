@@ -282,7 +282,7 @@ const Dashboard = () => {
       });
     };
     // Listen for updates for each index
-    indexes.forEach((item) => {
+    indexes.forEach((item: any) => {
       console.log("heheheheh", indexes);
       socket.emit("index2", item._id);
       socket.on(`index2:${item._id}`, handleSocketData);
@@ -290,7 +290,7 @@ const Dashboard = () => {
 
     // Clean up socket listeners
     return () => {
-      indexes.forEach((item) => {
+      indexes.forEach((item: any) => {
         socket.off(`index2:${item._id}`, handleSocketData);
       });
     };

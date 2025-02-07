@@ -24,12 +24,12 @@ export default defineConfig({
   server: {
     proxy: {
       "/socket.io": {
-        target: "http://localhost:5000", // WebSocket server URL
+        target: `${ process.env.VITE_PUBLIC_SOCKET}`, // WebSocket server URL
         ws: true, // WebSocket proxying
         changeOrigin: true,
       },
       "/uploads": {
-        target: "http://localhost:5000",
+        target: `${ process.env.VITE_UPLOAD_URL}`,
         changeOrigin: true,
       },
     },
