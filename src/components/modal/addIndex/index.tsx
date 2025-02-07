@@ -36,7 +36,8 @@ const initialIndex = {
   description: "",
   file: "",
   feeAmount: "",
-  category: ""
+  category: "",
+  symbol: "",
 };
 
 const questions = ["Overview", "Maintenance", "Methodology", "Risks", "Fees"];
@@ -141,7 +142,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       collector: new PublicKey(item.collector),
       weight: new anchor.BN(item.weight),
     }));
-    const collectorDetailApi = optionTags.map((item)=>({
+    const collectorDetailApi = optionTags.map((item) => ({
       collector: item.collector,
       weight: item.weight,
     }))
@@ -249,11 +250,23 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         {/* Input Fields */}
         <div style={{ marginTop: 16 }}>
           <StyledInput
-            placeholder="Coin Name"
+            placeholder="Index Name"
             value={addIndex.name}
             showCount
             maxLength={20}
             name="name"
+            onChange={handleChange}
+          />
+        </div>
+
+
+        <div style={{ marginTop: 16 }}>
+          <StyledInput
+            placeholder="Index Symbol"
+            value={addIndex.symbol}
+            showCount
+            maxLength={20}
+            name="symbol"
             onChange={handleChange}
           />
         </div>

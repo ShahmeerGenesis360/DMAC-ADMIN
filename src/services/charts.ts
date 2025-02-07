@@ -76,3 +76,23 @@ export const feesChart = async ():Promise<any> => {
     throw error;
   }
 };
+
+export const LockedChart = async (type: string):Promise<any> => {
+  const token = await getAuthToken();
+  try {
+    const response = await apiRequest<any>(
+      `/index/tvl?type=${type}`,
+      "GET",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log({response})
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};

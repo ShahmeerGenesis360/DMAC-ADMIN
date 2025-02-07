@@ -1,5 +1,5 @@
 import { Input, Select } from "antd";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 
 export const StyledSelect = styled(Select)`
   &.ant-select,

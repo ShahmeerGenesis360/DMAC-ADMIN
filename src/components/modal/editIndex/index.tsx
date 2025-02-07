@@ -185,7 +185,18 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
 
         {/* Input Fields */}
         <div style={{ marginTop: 16 }}>
-          <StyledInput placeholder="Coin Name" value={addIndex.name} showCount maxLength={20} name="name" onChange={handleChange} />
+          <StyledInput placeholder="Index Name" value={addIndex.name} showCount maxLength={20} name="name" onChange={handleChange} />
+        </div>
+
+        <div style={{ marginTop: 16 }}>
+          <StyledInput
+            placeholder="Index Symbol"
+            value={addIndex.symbol}
+            showCount
+            maxLength={20}
+            name="symbol"
+            onChange={handleChange}
+          />
         </div>
 
         <div style={{ marginTop: 16 }}>
