@@ -1,3 +1,4 @@
+// @ts-ignore
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Dropdown, Flex, MenuProps, Space } from "antd";
 import styled from "styled-components";
@@ -309,8 +310,8 @@ const Dashboard = () => {
       console.log("totalUsers", latestMonth, monthTotals);
       setUsersInfo({ totalUsers, latestMonth, latestMonthCount });
       const formattedLabels = monthLabels.map((label) => {
-        const [year, month] = label.split("-"); // Split into year and month
-        const date = new Date(year, month - 1); // Create a Date object
+        const [year, month]: any = label.split("-"); // Split into year and month
+        const date: any = new Date(year, month - 1); // Create a Date object
         return `${date.toLocaleString("en-US", { month: "short" })} ${year}`; // Format as "Jan 2025"
       });
 
@@ -422,7 +423,7 @@ const Dashboard = () => {
     };
 
     setLockedData({
-      labels:  formatData(data).map((entry) => entry.x),
+      labels: formatData(data).map((entry) => entry.x),
       datasets: [
         {
           label: "Locked",
