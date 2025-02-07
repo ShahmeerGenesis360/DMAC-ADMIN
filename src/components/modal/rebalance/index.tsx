@@ -31,8 +31,8 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
     const isFormValid =
       editIndex.name.trim() !== "" &&
       editIndex.description.trim() !== "" &&
-      faq.every((item) => (item.answer as any).trim() !== "") &&
-      (collectorDetail.length > 0 && collectorDetail.every((item) => (item.weight as any).toString().trim() !== "")) &&
+      faq.every((item: any) => item.answer.trim() !== "") &&
+      (collectorDetail.length > 0 && collectorDetail.every((item: any) => item.weight.toString().trim() !== "")) &&
       totalProportion === 100 &&
       ((editIndex.file && !(editIndex.file as any)?.status && typeof editIndex.file !== 'undefined') || editIndex.imageUrl !== "")
 
