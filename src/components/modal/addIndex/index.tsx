@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { Flex } from "antd";
 import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import * as anchor from "@coral-xyz/anchor";
@@ -21,11 +21,14 @@ import { PublicKey, Keypair, Connection } from "@solana/web3.js";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Select from "../../select";
 import { Select as SelectOptions } from 'antd'
-
+import fs from "fs";
 
 import { StyledSelect } from "../../select/styles";
 import { useWallet } from "@solana/wallet-adapter-react";
 import CategorySelect from "../../category";
+import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+import { createGenericFile } from "@metaplex-foundation/umi";
 interface IAddIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -42,11 +45,15 @@ const initialIndex = {
 
 const questions = ["Overview", "Maintenance", "Methodology", "Risks", "Fees"];
 
+// ✅ Set QuickNode RPC URL
+const RPC_URL = "https://mainnet.helius-rpc.com/?api-key=d91bf63d-1cdb-416a-9fb2-ad1c273540fc";
+
+
 const AddIndexModal: React.FC<IAddIndexModal> = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
-  const { publicKey, signTransaction } = useWallet(); // Wallet context
+  const { publicKey, signTransaction , connected } = useWallet(); // Wallet context
   const { program, connection } = useProgram() || {}; // Use the custom hook
   const handleCancel = () => setIsModalOpen(false);
 
@@ -64,6 +71,15 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const [optionTags, setOptionTags] = useState<WalletOption[] | []>([]);
   const keypair = Keypair.generate(); // Generate mint keypair
   const [mintKeypair] = useState(keypair);
+
+  const umi = useMemo(() => {
+    if (!connected) return null;
+    console.log("🔹 Initializing Umi with Wallet Adapter...");
+    const umiInstance = createUmi(RPC_URL);
+    umiInstance.use(walletAdapterIdentity({ publicKey, signTransaction }));
+    console.log("✅ Umi initialized!");
+    return umiInstance;
+  }, [connected]);
 
   useEffect(() => {
     const isFormValid =
@@ -100,6 +116,57 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     });
   };
 
+    // ✅ Upload Image to Arweave
+    async function uploadImageToArweave(filePath: string): Promise<string> {
+      try {
+        if (!umi) throw new Error("Umi is not initialized!");
+  
+        console.log("🚀 Uploading Image:", filePath);
+        const fileBuffer = fs.readFileSync(filePath);
+        const fileName = filePath.split("/").pop() || "image.png";
+  
+        const image = createGenericFile(fileBuffer, fileName, {
+          uniqueName: fileName,
+          contentType: "image/png", // Assuming PNG; modify if needed
+        });
+  
+        const [imageUri] = await umi.uploader.upload([image]);
+        console.log("✅ Image Uploaded:", imageUri);
+        return imageUri;
+      } catch (error) {
+        console.error("❌ Error uploading image:", error);
+        throw error;
+      }
+    }
+
+      // ✅ Upload Metadata to Arweave
+  async function uploadMetadataToArweave(
+    imageUri: string,
+    indexName: string,
+    indexDescription: string
+  ): Promise<string> {
+    try {
+      if (!umi) throw new Error("Umi is not initialized!");
+
+      console.log("🚀 Uploading Metadata...");
+      const metadata = {
+        name: indexName,
+        description: indexDescription,
+        image: imageUri,
+        properties: {
+          files: [{ type: "image/png", uri: imageUri }],
+        },
+      };
+
+      const metadataUri = await umi.uploader.uploadJson(metadata);
+      console.log("✅ Metadata Uploaded:", metadataUri);
+      return metadataUri;
+    } catch (error) {
+      console.error("❌ Error uploading metadata:", error);
+      throw error;
+    }
+  }
+
   const handleSubmit = async () => {
     if (!program || !connection || !publicKey || !signTransaction) {
       console.warn(
@@ -108,27 +175,30 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       return;
     }
 
-    // Filter selected tokens and prepare data
+     const imageUri = await uploadImageToArweave(addIndex.file);
+     const metadataUri = await uploadMetadataToArweave(imageUri, addIndex.name, addIndex.description);
+     
+
     const selectedTokens = options.filter((item) =>
       selectedOptions.includes(item.value)
     );
     const tokenData = selectedTokens.map((item) => ({
-      coinName: item.label, // For DB
-      address: item.value, // For DB
-      proportion: item.proportion, // For both DB and on-chain
-      mint: new PublicKey(item.value), // For on-chain
-      weight: item.proportion, // For on-chain
+      coinName: item.label,
+      address: item.value,
+      proportion: item.proportion,
+      mint: new PublicKey(item.value),
+      weight: item.proportion,
     }));
 
     const coins = tokenData.map(({ coinName, address, proportion }) => ({
       coinName,
       address,
       proportion,
-    })); // For DB
+    })); 
     const tokenAllocations = tokenData.map(({ mint, weight }) => ({
       mint,
-      weight: new anchor.BN(weight), // Convert to BN for on-chain
-    })); // For on-chain
+      weight: new anchor.BN(weight), 
+    }));
 
     const totalWeight = tokenAllocations.reduce(
       (sum, allocation) => sum + allocation.weight.toNumber(),
@@ -157,6 +227,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         mintKeypair,
         addIndex.name,
         addIndex.description,
+        metadataUri,
         tokenAllocations,
         collectorDetails,
         parseFloat(addIndex.feeAmount),
