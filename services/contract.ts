@@ -22,6 +22,7 @@ export async function createIndex(
   mintKeypair: Keypair,
   indexName: string,
   indexDescription: string,
+  metadataUri:string,
   tokenAllocations: { mint: PublicKey; weight: anchor.BN }[],
   collectorDetails: { collector: PublicKey; weight: anchor.BN }[],
   feeAmount: number,
@@ -76,12 +77,14 @@ export async function createIndex(
   const programState = getProgramState();
 
   console.log("Program State:", programState);
+  console.log(metadataUri, "metadataUri")
 
   // --- Instruction 1: Create Index ---
   const createIndexInstruction = await program.methods
     .createIndex(
       indexName,
       indexDescription,
+      metadataUri,
       scaledTokenAllocations, // Pass scaled token allocations
       scaledCollectorDetails, // Pass scaled collector details
       new anchor.BN(feeAmount * anchor.web3.LAMPORTS_PER_SOL)

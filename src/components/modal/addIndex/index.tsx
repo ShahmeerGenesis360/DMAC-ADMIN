@@ -21,6 +21,7 @@ import { PublicKey, Keypair, Connection } from "@solana/web3.js";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Select from "../../select";
 import { Select as SelectOptions } from 'antd'
+import { uploadImageToPinata, uploadMetadataToPinata } from "../../../../services/pinata";
 
 
 import { StyledSelect } from "../../select/styles";
@@ -34,7 +35,7 @@ interface IAddIndexModal {
 const initialIndex = {
   name: "",
   description: "",
-  file: "",
+  file: null as File | null,
   feeAmount: "",
   category: "",
   symbol: "",
@@ -46,7 +47,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
-  const { publicKey, signTransaction } = useWallet(); // Wallet context
+  const { publicKey, signTransaction , connected } = useWallet(); // Wallet context
   const { program, connection } = useProgram() || {}; // Use the custom hook
   const handleCancel = () => setIsModalOpen(false);
 
@@ -108,27 +109,40 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       return;
     }
 
-    // Filter selected tokens and prepare data
+    if (!addIndex.file) {
+      console.error("❌ No file selected for upload!");
+      return;
+    }
+    
+    // ✅ Upload Image to Pinata
+  const imageUri = await uploadImageToPinata(addIndex.file);
+
+  // ✅ Upload Metadata to Pinata
+  const metadataUri = await uploadMetadataToPinata(imageUri, addIndex.name, addIndex.description);
+
+  console.log("📌 Pinata Metadata URI:", metadataUri);
+     
+
     const selectedTokens = options.filter((item) =>
       selectedOptions.includes(item.value)
     );
     const tokenData = selectedTokens.map((item) => ({
-      coinName: item.label, // For DB
-      address: item.value, // For DB
-      proportion: item.proportion, // For both DB and on-chain
-      mint: new PublicKey(item.value), // For on-chain
-      weight: item.proportion, // For on-chain
+      coinName: item.label,
+      address: item.value,
+      proportion: item.proportion,
+      mint: new PublicKey(item.value),
+      weight: item.proportion,
     }));
 
     const coins = tokenData.map(({ coinName, address, proportion }) => ({
       coinName,
       address,
       proportion,
-    })); // For DB
+    })); 
     const tokenAllocations = tokenData.map(({ mint, weight }) => ({
       mint,
-      weight: new anchor.BN(weight), // Convert to BN for on-chain
-    })); // For on-chain
+      weight: new anchor.BN(weight), 
+    }));
 
     const totalWeight = tokenAllocations.reduce(
       (sum, allocation) => sum + allocation.weight.toNumber(),
@@ -156,18 +170,21 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         publicKey,
         mintKeypair,
         addIndex.name,
-        addIndex.description,
+        addIndex.symbol,
+        metadataUri,
         tokenAllocations,
         collectorDetails,
         parseFloat(addIndex.feeAmount),
         signTransaction
       );
 
-      // console.log("Transaction Hash:", txHash);
+      console.log("Transaction Hash:", txHash);
 
       console.log(addIndex.feeAmount, "feeAmount")
       const mintPublickey = mintKeypair.publicKey;
-      const mintKeySecret = mintKeypair.secretKey;
+      const mintKeySecret = Buffer.from(mintKeypair.secretKey).toString(
+        "base64"
+      );
       await createIndexToDB({
         ...addIndex,
         coins,
@@ -178,7 +195,6 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         collectorDetailApi,
       });
 
-      // Clear the form and close the modal
       setAddIndex(initialIndex);
       setFileList([]);
       setSelectedOptions([]);
