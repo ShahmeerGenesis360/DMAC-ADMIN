@@ -17,18 +17,11 @@ import { allocationList } from "../../../constants";
 import { createIndex as createIndexToDB } from "../../../services/indexGroup"; // DB Function
 import { createIndex as createIndexContract } from "../../../../services/contract"; // On-chain Function
 import { useProgram } from "../../../../services/idl"; // Custom hook for Anchor program
-import { PublicKey, Keypair, Connection } from "@solana/web3.js";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { PublicKey, Keypair } from "@solana/web3.js";
 import Select from "../../select";
-import { Select as SelectOptions } from 'antd'
-import fs from "fs";
-
-import { StyledSelect } from "../../select/styles";
 import { useWallet } from "@solana/wallet-adapter-react";
 import CategorySelect from "../../category";
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
-import { createGenericFile } from "@metaplex-foundation/umi";
+import { uploadImageToPinata, uploadMetadataToPinata } from "../../../../services/pinata";
 interface IAddIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,7 +30,7 @@ interface IAddIndexModal {
 const initialIndex = {
   name: "",
   description: "",
-  file: "",
+  file: null as File | null,
   feeAmount: "",
   category: "",
   symbol: "",
@@ -73,13 +66,15 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const [mintKeypair] = useState(keypair);
 
   const umi = useMemo(() => {
-    if (!connected) return null;
+    if (!connected || !publicKey || !signTransaction) return null;
+  
     console.log("🔹 Initializing Umi with Wallet Adapter...");
     const umiInstance = createUmi(RPC_URL);
     umiInstance.use(walletAdapterIdentity({ publicKey, signTransaction }));
     console.log("✅ Umi initialized!");
     return umiInstance;
-  }, [connected]);
+  }, [connected, publicKey, signTransaction]); 
+  
 
   useEffect(() => {
     const isFormValid =
@@ -116,56 +111,6 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     });
   };
 
-    // ✅ Upload Image to Arweave
-    async function uploadImageToArweave(filePath: string): Promise<string> {
-      try {
-        if (!umi) throw new Error("Umi is not initialized!");
-  
-        console.log("🚀 Uploading Image:", filePath);
-        const fileBuffer = fs.readFileSync(filePath);
-        const fileName = filePath.split("/").pop() || "image.png";
-  
-        const image = createGenericFile(fileBuffer, fileName, {
-          uniqueName: fileName,
-          contentType: "image/png", // Assuming PNG; modify if needed
-        });
-  
-        const [imageUri] = await umi.uploader.upload([image]);
-        console.log("✅ Image Uploaded:", imageUri);
-        return imageUri;
-      } catch (error) {
-        console.error("❌ Error uploading image:", error);
-        throw error;
-      }
-    }
-
-      // ✅ Upload Metadata to Arweave
-  async function uploadMetadataToArweave(
-    imageUri: string,
-    indexName: string,
-    indexDescription: string
-  ): Promise<string> {
-    try {
-      if (!umi) throw new Error("Umi is not initialized!");
-
-      console.log("🚀 Uploading Metadata...");
-      const metadata = {
-        name: indexName,
-        description: indexDescription,
-        image: imageUri,
-        properties: {
-          files: [{ type: "image/png", uri: imageUri }],
-        },
-      };
-
-      const metadataUri = await umi.uploader.uploadJson(metadata);
-      console.log("✅ Metadata Uploaded:", metadataUri);
-      return metadataUri;
-    } catch (error) {
-      console.error("❌ Error uploading metadata:", error);
-      throw error;
-    }
-  }
 
   const handleSubmit = async () => {
     if (!program || !connection || !publicKey || !signTransaction) {
@@ -175,8 +120,18 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       return;
     }
 
-     const imageUri = await uploadImageToArweave(addIndex.file);
-     const metadataUri = await uploadMetadataToArweave(imageUri, addIndex.name, addIndex.description);
+    if (!addIndex.file) {
+      console.error("❌ No file selected for upload!");
+      return;
+    }
+    
+    // ✅ Upload Image to Pinata
+  const imageUri = await uploadImageToPinata(addIndex.file);
+
+  // ✅ Upload Metadata to Pinata
+  const metadataUri = await uploadMetadataToPinata(imageUri, addIndex.name, addIndex.description);
+
+  console.log("📌 Pinata Metadata URI:", metadataUri);
      
 
     const selectedTokens = options.filter((item) =>
@@ -251,7 +206,6 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         collectorDetailApi,
       });
 
-      // Clear the form and close the modal
       setAddIndex(initialIndex);
       setFileList([]);
       setSelectedOptions([]);
@@ -264,20 +218,27 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
 
   const handleFileRemove = (file: UploadFile) => {
     console.log("Removing file:", file);
-    setAddIndex((prev) => ({ ...prev, file: "" }));
+  
+    setAddIndex((prev) => ({ 
+      ...prev, 
+      file: null 
+    }));
+  
     setFileList([]);
   };
+  
 
   const handleFile = (info: UploadChangeParam<UploadFile>) => {
+    const file = info.file.originFileObj as File;
+    if (!file) return;
+  
     setFileList(info.fileList);
-    setAddIndex((prev) => ({ ...prev, file: info?.file as any }));
-
-    if (info.file.status === "done") {
-      console.log("File uploaded successfully:", info.file.originFileObj);
-    } else if (info.file.status === "error") {
-      console.error("File upload failed:", info.file);
-    }
+    setAddIndex((prev) => ({
+      ...prev,
+      file, // ✅ Store File object directly
+    }));
   };
+  
 
   console.log(addIndex, optionTags);
   const isUploaded = fileList.length > 0;
