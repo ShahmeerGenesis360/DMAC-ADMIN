@@ -47,7 +47,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
-  const { publicKey, signTransaction , connected } = useWallet(); // Wallet context
+  const { publicKey, signTransaction, connected } = useWallet(); // Wallet context
   const { program, connection } = useProgram() || {}; // Use the custom hook
   const handleCancel = () => setIsModalOpen(false);
 
@@ -113,15 +113,17 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       console.error("❌ No file selected for upload!");
       return;
     }
-    
+
     // ✅ Upload Image to Pinata
-  const imageUri = await uploadImageToPinata(addIndex.file);
+    const imageUri = await uploadImageToPinata(addIndex.file);
 
-  // ✅ Upload Metadata to Pinata
-  const metadataUri = await uploadMetadataToPinata(imageUri, addIndex.name, addIndex.description);
+    // ✅ Upload Metadata to Pinata
+    const metadataUri: any = await uploadMetadataToPinata(imageUri, addIndex.name, addIndex.description);
 
-  console.log("📌 Pinata Metadata URI:", metadataUri);
-     
+    console.log("📌 Pinata Metadata URI:", metadataUri);
+    const response = await fetch(metadataUri)
+    const data = await response.json()
+
 
     const selectedTokens = options.filter((item) =>
       selectedOptions.includes(item.value)
@@ -138,10 +140,10 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       coinName,
       address,
       proportion,
-    })); 
+    }));
     const tokenAllocations = tokenData.map(({ mint, weight }) => ({
       mint,
-      weight: new anchor.BN(weight), 
+      weight: new anchor.BN(weight),
     }));
 
     const totalWeight = tokenAllocations.reduce(
@@ -193,7 +195,13 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         mintKeySecret,
         tokenAllocations,
         collectorDetailApi,
-      });
+        imageUrl: data.image
+      }).then(() => {
+        toast.success("Index Added Sucessful!");
+      })
+        .catch(() => {
+          toast.error("Getting Error!!")
+        });
 
       setAddIndex(initialIndex);
       setFileList([]);

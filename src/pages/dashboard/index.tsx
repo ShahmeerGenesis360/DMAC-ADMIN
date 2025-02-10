@@ -161,7 +161,7 @@ const columns = (editIndex: Function) => [
           style={{ borderRadius: 50 }}
           src={
             record.index.imageUrl
-              ? `${BASE_URL}/uploads/${record?.index.imageUrl}`
+              ? `${record?.index.imageUrl}`
               : MonkeyIcon
           }
         />

@@ -47,85 +47,64 @@ export const getAllIndexWithPagination = async (
 
 export const createIndex = async (groupIndex: IGroupCoin) => {
   const token = await getAuthToken();
-  const formData = new FormData();
 
-  console.log("-----------------------------------");
-  // Append data to the FormData object
-  formData.append("file", groupIndex.file);
-  formData.append("name", groupIndex.name);
-  formData.append("symbol", groupIndex.symbol);
-  formData.append("description", groupIndex.description);
-  formData.append("category", groupIndex.category);
-  formData.append("faq", JSON.stringify(groupIndex.faq));
-  formData.append("coins", JSON.stringify(groupIndex.coins));
-  formData.append(
-    "mintKeySecret",
-    JSON.stringify(groupIndex.mintKeySecret.toString())
-  );
-  formData.append(
-    "mintPublickey",
-    JSON.stringify(groupIndex.mintPublickey.toString())
-  );
-  formData.append(
-    "tokenAllocations",
-    JSON.stringify(groupIndex.tokenAllocations)
-  );
-  formData.append(
-    "collectorDetailApi",
-    JSON.stringify(groupIndex.collectorDetailApi)
-  );
-  formData.append("feeAmount", JSON.stringify(groupIndex.feeAmount));
+  const payload = {
+    name: groupIndex.name,
+    symbol: groupIndex.symbol,
+    description: groupIndex.description,
+    category: groupIndex.category,
+    faq: groupIndex.faq,
+    coins: groupIndex.coins,
+    mintKeySecret: groupIndex.mintKeySecret.toString(),
+    mintPublickey: groupIndex.mintPublickey.toString(),
+    tokenAllocations: groupIndex.tokenAllocations,
+    collectorDetailApi: groupIndex.collectorDetailApi,
+    feeAmount: groupIndex.feeAmount,
+    imageUrl: groupIndex.imageUrl,
+  };
+
   try {
-    console.log("calling the API now");
     const response = await apiRequest<GetGroupCoinResponse>(
       "/index",
       "POST",
-      formData,
+      JSON.stringify(payload),
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       }
     );
-    console.log("-------------             -----------------");
-    console.log(response.data);
     return response;
   } catch (error: any) {
-    console.log(error);
     throw error;
   }
 };
 
 export const updateIndex = async (groupIndex: IGroupCoin) => {
   const token = await getAuthToken();
-  const formData = new FormData();
-  if (groupIndex.imageUrl === "") {
-    formData.append("file", groupIndex.file);
-  } else {
-    formData.append("imageUrl", groupIndex.imageUrl as string);
-  }
-  // Append data to the FormData object
-  formData.append("name", groupIndex.name);
-  formData.append("symbol", groupIndex.symbol);
-  formData.append("id", groupIndex._id as string);
-  formData.append("description", groupIndex.description);
-  formData.append("category", groupIndex.category);
-  formData.append("faq", JSON.stringify(groupIndex.faq));
-  formData.append("coins", JSON.stringify(groupIndex.coins));
-  formData.append(
-    "collectorDetails",
-    JSON.stringify(groupIndex.collectorDetail)
-  );
+  
+  const payload = {
+    name: groupIndex.name,
+    symbol: groupIndex.symbol,
+    id: groupIndex._id as string,
+    description: groupIndex.description,
+    category: groupIndex.category,
+    faq: groupIndex.faq,
+    coins: groupIndex.coins,
+    collectorDetails: groupIndex.collectorDetail,
+    imageUrl: groupIndex.imageUrl || undefined,
+  };
+
   try {
     const response = await apiRequest<GetGroupCoinResponse>(
       `/index/${groupIndex._id}`,
       "PUT",
-      formData,
+      JSON.stringify(payload),
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       }
     );
@@ -134,3 +113,4 @@ export const updateIndex = async (groupIndex: IGroupCoin) => {
     throw error;
   }
 };
+

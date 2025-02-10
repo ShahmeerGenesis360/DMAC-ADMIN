@@ -9,6 +9,7 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
 import '@solana/wallet-adapter-react-ui/styles.css';
+import { ToastContainer } from 'react-toastify'
 
 
 // Use require instead of import since the stylesheets are not included in the main bundle
@@ -37,6 +38,18 @@ function App() {
             </WalletModalProvider>
           </WalletProvider>
         </ConnectionProvider>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </BrowserRouter>
     </>
   );

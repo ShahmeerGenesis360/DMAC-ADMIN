@@ -6,6 +6,8 @@ import PercentageCard from "./percentageCard";
 import { useEffect, useState } from "react";
 import { updateIndex } from "../../../services/indexGroup";
 import { allocationList } from "../../../constants";
+import { uploadImageToPinata, uploadMetadataToPinata } from "../../../../services/pinata";
+import { toast } from "react-toastify";
 
 interface IRebalanceModal {
   isModalOpen: boolean;
@@ -29,6 +31,8 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
     let totalProportion = (editIndex.coins as ICoin[] || []).reduce((sum: number, coin: ICoin) => sum + coin.proportion, 0);
     // @ts-ignore
     const isFormValid =
+      editIndex.symbol !== "" &&
+      editIndex.category !== "" &&
       editIndex.name.trim() !== "" &&
       editIndex.description.trim() !== "" &&
       faq.every((item: any) => item.answer.trim() !== "") &&
@@ -40,7 +44,31 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
   }, [editIndex, faq, collectorDetail]);
 
   const handleSubmit = async () => {
-    await updateIndex({ ...editIndex, faq, collectorDetail }).then(() => { window.location.reload() })
+    if (editIndex.file) {
+      console.error("❌ No file selected for upload!");
+      const imageUri = await uploadImageToPinata(editIndex.file);
+      // ✅ Upload Metadata to Pinata
+      const metadataUri = await uploadMetadataToPinata(imageUri, editIndex.name, editIndex.description);
+      const response = await fetch(metadataUri)
+      const data = await response.json()
+      await updateIndex({ ...editIndex, faq, collectorDetail, imageUrl: data.image }).then(() => { 
+        toast.success("Index Updated Sucessful!");
+        window.location.reload() 
+      })
+        .catch(() => {
+          toast.error("Getting Error!!")
+        })
+
+    }
+    else {
+      await updateIndex({ ...editIndex, faq, collectorDetail }).then(() => { 
+        toast.success("Index Updated Sucessful!");
+        window.location.reload() 
+      })
+        .catch(() => {
+          toast.error("Getting Error!!")
+        })
+    }
 
   }
   return (

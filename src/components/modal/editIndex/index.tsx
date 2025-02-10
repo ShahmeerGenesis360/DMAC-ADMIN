@@ -67,7 +67,7 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
             uid: "-1",
             name: index.imageUrl.split("/").pop() || "image",
             status: "done",
-            url: `${BASE_URL}/uploads/${index.imageUrl}`,
+            url: `${index.imageUrl}`,
           },
         ])
       }
