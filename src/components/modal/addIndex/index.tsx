@@ -27,6 +27,7 @@ import { uploadImageToPinata, uploadMetadataToPinata } from "../../../../service
 import { StyledSelect } from "../../select/styles";
 import { useWallet } from "@solana/wallet-adapter-react";
 import CategorySelect from "../../category";
+import { toast } from "react-toastify";
 interface IAddIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -215,7 +216,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
 
   const handleFileRemove = (file: UploadFile) => {
     console.log("Removing file:", file);
-    setAddIndex((prev) => ({ ...prev, file: "" }));
+    setAddIndex((prev: any) => ({ ...prev, file: "" }));
     setFileList([]);
   };
 
