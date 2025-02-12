@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import { CustomModalStyle, Logo, LogoutButton, SidebarContainer, SidebarWrapper, StyledMenu, Text } from './styles';
-import LogoIcon from '../../assets/logo.svg';
+import LogoIcon from '../../assets/logoIcon.svg';
 import LogoutIcon from '../../assets/logout.svg';
 import { DashboardIcon } from '../../assets/dashboard';
 import { WalletIcon } from '../../assets/wallet';

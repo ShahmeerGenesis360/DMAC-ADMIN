@@ -46,6 +46,8 @@ import {
 import { buySellChart, feesChart, LockedChart, userChart } from "../../services/charts";
 import { socket } from "../../socket";
 import { Text } from "../../components/dropdown/styles";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { toast } from "react-toastify";
 
 const { Title: AntdTitle } = Typography;
 const { Option } = Select;
@@ -246,9 +248,14 @@ const Dashboard = () => {
   const [isUserOpen, setIsUserOpen] = useState(false);
   const [isTransactionOpen, setIsTransactionOpen] = useState(false);
   const [isRevenueOpen, setIsRevenueOpen] = useState(false);
+  const { connected } = useWallet()
 
 
   const editIndex = async (index: object) => {
+    if (!connected) {
+      toast.error("Wallet not Connected!!");
+      return;
+    }
     setCurrentIndex(index);
     setOpenEditModal(true);
   };
@@ -409,6 +416,14 @@ const Dashboard = () => {
     });
   };
 
+  const addIndexHandler = () => {
+    if (!connected) {
+      toast.error("Wallet not Connected!!");
+      return;
+    }
+    setOpenModal(true)
+  }
+
   const getLocked = async () => {
     const data = await LockedChart(TransactionRange[selectedLocked as keyof typeof TransactionRange]);
     const formatData = (transactions: any[]) => {
@@ -447,7 +462,7 @@ const Dashboard = () => {
         <Button
           text="Add Index"
           icon={<PlusOutlined size={20} />}
-          onClick={() => setOpenModal(true)}
+          onClick={addIndexHandler}
         />
       </Flex>
       <SubHeader>Here’s your analytics details:</SubHeader>
@@ -470,7 +485,14 @@ const Dashboard = () => {
               onDropdownVisibleChange={(open: boolean) => setIsLockedOpen(open)} />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#4caf50" }}>
-            4,556 <span style={{ fontSize: 12, color: "#7cf97c" }}>+5.2%</span>
+            {lockedData && lockedData.datasets[0].data.reduce((total, item) => {
+              Object.keys(item).forEach(key => {
+                if (item[key].totalDeposit !== undefined) {
+                  total += item[key].totalDeposit + item[key].totalWithdrawal;
+                }
+              });
+              return total;
+            }, 0)}
           </AntdTitle>
           {lockedData && <LineChart data={lockedData || {}} />}
         </StyledCard>
@@ -546,13 +568,11 @@ const Dashboard = () => {
         </CardHeader>
         <AntdTitle level={4} style={{ color: "#4caf50" }}>
           {feesData &&
-            Math.floor(
-              feesData?.datasets[0]?.data?.reduce(
-                (acc: number, value: any) => acc + value.y,
-                0
-              )
-            )}{" "}
-          <span style={{ fontSize: 12, color: "#7cf97c" }}>+5.2%</span>
+            feesData?.datasets[0]?.data?.reduce(
+              (acc: number, value: any) => acc + value.y,
+              0
+            )
+          }{" "}
         </AntdTitle>
         {feesData && <BarChart data={feesData || {}} />}
       </StyledCard>
