@@ -1,4 +1,6 @@
 import axios, { AxiosRequestConfig, Method } from "axios";
+import { logout } from "../../services/auth";
+
 
 // Base URL for API requests
 // const apiUrl = import.meta.env.VITE_API_URL;
@@ -28,6 +30,10 @@ export const apiRequest = async <T>(
     });
     return response.data;
   } catch (error: any) {
+    if (error.response?.status === 401) {
+      logout();
+      // window.location.href = "/login";
+    }
     // Handle errors (can be extended for specific needs)
     throw new Error(
       error.response?.data?.message ||
