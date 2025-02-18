@@ -23,7 +23,7 @@ const CategorySelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions 
         <Flex>
             <StyledSelect
                 placeholder="Categories"
-                value={selectedOptions}
+                value={selectedOptions === "" ? undefined : selectedOptions}
                 dropdownStyle={{
                     backgroundColor: "#242931",
                     borderRadius: "20px",

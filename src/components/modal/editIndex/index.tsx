@@ -86,7 +86,7 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
     }));
   }
 
-  const handleFaqChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleFaqChange = (e: ChangeEvent<HTMLTextAreaElement>, index: number) => {
     const { value } = e.target;
 
     // Update the specific answer in the array
@@ -185,7 +185,7 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
 
         {/* Input Fields */}
         <div style={{ marginTop: 16 }}>
-          <StyledInput placeholder="Index Name" value={addIndex.name} showCount maxLength={20} name="name" onChange={handleChange} />
+          <StyledInput placeholder="Index Name" value={addIndex.name} showCount maxLength={50} name="name" onChange={handleChange} />
         </div>
 
         <div style={{ marginTop: 16 }}>
@@ -200,7 +200,7 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <StyledTextArea style={{ resize: "none" }} value={addIndex.description} showCount rows={4} maxLength={200} placeholder="Description" name="description" onChange={handleChange} />
+          <StyledTextArea style={{ resize: "none" }} value={addIndex.description} showCount rows={4} maxLength={2000} placeholder="Description" name="description" onChange={handleChange} />
         </div>
 
         <div style={{ marginTop: 16 }}>
@@ -220,7 +220,18 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
           {
             faq.length > 0 && faq.map((item: IFaq, index) => (
               <div style={{ marginTop: 16 }}>
-                <StyledInput placeholder={item.question} value={item.answer} showCount maxLength={20} name={item.question} onChange={(e: ChangeEvent<HTMLInputElement>) => handleFaqChange(e, index)} />
+                <StyledTextArea
+                  placeholder={item.question}
+                  value={item.answer}
+                  showCount={item.question === "Fees" ? false : true}
+                  maxLength={200}
+                  style={{ resize: "none" }}
+                  name={item.question}
+                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                    handleFaqChange(e, index)
+                  }
+                  autoSize={{ minRows: 1, maxRows: item.question === "Fees" ? 1 : 3 }}
+                />
               </div>
             ))
           }

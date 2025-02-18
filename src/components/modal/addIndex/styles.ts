@@ -45,6 +45,9 @@ export const StyledInput = styled(Input)`
     padding: 15px 12px;
     font-size: 16px;
     font-weight: 500;
+    &::placeholder {
+      color: #828282 !important; /* Placeholder color */
+    }
   }
 
   ::placeholder {
@@ -88,6 +91,9 @@ export const StyledTextArea = styled(TextArea)`
     padding: 15px 12px;
     font-size: 16px;
     font-weight: 500;
+    &::placeholder {
+      color: #828282 !important; /* Placeholder color */
+    }
     .ant-input {
       padding: 0;
     }

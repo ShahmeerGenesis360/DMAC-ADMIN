@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Avatar, Flex, message } from "antd";
 import { DropdownOption, DropdownOptions, InputNumber, StyledSelect, Text } from "./styles";
-import { DownOutlined, UpOutlined } from "@ant-design/icons";
+import { CloseOutlined, DownOutlined, UpOutlined } from "@ant-design/icons";
 
 
 
@@ -64,7 +64,6 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
       }
     }
   };
-
   return (
     <Flex>
       <StyledSelect
@@ -76,7 +75,7 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
           borderRadius: "20px",
           padding: "0px",
         }}
-        onDeselect={handleDeselect}
+        // onDeselect={handleDeselect}
         options={options.map((option) => ({
           value: option.value,
           label: (
@@ -85,6 +84,7 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
               <Text>
                 {option.label} - {option.proportion}%
               </Text>
+              <CloseOutlined onClick={() => handleDeselect(option.value)} />
             </Flex>
           ),
         }))}

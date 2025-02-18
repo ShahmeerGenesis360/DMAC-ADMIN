@@ -392,25 +392,35 @@ const Dashboard = () => {
 
   const getFees = async () => {
     const data = await feesChart();
-    const formatData = (transactions: any, key: "totalAmount") => {
-      return transactions?.map((txn: any) => ({
-        x: new Date(txn.startDate),
-        y: txn[key],
+    const formatData = (transactions: any[]) => {
+      return transactions?.map((txn) => ({
+        x: new Date(txn.date), // Using `date` instead of `startDate`
+        y: txn.totalAmount, // Ensuring the correct key
       }));
     };
 
     setFeesData({
-      labels: data?.map((item: any) => item.startDate),
+      labels: data.buyRewards.map((item: any) => item.date),
       datasets: [
         {
           label: "Buy",
-          data: formatData(data, "totalAmount"),
+          data: formatData(data.buyRewards),
           backgroundColor: "#78DA89",
           borderRadius: 2,
           barPercentage: 0.4,
           categoryPercentage: 0.4,
           borderColor: "#78DA89",
           pointBackgroundColor: "#78DA89",
+        },
+        {
+          label: "Sell",
+          data: formatData(data.sellRewards),
+          backgroundColor: "#E87975",
+          borderRadius: 2,
+          barPercentage: 0.4,
+          categoryPercentage: 0.4,
+          borderColor: "#E87975",
+          pointBackgroundColor: "#E87975",
         },
       ],
     });
@@ -426,15 +436,16 @@ const Dashboard = () => {
 
   const getLocked = async () => {
     const data = await LockedChart(TransactionRange[selectedLocked as keyof typeof TransactionRange]);
+    const formatDate = (dateStr: string) => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
+    };
     const formatData = (transactions: any[]) => {
-      return transactions.flatMap((txn: any) => {
-        return Object.values(txn) // Extract all indexed entries (0,1,2,3,...)
-          .filter((entry: any) => entry.startDate) // Ensure it has valid data
-          .map((entry: any) => ({
-            x: entry.startDate,
-            y: Math.max(0, entry.totalDeposit - entry.totalWithdrawal),
-          }));
-      });
+      return transactions.reverse()
+        .map((entry: any) => ({
+          x: formatDate(entry.date),
+          y: entry.tvl,
+        }));
     };
 
     setLockedData({
@@ -485,14 +496,15 @@ const Dashboard = () => {
               onDropdownVisibleChange={(open: boolean) => setIsLockedOpen(open)} />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#4caf50" }}>
-            {lockedData && lockedData.datasets[0].data.reduce((total, item) => {
-              Object.keys(item).forEach(key => {
-                if (item[key].totalDeposit !== undefined) {
-                  total += item[key].totalDeposit + item[key].totalWithdrawal;
-                }
-              });
-              return total;
-            }, 0)}
+            {lockedData &&
+              formatNumber(
+                lockedData.datasets[0]?.data?.reduce(
+                  (total: number, point: any) => total + (point.y || 0),
+                  0
+                ) || 0
+              )
+            }
+            {" "}
           </AntdTitle>
           {lockedData && <LineChart data={lockedData || {}} />}
         </StyledCard>
@@ -553,7 +565,7 @@ const Dashboard = () => {
       <StyledCard>
         <CardHeader>
           <CardText>Total Fee Revenue</CardText>
-          <StyledSelect open={isRevenueOpen} value={selectedRevenue} size="small" dropdownClassName="range_popup" dropdownRender={() => (
+          {/* <StyledSelect open={isRevenueOpen} value={selectedRevenue} size="small" dropdownClassName="range_popup" dropdownRender={() => (
             <Flex vertical>
               {["Monthly", "Weekly", "Daily"].map((item) => (
                 <Text key={item} style={{ cursor: "pointer" }}
@@ -564,14 +576,15 @@ const Dashboard = () => {
               ))}
             </Flex>
           )}
-            onDropdownVisibleChange={(open: boolean) => setIsRevenueOpen(open)} />
+            onDropdownVisibleChange={(open: boolean) => setIsRevenueOpen(open)} /> */}
         </CardHeader>
         <AntdTitle level={4} style={{ color: "#4caf50" }}>
           {feesData &&
-            feesData?.datasets[0]?.data?.reduce(
-              (acc: number, value: any) => acc + value.y,
+            formatNumber(feesData?.datasets?.reduce(
+              (acc: number, dataset: any) =>
+                acc + dataset?.data?.reduce((sum: number, value: any) => sum + (value.y || 0), 0),
               0
-            )
+            ))
           }{" "}
         </AntdTitle>
         {feesData && <BarChart data={feesData || {}} />}

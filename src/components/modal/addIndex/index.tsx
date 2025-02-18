@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Flex } from "antd";
+import { Flex, Tooltip } from "antd";
 import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import * as anchor from "@coral-xyz/anchor";
 import {
@@ -54,7 +54,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [faq, setFaq] = useState(
-    questions.map((question) => ({ question, answer: "" }))
+    questions.map((question) => ({ question, answer: question.toLowerCase() === "fees" ? "1%" : "", }))
   );
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -91,7 +91,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     }));
   };
 
-  const handleFaqChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleFaqChange = (e: ChangeEvent<HTMLTextAreaElement>, index: number) => {
     const { value } = e.target;
 
     // Update the specific answer in the array
@@ -257,107 +257,122 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
           background: "#1C1C1C1A",
         }}
       >
-        <StyledUpload
-          isUploaded={isUploaded}
-          fileList={fileList}
-          listType="picture"
-          multiple={false}
-          beforeUpload={() => false}
-          onChange={handleFile}
-          onRemove={handleFileRemove}
-        >
-          <Flex gap={10} justify="center" align="center">
-            <CloudUploadOutlined style={{ fontSize: "24px", color: "#fff" }} />{" "}
-            <UploadText>Upload Image</UploadText>
-          </Flex>
-        </StyledUpload>
+        <Tooltip title="Upload an image of index">
+          <StyledUpload
+            isUploaded={isUploaded}
+            fileList={fileList}
+            listType="picture"
+            multiple={false}
+            beforeUpload={() => false}
+            onChange={handleFile}
+            onRemove={handleFileRemove}
+          >
+            <Flex gap={10} justify="center" align="center">
+              <CloudUploadOutlined style={{ fontSize: "24px", color: "#fff" }} />{" "}
+              <UploadText>Upload Image</UploadText>
+            </Flex>
+          </StyledUpload>
+        </Tooltip>
 
         {/* Input Fields */}
         <div style={{ marginTop: 16 }}>
-          <StyledInput
-            placeholder="Index Name"
-            value={addIndex.name}
-            showCount
-            maxLength={20}
-            name="name"
-            onChange={handleChange}
-          />
+          <Tooltip title="Enter a name for your index">
+            <StyledInput
+              placeholder="Index Name"
+              value={addIndex.name}
+              showCount
+              maxLength={50}
+              name="name"
+              onChange={handleChange}
+            />
+          </Tooltip>
         </div>
 
 
         <div style={{ marginTop: 16 }}>
-          <StyledInput
-            placeholder="Index Symbol"
-            value={addIndex.symbol}
-            showCount
-            maxLength={20}
-            name="symbol"
-            onChange={handleChange}
-          />
+          <Tooltip title="Enter a symbol for the index">
+            <StyledInput
+              placeholder="Index Symbol"
+              value={addIndex.symbol}
+              showCount
+              maxLength={20}
+              name="symbol"
+              onChange={handleChange}
+            />
+          </Tooltip>
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <StyledTextArea
-            style={{ resize: "none" }}
-            value={addIndex.description}
-            showCount
-            rows={4}
-            maxLength={200}
-            placeholder="Description"
-            name="description"
-            onChange={handleChange}
-          />
+          <Tooltip title="Enter a description of the index">
+            <StyledTextArea
+              style={{ resize: "none" }}
+              value={addIndex.description}
+              showCount
+              rows={4}
+              maxLength={2000}
+              placeholder="Description"
+              name="description"
+              onChange={handleChange}
+            />
+          </Tooltip>
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <CustomSelect
-            setSelectedOptions={setSelectedOptions}
-            selectedOptions={selectedOptions}
-            setOptions={setOptions}
-            options={options}
-          />
+          <Tooltip title="Select the coins and Enter its proportions" getPopupContainer={(triggerNode: any) => triggerNode.parentNode}>
+            <span>
+              <CustomSelect
+                setSelectedOptions={setSelectedOptions}
+                selectedOptions={selectedOptions}
+                setOptions={setOptions}
+                options={options}
+              />
+            </span>
+          </Tooltip>
         </div>
         <div style={{ marginTop: 16 }}>
-          <Select
-            setSelectedOptions={setSelectedOptionTags}
-            selectedOptions={selectedOptionTags}
-            setOptions={setOptionTags}
-            options={optionTags}
-          />
+          <Tooltip title="Enter the address and Enter its proportion" getPopupContainer={(triggerNode: any) => triggerNode.parentNode}>
+            <span>
+              <Select
+                setSelectedOptions={setSelectedOptionTags}
+                selectedOptions={selectedOptionTags}
+                setOptions={setOptionTags}
+                options={optionTags}
+              />
+            </span>
+          </Tooltip>
         </div>
         <div style={{ marginTop: 16 }}>
-          <CategorySelect setSelectedOptions={setAddIndex}
-            selectedOptions={addIndex.category} />
+          <Tooltip title="Select the Category for the index" getPopupContainer={(triggerNode: any) => triggerNode.parentNode}>
+            <span> {/* Wrapping with a span to fix Tooltip not appearing on Select */}
+              <CategorySelect
+                setSelectedOptions={setAddIndex}
+                selectedOptions={addIndex.category}
+              />
+            </span>
+          </Tooltip>
         </div>
         <>
           {faq.map((item, index) => (
             <div style={{ marginTop: 16 }}>
-              <StyledInput
-                placeholder={item.question}
-                value={item.answer}
-                showCount
-                maxLength={20}
-                name={item.question}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleFaqChange(e, index)
-                }
-              />
+              <Tooltip title={`Enter the detail of ${item.question}`}>
+                <StyledTextArea
+                  placeholder={item.question}
+                  value={item.answer}
+                  showCount={item.question === "Fees" ? false : true}
+                  maxLength={200}
+                  style={{ resize: "none" }}
+                  name={item.question}
+                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                    handleFaqChange(e, index)
+                  }
+                  autoSize={{ minRows: 1, maxRows: item.question === "Fees" ? 1 : 3 }}
+                />
+              </Tooltip>
             </div>
           ))}
         </>
-        <div style={{ marginTop: 16 }}>
-          <StyledInput
-            placeholder="Fees Amount"
-            type={"number"}
-            value={addIndex.feeAmount}
-            showCount
-            maxLength={20}
-            name="feeAmount"
-            onChange={handleChange}
-          />
-        </div>
       </StyledModal>
-    </div>
+    </div >
   );
 };
 

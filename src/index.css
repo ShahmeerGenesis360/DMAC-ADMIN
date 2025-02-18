@@ -12,7 +12,7 @@
   display: none !important;
 }
 
-.range_popup{
+.range_popup {
   background: #1d1d1d;
   color: #fcfcfc;
   border: 1px solid #ffffff1a;
@@ -25,4 +25,19 @@
   display: flex !important;
   height: auto;
   width: auto;
+}
+
+.ant-tooltip .ant-tooltip-inner {
+  background: #242931;
+  border: 1px solid #ffffff63;
+  border-radius: 20px;
+  color: #828282;
+}
+
+.ant-tooltip .ant-tooltip-arrow:before {
+  background: #242931;
+}
+
+.ant-tooltip {
+  max-width: 500px;
 }
