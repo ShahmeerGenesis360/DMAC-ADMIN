@@ -14,18 +14,14 @@ interface IProps {
 
 const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, setOptions, options }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  console.log(options, "options")
+  const [searchTerm, setSearchTerm] = useState("");
 
   const getTotalProportion = () =>
     options.reduce((sum, option) => sum + option.proportion, 0);
 
   const handleProportionChange = (value: string, proportion: number) => {
-    console.log("value", value);
-    console.log("proportion", proportion);
     const totalProportion = getTotalProportion();
     const currentOption = options.find((option) => option.value === value);
-
-    // Calculate the total proportion after the change
     const newTotal = totalProportion - (currentOption?.proportion || 0) + proportion;
 
     if (newTotal > 100) {
@@ -45,9 +41,10 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
     if (option && option.proportion > 0 && !selectedOptions.includes(value)) {
       setSelectedOptions([...selectedOptions, value]);
     }
+    setSearchTerm("");
   };
 
-  const handleDeselect = (value: string | unknown) => {
+  const handleDeselect = (value: string) => {
     setSelectedOptions(selectedOptions.filter((item) => item !== value));
     setOptions(
       options.map((option) =>
@@ -58,44 +55,55 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
 
   const handleOptionClick = (value: string) => {
     const option = options.find((opt) => opt.value === value);
-    if (option && option.proportion > 0) {
-      if (!selectedOptions.includes(value)) {
-        setSelectedOptions([...selectedOptions, value]);
-      }
+    if (option && option.proportion > 0 && !selectedOptions.includes(value)) {
+      setSelectedOptions([...selectedOptions, value]);
     }
+    // setSearchTerm("");
   };
+
+  // Filter options based on searchTerm
+  const filteredOptions = options.filter(option =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  console.log(searchTerm, "searchTerm")
+
   return (
     <Flex>
       <StyledSelect
         placeholder="Allocations"
         mode="multiple"
         value={selectedOptions}
+        open={isDropdownOpen}
+        showSearch
+        searchValue={searchTerm}
+        onSearch={(value) => setSearchTerm(value)} // Capture search input
+        filterOption={false} // Disable default filter (we handle it manually)
         dropdownStyle={{
           backgroundColor: "#242931",
           borderRadius: "20px",
           padding: "0px",
         }}
-        // onDeselect={handleDeselect}
-        options={options.map((option) => ({
+        options={filteredOptions.map((option) => ({
           value: option.value,
           label: (
-            <Flex gap={10} align="center" >
+            <Flex gap={10} align="center">
               <Avatar src={option.icon} size="small" />
-              <Text>
-                {option.label} - {option.proportion}%
-              </Text>
+              <Text>{option.label} - {option.proportion}%</Text>
               <CloseOutlined onClick={() => handleDeselect(option.value)} />
             </Flex>
           ),
         }))}
         dropdownRender={() => (
           <DropdownOptions>
-            {options.map((option) => (
-              <DropdownOption
-                key={option.value}
-                onClick={() => handleOptionClick(option.value)}
-              >
-                <Flex gap={10} align="center" >
+            {filteredOptions.map((option) => (
+              <DropdownOption key={option.value} onClick={(e) => {
+                // Prevent onClick from firing when interacting with InputNumber
+                if ((e.target as HTMLElement).tagName !== "INPUT") {
+                  handleOptionClick(option.value);
+                  setSearchTerm("");
+                }
+              }}>
+                <Flex gap={10} align="center">
                   <Avatar src={option.icon} size="large" />
                   <Text>{option.label}</Text>
                 </Flex>
@@ -103,8 +111,10 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
                   type="number"
                   placeholder="Enter %"
                   value={option.proportion}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    e.stopPropagation()
                     handleProportionChange(option.value, Number(e.target.value))
+                  }
                   }
                   onPressEnter={() => handleProportionSubmit(option.value)}
                 />
@@ -113,7 +123,7 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
           </DropdownOptions>
         )}
         optionLabelProp="label"
-        suffixIcon={isDropdownOpen ? <UpOutlined /> : <DownOutlined />} // Toggle icon
+        suffixIcon={isDropdownOpen ? <UpOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} /> : <DownOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} />} // Toggle icon
         onDropdownVisibleChange={(open: boolean) => setIsDropdownOpen(open)} // Track dropdown visibility
       />
     </Flex>

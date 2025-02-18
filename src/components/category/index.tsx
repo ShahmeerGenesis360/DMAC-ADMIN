@@ -47,7 +47,7 @@ const CategorySelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions 
                     </DropdownOptions>
                 )}
                 optionLabelProp="label"
-                suffixIcon={isDropdownOpen ? <UpOutlined /> : <DownOutlined />} // Toggle icon
+                suffixIcon={isDropdownOpen ? <UpOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} /> : <DownOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} />} // Toggle icon
                 onDropdownVisibleChange={(open: boolean) => setIsDropdownOpen(open)} // Track dropdown visibility
             />
         </Flex>

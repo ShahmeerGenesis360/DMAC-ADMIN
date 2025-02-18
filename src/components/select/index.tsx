@@ -56,6 +56,7 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
             <StyledSelect
                 placeholder="Collectors"
                 mode="tags"
+                open={isDropdownOpen}
                 value={selectedOptions}
                 tokenSeparators={[',']}
                 dropdownStyle={{
@@ -97,7 +98,7 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
                         {menu}
                     </DropdownOptions>
                 )}
-                suffixIcon={isDropdownOpen ? <UpOutlined /> : <DownOutlined />} // Toggle icon
+                suffixIcon={isDropdownOpen ? <UpOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} /> : <DownOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)}/>} // Toggle icon
                 onDropdownVisibleChange={(open: boolean) => setIsDropdownOpen(open)} // Track dropdown visibility
             >
                 {(options || []).map((option) => (
