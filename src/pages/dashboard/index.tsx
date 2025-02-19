@@ -43,7 +43,12 @@ import {
   getAllIndex,
   getAllIndexWithPagination,
 } from "../../services/indexGroup";
-import { buySellChart, feesChart, LockedChart, userChart } from "../../services/charts";
+import {
+  buySellChart,
+  feesChart,
+  LockedChart,
+  userChart,
+} from "../../services/charts";
 import { socket } from "../../socket";
 import { Text } from "../../components/dropdown/styles";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -161,11 +166,7 @@ const columns = (editIndex: Function) => [
           height={34}
           width={34}
           style={{ borderRadius: 50 }}
-          src={
-            record.index.imageUrl
-              ? `${record?.index.imageUrl}`
-              : MonkeyIcon
-          }
+          src={record.index.imageUrl ? `${record?.index.imageUrl}` : MonkeyIcon}
         />
         <IndexText>{record.index.name}</IndexText>
       </IndexName>
@@ -178,19 +179,29 @@ const columns = (editIndex: Function) => [
     render: () => "Loreum",
   },
   {
+    title: "Volume",
+    dataIndex: "totalVolume",
+    key: "totalVolume",
+    render: (text: number) => (
+      <IndexText>{text && formatNumber(Math.max(0, text))}</IndexText>
+    ),
+  },
+  {
     title: "Price",
-    dataIndex: "price",
-    key: "price",
-    render: (text: number) => <IndexText>{text.toFixed(2)}</IndexText>,
+    dataIndex: "index.price",
+    key: "index.price",
+    render: (_: any, record: { index: IGroupCoin }) => (
+      <IndexText>
+        {record?.index?.price && record?.index?.price?.toFixed(2)}
+      </IndexText>
+    ),
   },
   {
     title: "TVL",
     dataIndex: "totalValueLocked",
     key: "totalValueLocked",
     render: (text: number) => (
-      <IndexText>
-        {text && formatNumber(Math.max(0, text))}
-      </IndexText>
+      <IndexText>{text && formatNumber(Math.max(0, text))}</IndexText>
     ),
   },
   {
@@ -239,17 +250,16 @@ const Dashboard = () => {
   const [transactionData, setTransactionData] = useState<any | null>(null);
   const [feesData, setFeesData] = useState<any | null>(null);
   const [lockedData, setLockedData] = useState<any | null>(null);
-  const [selectedUsers, setSelectedUsers] = useState('Monthly');
-  const [selectedTransactions, setSelectedTransactions] = useState('Weekly');
-  const [selectedRevenue, setSelectedRevenue] = useState('Monthly');
-  const [selectedLocked, setSelectedLocked] = useState('Monthly');
+  const [selectedUsers, setSelectedUsers] = useState("Monthly");
+  const [selectedTransactions, setSelectedTransactions] = useState("Weekly");
+  const [selectedRevenue, setSelectedRevenue] = useState("Monthly");
+  const [selectedLocked, setSelectedLocked] = useState("Monthly");
   const [usersInfo, setUsersInfo] = useState<any>(null);
   const [isLockedOpen, setIsLockedOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
   const [isTransactionOpen, setIsTransactionOpen] = useState(false);
   const [isRevenueOpen, setIsRevenueOpen] = useState(false);
-  const { connected } = useWallet()
-
+  const { connected } = useWallet();
 
   const editIndex = async (index: object) => {
     if (!connected) {
@@ -303,11 +313,11 @@ const Dashboard = () => {
     };
   }, [indexes]);
 
-
-
   useEffect(() => {
     const fetchData = async () => {
-      const response = await userChart(TimeRange[selectedUsers as keyof typeof TimeRange]);
+      const response = await userChart(
+        TimeRange[selectedUsers as keyof typeof TimeRange]
+      );
       const { groupedData, totalUsers, latestMonth, latestMonthCount } =
         response.data;
       console.log(groupedData, "groupedData");
@@ -323,12 +333,15 @@ const Dashboard = () => {
       });
 
       setChartData({
-        labels: selectedUsers === "month" ? [
-          ...formattedLabels,
-          `${new Date().toLocaleString("en-US", {
-            month: "short",
-          })} ${new Date().getFullYear()}`,
-        ] : monthLabels, // Months as labels
+        labels:
+          selectedUsers === "month"
+            ? [
+                ...formattedLabels,
+                `${new Date().toLocaleString("en-US", {
+                  month: "short",
+                })} ${new Date().getFullYear()}`,
+              ]
+            : monthLabels, // Months as labels
         datasets: [
           {
             label: "Total Users",
@@ -344,19 +357,21 @@ const Dashboard = () => {
 
   useEffect(() => {
     getTransaction();
-  }, [selectedTransactions])
+  }, [selectedTransactions]);
 
   useEffect(() => {
     getFees();
-  }, [selectedRevenue])
+  }, [selectedRevenue]);
 
   useEffect(() => {
     getLocked();
-  }, [selectedLocked])
+  }, [selectedLocked]);
   // transactionChart
 
   const getTransaction = async () => {
-    const data = await buySellChart(TransactionRange[selectedTransactions as keyof typeof TransactionRange]);
+    const data = await buySellChart(
+      TransactionRange[selectedTransactions as keyof typeof TransactionRange]
+    );
     const formatData = (
       transactions: any,
       key: "totaldeposit" | "totalwithdrawl"
@@ -431,21 +446,25 @@ const Dashboard = () => {
       toast.error("Wallet not Connected!!");
       return;
     }
-    setOpenModal(true)
-  }
+    setOpenModal(true);
+  };
 
   const getLocked = async () => {
-    const data = await LockedChart(TransactionRange[selectedLocked as keyof typeof TransactionRange]);
+    const data = await LockedChart(
+      TransactionRange[selectedLocked as keyof typeof TransactionRange]
+    );
     const formatDate = (dateStr: string) => {
       const date = new Date(dateStr);
-      return date.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+      });
     };
     const formatData = (transactions: any[]) => {
-      return transactions.reverse()
-        .map((entry: any) => ({
-          x: formatDate(entry.date),
-          y: entry.tvl,
-        }));
+      return transactions.reverse().map((entry: any) => ({
+        x: formatDate(entry.date),
+        y: entry.tvl,
+      }));
     };
 
     setLockedData({
@@ -482,18 +501,29 @@ const Dashboard = () => {
         <StyledCard>
           <CardHeader>
             <CardText>Total Value Locked</CardText>
-            <StyledSelect open={isLockedOpen} value={selectedLocked} size="small" dropdownClassName="range_popup" dropdownRender={() => (
-              <Flex vertical>
-                {["Monthly", "Weekly", "Daily"].map((item) => (
-                  <Text key={item} style={{ cursor: "pointer" }}
-                    onClick={() => {
-                      setSelectedLocked(item)
-                      setIsLockedOpen(false)
-                    }}>{item}</Text>
-                ))}
-              </Flex>
-            )}
-              onDropdownVisibleChange={(open: boolean) => setIsLockedOpen(open)} />
+            <StyledSelect
+              open={isLockedOpen}
+              value={selectedLocked}
+              size="small"
+              dropdownClassName="range_popup"
+              dropdownRender={() => (
+                <Flex vertical>
+                  {["Monthly", "Weekly", "Daily"].map((item) => (
+                    <Text
+                      key={item}
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        setSelectedLocked(item);
+                        setIsLockedOpen(false);
+                      }}
+                    >
+                      {item}
+                    </Text>
+                  ))}
+                </Flex>
+              )}
+              onDropdownVisibleChange={(open: boolean) => setIsLockedOpen(open)}
+            />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#4caf50" }}>
             {lockedData &&
@@ -502,9 +532,7 @@ const Dashboard = () => {
                   (total: number, point: any) => total + (point.y || 0),
                   0
                 ) || 0
-              )
-            }
-            {" "}
+              )}{" "}
           </AntdTitle>
           {lockedData && <LineChart data={lockedData || {}} />}
         </StyledCard>
@@ -512,19 +540,32 @@ const Dashboard = () => {
         {/* Card 2: Total Users */}
         <StyledCard>
           <CardHeader>
-            <CardText>Total Users • {usersInfo?.latestMonthCount || 0} new users</CardText>
-            <StyledSelect open={isUserOpen} value={selectedUsers} size="small" dropdownClassName="range_popup" dropdownRender={() => (
-              <Flex vertical>
-                {["Monthly", "Weekly"].map((item) => (
-                  <Text key={item} style={{ cursor: "pointer" }}
-                    onClick={() => {
-                      setSelectedUsers(item)
-                      setIsUserOpen(false)
-                    }}>{item}</Text>
-                ))}
-              </Flex>
-            )}
-              onDropdownVisibleChange={(open: boolean) => setIsUserOpen(open)} />
+            <CardText>
+              Total Users • {usersInfo?.latestMonthCount || 0} new users
+            </CardText>
+            <StyledSelect
+              open={isUserOpen}
+              value={selectedUsers}
+              size="small"
+              dropdownClassName="range_popup"
+              dropdownRender={() => (
+                <Flex vertical>
+                  {["Monthly", "Weekly"].map((item) => (
+                    <Text
+                      key={item}
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        setSelectedUsers(item);
+                        setIsUserOpen(false);
+                      }}
+                    >
+                      {item}
+                    </Text>
+                  ))}
+                </Flex>
+              )}
+              onDropdownVisibleChange={(open: boolean) => setIsUserOpen(open)}
+            />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#fff" }}>
             {usersInfo?.totalUsers || 0} users since{" "}
@@ -534,23 +575,37 @@ const Dashboard = () => {
           </AntdTitle>
           {chartData && <LineChart data={chartData || {}} />}
         </StyledCard>
-
-        {/* Card 3: Transactions */}
+      </DashboardContainer>
+      {/* Card 3: Transactions */}
+      <div style={{ padding: "0 0 20px 0" }}>
         <StyledCard>
           <CardHeader>
             <CardText>Transactions</CardText>
-            <StyledSelect open={isTransactionOpen} value={selectedTransactions} size="small" dropdownClassName="range_popup" dropdownRender={() => (
-              <Flex vertical>
-                {["Monthly", "Weekly", "Daily"].map((item) => (
-                  <Text key={item} style={{ cursor: "pointer" }}
-                    onClick={() => {
-                      setSelectedTransactions(item)
-                      setIsTransactionOpen(false)
-                    }}>{item}</Text>
-                ))}
-              </Flex>
-            )}
-              onDropdownVisibleChange={(open: boolean) => setIsTransactionOpen(open)} />
+            <StyledSelect
+              open={isTransactionOpen}
+              value={selectedTransactions}
+              size="small"
+              dropdownClassName="range_popup"
+              dropdownRender={() => (
+                <Flex vertical>
+                  {["Monthly", "Weekly", "Daily"].map((item) => (
+                    <Text
+                      key={item}
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        setSelectedTransactions(item);
+                        setIsTransactionOpen(false);
+                      }}
+                    >
+                      {item}
+                    </Text>
+                  ))}
+                </Flex>
+              )}
+              onDropdownVisibleChange={(open: boolean) =>
+                setIsTransactionOpen(open)
+              }
+            />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#fff" }}>
             Transactions in past week{" "}
@@ -560,7 +615,7 @@ const Dashboard = () => {
             <LineChart legend={true} data={transactionData} />
           )}
         </StyledCard>
-      </DashboardContainer>
+      </div>
 
       <StyledCard>
         <CardHeader>
@@ -580,12 +635,17 @@ const Dashboard = () => {
         </CardHeader>
         <AntdTitle level={4} style={{ color: "#4caf50" }}>
           {feesData &&
-            formatNumber(feesData?.datasets?.reduce(
-              (acc: number, dataset: any) =>
-                acc + dataset?.data?.reduce((sum: number, value: any) => sum + (value.y || 0), 0),
-              0
-            ))
-          }{" "}
+            formatNumber(
+              feesData?.datasets?.reduce(
+                (acc: number, dataset: any) =>
+                  acc +
+                  dataset?.data?.reduce(
+                    (sum: number, value: any) => sum + (value.y || 0),
+                    0
+                  ),
+                0
+              )
+            )}{" "}
         </AntdTitle>
         {feesData && <BarChart data={feesData || {}} />}
       </StyledCard>

@@ -10,7 +10,7 @@ export const StyledModal = styled(Modal)`
   .ant-modal-content {
     background: #242931;
     border-radius: 20px;
-    height: 500px;
+    height: 80vh;
     overflow: hidden;
   }
   .ant-modal-header {
