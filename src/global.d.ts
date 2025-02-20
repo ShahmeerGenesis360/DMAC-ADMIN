@@ -1,3 +1,5 @@
+import { PublicKey } from "@solana/web3.js";
+
 export {};
 
 declare global {
@@ -43,6 +45,15 @@ declare global {
     file: any;
     faq: IFaq[] | [];
     collectorDetail?: WalletOption[] | [];
+    feeAmount: string;
+    mintKeySecret: string;
+    mintKeySecret: string;
+    mintPublickey: PublicKey;
+    collectorDetail: Array<ICollectorDetail>;
+    feeAmount: string;
+    category: string;
+    symbol: string;
+    imageUri: string;
   }
 
   interface IFaq {

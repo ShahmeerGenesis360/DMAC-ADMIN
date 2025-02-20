@@ -164,27 +164,28 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     console.log("Submitting index...");
 
     try {
-      const txHash = await createIndexContract(
-        program,
-        connection,
-        publicKey,
-        mintKeypair,
-        addIndex.name,
-        addIndex.symbol,
-        metadataUri,
-        tokenAllocations,
-        collectorDetails,
-        parseFloat(addIndex.feeAmount),
-        signTransaction
-      );
+      // const txHash = await createIndexContract(
+      //   program,
+      //   connection,
+      //   publicKey,
+      //   mintKeypair,
+      //   addIndex.name,
+      //   addIndex.symbol,
+      //   metadataUri,
+      //   tokenAllocations,
+      //   collectorDetails,
+      //   parseFloat(addIndex.feeAmount),
+      //   signTransaction
+      // );
 
-      console.log("Transaction Hash:", txHash);
+      // console.log("Transaction Hash:", txHash);
 
       console.log(addIndex.feeAmount, "feeAmount")
       const mintPublickey = mintKeypair.publicKey;
       const mintKeySecret = Buffer.from(mintKeypair.secretKey).toString(
         "base64"
       );
+      console.log(addIndex, "addIndex")
       await createIndexToDB({
         ...addIndex,
         coins,
@@ -193,6 +194,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         mintKeySecret,
         tokenAllocations,
         collectorDetailApi,
+        imageUri
       });
 
       setAddIndex(initialIndex);

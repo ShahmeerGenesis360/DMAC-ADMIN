@@ -50,8 +50,9 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
   const formData = new FormData();
 
   console.log("-----------------------------------");
+  console.log(groupIndex, "groupIndex")
   // Append data to the FormData object
-  formData.append("file", groupIndex.file);
+  formData.append("imageUrl", groupIndex.imageUri);
   formData.append("name", groupIndex.name);
   formData.append("symbol", groupIndex.symbol);
   formData.append("description", groupIndex.description);
@@ -74,7 +75,11 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
     "collectorDetailApi",
     JSON.stringify(groupIndex.collectorDetailApi)
   );
+  console.log(groupIndex.feeAmount)
   formData.append("feeAmount", JSON.stringify(groupIndex.feeAmount));
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
+  }
   try {
     console.log("calling the API now");
     const response = await apiRequest<GetGroupCoinResponse>(
