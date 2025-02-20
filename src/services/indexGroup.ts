@@ -47,36 +47,61 @@ export const getAllIndexWithPagination = async (
 
 export const createIndex = async (groupIndex: IGroupCoin) => {
   const token = await getAuthToken();
+  const formData = new FormData();
 
-  const payload = {
-    name: groupIndex.name,
-    symbol: groupIndex.symbol,
-    description: groupIndex.description,
-    category: groupIndex.category,
-    faq: groupIndex.faq,
-    coins: groupIndex.coins,
-    mintKeySecret: groupIndex.mintKeySecret.toString(),
-    mintPublickey: groupIndex.mintPublickey.toString(),
-    tokenAllocations: groupIndex.tokenAllocations,
-    collectorDetailApi: groupIndex.collectorDetailApi,
-    feeAmount: groupIndex.feeAmount,
-    imageUrl: groupIndex.imageUrl,
-  };
-
+  console.log("-----------------------------------");
+  console.log(groupIndex, "groupIndex")
+  // Append data to the FormData object
+  formData.append("imageUrl", groupIndex.imageUri);
+  formData.append("name", groupIndex.name);
+  formData.append("symbol", groupIndex.symbol);
+  formData.append("description", groupIndex.description);
+  formData.append("category", groupIndex.category);
+  formData.append("faq", JSON.stringify(groupIndex.faq));
+  formData.append("coins", JSON.stringify(groupIndex.coins));
+  formData.append(
+    "mintKeySecret",
+    JSON.stringify(groupIndex.mintKeySecret.toString())
+  );
+  formData.append(
+    "mintPublickey",
+    JSON.stringify(groupIndex.mintPublickey.toString())
+  );
+  formData.append(
+    "tokenAllocations",
+    JSON.stringify(groupIndex.tokenAllocations)
+  );
+  formData.append(
+    "collectorDetailApi",
+    JSON.stringify(groupIndex.collectorDetailApi)
+  );
+  formData.append(
+    "pda",
+    JSON.stringify(groupIndex.IndexPda.toString())
+  );
+  console.log(groupIndex.feeAmount)
+  formData.append("feeAmount", JSON.stringify(groupIndex.feeAmount));
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
+  }
   try {
+    console.log("calling the API now");
     const response = await apiRequest<GetGroupCoinResponse>(
       "/index",
       "POST",
-      JSON.stringify(payload),
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       }
     );
+    console.log("-------------             -----------------");
+    console.log(response.data);
     return response;
   } catch (error: any) {
+    console.log(error);
     throw error;
   }
 };

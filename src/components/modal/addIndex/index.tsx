@@ -167,7 +167,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     console.log("Submitting index...");
 
     try {
-      const txHash = await createIndexContract(
+      const {txHash , IndexPda} = await createIndexContract(
         program,
         connection,
         publicKey,
@@ -188,6 +188,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
       const mintKeySecret = Buffer.from(mintKeypair.secretKey).toString(
         "base64"
       );
+      console.log(addIndex, "addIndex")
       await createIndexToDB({
         ...addIndex,
         coins,
@@ -196,7 +197,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         mintKeySecret,
         tokenAllocations,
         collectorDetailApi,
-        imageUrl: data.image
+        imageUri,
+        IndexPda,
       }).then(() => {
         toast.success("Index Added Sucessful!");
       })

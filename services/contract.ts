@@ -6,14 +6,26 @@ import {
   getAssociatedTokenAddressSync,
   TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
-import { Keypair } from "@solana/web3.js";
+import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { getIndexInfoPda, getProgramState } from "./utils";
 import {
   PYTH_NETWORK_PROGRAM_ID,
-  NEXT_PUBLIC_ADMIN_PK,
 } from "../src/constants/blockchain";
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
+// import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { PublicKey } from "@solana/web3.js";
+
+function getProgramId() {
+  return new anchor.web3.PublicKey(
+    process.env.VITE_PUBLIC_PROGRAM_ID as string
+  );
+}
+
+function getProgramAuthority() {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("program_authority")],
+    getProgramId()
+  )[0];
+}
 
 export async function createIndex(
   program: Program,
@@ -21,7 +33,7 @@ export async function createIndex(
   walletPublicKey: PublicKey,
   mintKeypair: Keypair,
   indexName: string,
-  indexDescription: string,
+  indexSymbol:string,
   metadataUri:string,
   tokenAllocations: { mint: PublicKey; weight: anchor.BN }[],
   collectorDetails: { collector: PublicKey; weight: anchor.BN }[],
@@ -32,18 +44,20 @@ export async function createIndex(
 ) {
   console.log("----------------------");
 
-  const adminKeypair = Keypair.fromSecretKey(
-    bs58.decode(NEXT_PUBLIC_ADMIN_PK as string)
-  );
-
-  const { blockhash } = await connection.getLatestBlockhash();
-  console.log("Blockhash:", blockhash);
+  // const adminKeypair = Keypair.fromSecretKey(
+  //   bs58.decode(NEXT_PUBLIC_ADMIN_PK as string)
+  // );
 
   // --- Convert Weights in Token Allocations ---
   const scaledTokenAllocations = tokenAllocations.map((allocation) => ({
     mint: allocation.mint,
     weight: allocation.weight.mul(new anchor.BN(100)), // Scale the weight by 100
   }));
+
+
+  console.log("----------------");
+  console.log("indexSymbol",indexSymbol);
+  console.log("----------------");
 
   console.log("Scaled Token Allocations:");
   scaledTokenAllocations.forEach((allocation, index) => {
@@ -68,6 +82,9 @@ export async function createIndex(
     );
   });
 
+
+  const { blockhash } = await connection.getLatestBlockhash();
+  console.log("Blockhash:", blockhash);
   // --- Single Transaction Object ---
   const transaction = new anchor.web3.Transaction({
     feePayer: walletPublicKey,
@@ -76,35 +93,36 @@ export async function createIndex(
 
   const programState = getProgramState();
 
+  const IndexPda = getIndexInfoPda(mintKeypair.publicKey)
+
+
+  console.log(feeAmount);
+
   console.log("Program State:", programState);
   console.log(metadataUri, "metadataUri")
-
+  const programAuthorityPda = getProgramAuthority();
+  const platformFeePercentage = 1;
   // --- Instruction 1: Create Index ---
   const createIndexInstruction = await program.methods
     .createIndex(
       indexName,
-      indexDescription,
+      indexSymbol,
       metadataUri,
       scaledTokenAllocations, // Pass scaled token allocations
       scaledCollectorDetails, // Pass scaled collector details
-      new anchor.BN(feeAmount * anchor.web3.LAMPORTS_PER_SOL)
+      new anchor.BN(feeAmount *LAMPORTS_PER_SOL),
+      new anchor.BN(platformFeePercentage * 100),
     )
     .accounts({
       programState: programState,
       admin: walletPublicKey,
-      indexInfo: getIndexInfoPda(mintKeypair.publicKey),
+      indexInfo: IndexPda,
       authority: mintKeypair.publicKey,
       indexMint: mintKeypair.publicKey,
-      adminTokenAccount: getAssociatedTokenAddressSync(
-        mintKeypair.publicKey,
-        adminKeypair.publicKey,
-        false,
-        TOKEN_2022_PROGRAM_ID
-      ),
       priceUpdate: PYTH_NETWORK_PROGRAM_ID,
       tokenProgram: TOKEN_2022_PROGRAM_ID,
       systemProgram: SYSTEM_PROGRAM_ID,
-      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+      programAuthorityPda: programAuthorityPda
     })
     .instruction();
 
@@ -116,7 +134,7 @@ export async function createIndex(
     .accounts({
       programState: programState,
       admin: walletPublicKey,
-      indexInfo: getIndexInfoPda(mintKeypair.publicKey),
+      indexInfo: IndexPda,
       authority: mintKeypair.publicKey,
       indexMint: mintKeypair.publicKey,
       adminTokenAccount: getAssociatedTokenAddressSync(
@@ -145,5 +163,5 @@ export async function createIndex(
   );
 
   console.log("Transaction Hash:", txHash);
-  return txHash;
+  return{ txHash,IndexPda: IndexPda };
 }
