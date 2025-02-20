@@ -164,21 +164,21 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     console.log("Submitting index...");
 
     try {
-      // const txHash = await createIndexContract(
-      //   program,
-      //   connection,
-      //   publicKey,
-      //   mintKeypair,
-      //   addIndex.name,
-      //   addIndex.symbol,
-      //   metadataUri,
-      //   tokenAllocations,
-      //   collectorDetails,
-      //   parseFloat(addIndex.feeAmount),
-      //   signTransaction
-      // );
+      const {txHash , IndexPda} = await createIndexContract(
+        program,
+        connection,
+        publicKey,
+        mintKeypair,
+        addIndex.name,
+        addIndex.symbol,
+        metadataUri,
+        tokenAllocations,
+        collectorDetails,
+        parseFloat(addIndex.feeAmount),
+        signTransaction
+      );
 
-      // console.log("Transaction Hash:", txHash);
+      console.log("Transaction Hash:", txHash);
 
       console.log(addIndex.feeAmount, "feeAmount")
       const mintPublickey = mintKeypair.publicKey;
@@ -194,7 +194,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         mintKeySecret,
         tokenAllocations,
         collectorDetailApi,
-        imageUri
+        imageUri,
+        IndexPda,
       });
 
       setAddIndex(initialIndex);

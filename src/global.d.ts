@@ -54,6 +54,7 @@ declare global {
     category: string;
     symbol: string;
     imageUri: string;
+    IndexPda:PublicKeys;
   }
 
   interface IFaq {

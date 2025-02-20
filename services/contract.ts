@@ -93,6 +93,8 @@ export async function createIndex(
 
   const programState = getProgramState();
 
+  const IndexPda = getIndexInfoPda(mintKeypair.publicKey)
+
 
   console.log(feeAmount);
 
@@ -114,7 +116,7 @@ export async function createIndex(
     .accounts({
       programState: programState,
       admin: walletPublicKey,
-      indexInfo: getIndexInfoPda(mintKeypair.publicKey),
+      indexInfo: IndexPda,
       authority: mintKeypair.publicKey,
       indexMint: mintKeypair.publicKey,
       priceUpdate: PYTH_NETWORK_PROGRAM_ID,
@@ -132,7 +134,7 @@ export async function createIndex(
     .accounts({
       programState: programState,
       admin: walletPublicKey,
-      indexInfo: getIndexInfoPda(mintKeypair.publicKey),
+      indexInfo: IndexPda,
       authority: mintKeypair.publicKey,
       indexMint: mintKeypair.publicKey,
       adminTokenAccount: getAssociatedTokenAddressSync(
@@ -161,5 +163,5 @@ export async function createIndex(
   );
 
   console.log("Transaction Hash:", txHash);
-  return txHash;
+  return{ txHash,IndexPda: IndexPda };
 }
