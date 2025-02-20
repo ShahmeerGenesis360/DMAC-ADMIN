@@ -15,6 +15,19 @@ import {
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { PublicKey } from "@solana/web3.js";
 
+function getProgramId() {
+  return new anchor.web3.PublicKey(
+    process.env.VITE_PUBLIC_PROGRAM_ID as string
+  );
+}
+
+function getProgramAuthority() {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("program_authority")],
+    getProgramId()
+  )[0];
+}
+
 export async function createIndex(
   program: Program,
   connection: anchor.web3.Connection,
@@ -78,7 +91,8 @@ export async function createIndex(
 
   console.log("Program State:", programState);
   console.log(metadataUri, "metadataUri")
-
+  const programAuthorityPda = getProgramAuthority();
+  const platformFeePercentage = 1;
   // --- Instruction 1: Create Index ---
   const createIndexInstruction = await program.methods
     .createIndex(
@@ -87,7 +101,8 @@ export async function createIndex(
       metadataUri,
       scaledTokenAllocations, // Pass scaled token allocations
       scaledCollectorDetails, // Pass scaled collector details
-      new anchor.BN(feeAmount * anchor.web3.LAMPORTS_PER_SOL)
+      new anchor.BN(feeAmount * anchor.web3.LAMPORTS_PER_SOL),
+      new anchor.BN(platformFeePercentage * 100),
     )
     .accounts({
       programState: programState,
@@ -95,16 +110,17 @@ export async function createIndex(
       indexInfo: getIndexInfoPda(mintKeypair.publicKey),
       authority: mintKeypair.publicKey,
       indexMint: mintKeypair.publicKey,
-      adminTokenAccount: getAssociatedTokenAddressSync(
-        mintKeypair.publicKey,
-        adminKeypair.publicKey,
-        false,
-        TOKEN_2022_PROGRAM_ID
-      ),
+      // adminTokenAccount: getAssociatedTokenAddressSync(
+      //   mintKeypair.publicKey,
+      //   adminKeypair.publicKey,
+      //   false,
+      //   TOKEN_2022_PROGRAM_ID
+      // ),
       priceUpdate: PYTH_NETWORK_PROGRAM_ID,
       tokenProgram: TOKEN_2022_PROGRAM_ID,
       systemProgram: SYSTEM_PROGRAM_ID,
-      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+      // associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+      programAuthorityPda: programAuthorityPda
     })
     .instruction();
 
