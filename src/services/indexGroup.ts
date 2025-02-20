@@ -50,7 +50,7 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
   const formData = new FormData();
 
   console.log("-----------------------------------");
-  console.log(groupIndex, "groupIndex")
+  console.log(groupIndex, "groupIndex");
   // Append data to the FormData object
   formData.append("imageUrl", groupIndex.imageUri);
   formData.append("name", groupIndex.name);
@@ -75,11 +75,8 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
     "collectorDetailApi",
     JSON.stringify(groupIndex.collectorDetailApi)
   );
-  formData.append(
-    "pda",
-    JSON.stringify(groupIndex.IndexPda.toString())
-  );
-  console.log(groupIndex.feeAmount)
+  formData.append("pda", JSON.stringify(groupIndex.IndexPda.toString()));
+  console.log(groupIndex.feeAmount);
   formData.append("feeAmount", JSON.stringify(groupIndex.feeAmount));
   for (let [key, value] of formData.entries()) {
     console.log(`${key}:`, value);
@@ -108,7 +105,7 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
 
 export const updateIndex = async (groupIndex: IGroupCoin) => {
   const token = await getAuthToken();
-  
+
   const payload = {
     name: groupIndex.name,
     symbol: groupIndex.symbol,
@@ -139,3 +136,22 @@ export const updateIndex = async (groupIndex: IGroupCoin) => {
   }
 };
 
+export const getAllCategory = async () => {
+  try {
+    const response = await apiRequest<any>("/category", "GET");
+    return response;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const createCategory = async (value: string) => {
+  try {
+    const response = await apiRequest<any>("/category/create", "POST", {
+      value,
+    });
+    return response;
+  } catch (error: any) {
+    throw error;
+  }
+};
