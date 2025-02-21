@@ -23,7 +23,7 @@ const CategorySelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions 
         getAllCategory().then((res) => {
             setOptions(res)
         })
-    })
+    }, [])
 
     const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setName(event.target.value);

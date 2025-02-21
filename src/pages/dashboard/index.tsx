@@ -210,7 +210,7 @@ const columns = (editIndex: Function) => [
     key: "totalHolder",
     render: (text: number) => (
       <IndexText>
-        {text && formatNumber(text)}
+        {text}
         {/* {record?.totalBuy && formatNumber(record?.totalBuy - record?.totalSell)} */}
       </IndexText>
     ),
