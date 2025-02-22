@@ -40,6 +40,7 @@ export const StyledSelect = styled(Select)`
       color: #828282;
     }
     .ant-select-selection-item-remove {
+      display: none;
       color: #828282;
       font-size: 14px;
       padding-left: 5px;

@@ -28,6 +28,7 @@ import { StyledSelect } from "../../select/styles";
 import { useWallet } from "@solana/wallet-adapter-react";
 import CategorySelect from "../../category";
 import { toast } from "react-toastify";
+import AllocationToken from "../../allocationToken";
 interface IAddIndexModal {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -51,7 +52,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const { publicKey, signTransaction, connected } = useWallet(); // Wallet context
   const { program, connection } = useProgram() || {}; // Use the custom hook
   const handleCancel = () => setIsModalOpen(false);
-
+  const [isAllocation, setIsAllocation] = useState(false)
+  const handleAllocation = () => setIsAllocation(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [faq, setFaq] = useState(
     questions.map((question) => ({ question, answer: question.toLowerCase() === "fees" ? "1%" : "", }))
@@ -167,7 +169,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     console.log("Submitting index...");
 
     try {
-      const {txHash , IndexPda} = await createIndexContract(
+      const { txHash, IndexPda } = await createIndexContract(
         program,
         connection,
         publicKey,
@@ -318,27 +320,18 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
             />
           </Tooltip>
         </div>
-
+        <AllocationToken visible={isAllocation} onClose={handleAllocation} setOptions={setOptions}
+          options={options} setSelectedOptions={setSelectedOptions}
+          selectedOptions={selectedOptions} />
         <div style={{ marginTop: 16 }}>
           <Tooltip title="Select the coins and Enter its proportions" getPopupContainer={(triggerNode: any) => triggerNode.parentNode}>
             <span>
               <CustomSelect
+                setAllocation={setIsAllocation}
                 setSelectedOptions={setSelectedOptions}
                 selectedOptions={selectedOptions}
                 setOptions={setOptions}
                 options={options}
-              />
-            </span>
-          </Tooltip>
-        </div>
-        <div style={{ marginTop: 16 }}>
-          <Tooltip title="Enter the address and Enter its proportion" getPopupContainer={(triggerNode: any) => triggerNode.parentNode}>
-            <span>
-              <Select
-                setSelectedOptions={setSelectedOptionTags}
-                selectedOptions={selectedOptionTags}
-                setOptions={setOptionTags}
-                options={optionTags}
               />
             </span>
           </Tooltip>
@@ -355,22 +348,54 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         </div>
         <>
           {faq.map((item, index) => (
-            <div style={{ marginTop: 16 }}>
-              <Tooltip title={`Enter the detail of ${item.question}`}>
-                <StyledTextArea
-                  placeholder={item.question}
-                  value={item.answer}
-                  showCount={item.question === "Fees" ? false : true}
-                  maxLength={200}
-                  style={{ resize: "none" }}
-                  name={item.question}
-                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                    handleFaqChange(e, index)
-                  }
-                  autoSize={{ minRows: 1, maxRows: item.question === "Fees" ? 1 : 3 }}
-                />
-              </Tooltip>
-            </div>
+            item.question === "Risks" ?
+              <>
+                <div style={{ marginTop: 16 }}>
+                  <Tooltip title={`Enter the detail of ${item.question}`}>
+                    <StyledTextArea
+                      placeholder={item.question}
+                      value={item.answer}
+                      showCount={true}
+                      maxLength={200}
+                      style={{ resize: "none" }}
+                      name={item.question}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                        handleFaqChange(e, index)
+                      }
+                      autoSize={{ minRows: 1, maxRows: 3 }}
+                    />
+                  </Tooltip>
+                </div>
+                <div style={{ marginTop: 16 }}>
+                  <Tooltip title="Enter the address and Enter its proportion" getPopupContainer={(triggerNode: any) => triggerNode.parentNode}>
+                    <span>
+                      <Select
+                        setSelectedOptions={setSelectedOptionTags}
+                        selectedOptions={selectedOptionTags}
+                        setOptions={setOptionTags}
+                        options={optionTags}
+                      />
+                    </span>
+                  </Tooltip>
+                </div>
+              </>
+              :
+              <div style={{ marginTop: 16 }}>
+                <Tooltip title={`Enter the detail of ${item.question}`}>
+                  <StyledTextArea
+                    placeholder={item.question}
+                    value={item.answer}
+                    showCount={item.question === "Fees" ? false : true}
+                    maxLength={200}
+                    style={{ resize: "none" }}
+                    name={item.question}
+                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                      handleFaqChange(e, index)
+                    }
+                    autoSize={{ minRows: 1, maxRows: item.question === "Fees" ? 1 : 3 }}
+                  />
+                </Tooltip>
+              </div>
           ))}
         </>
       </StyledModal>

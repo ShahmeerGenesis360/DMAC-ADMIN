@@ -6,13 +6,14 @@ import { CloseOutlined, DownOutlined, UpOutlined } from "@ant-design/icons";
 
 
 interface IProps {
+  setAllocation: (item: boolean) => void
   selectedOptions: string[];
   setSelectedOptions: (item: string[]) => void;
   options: Option[];
   setOptions: (item: Option[]) => void;
 }
 
-const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, setOptions, options }) => {
+const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, setOptions, options, setAllocation }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -70,10 +71,11 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
   return (
     <Flex>
       <StyledSelect
+        onSelect={() => setAllocation(true)}
         placeholder="Allocations"
         mode="multiple"
         value={selectedOptions}
-        open={isDropdownOpen}
+        open={false}
         showSearch
         searchValue={searchTerm}
         onSearch={(value) => setSearchTerm(value)} // Capture search input
@@ -124,7 +126,7 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
         )}
         optionLabelProp="label"
         suffixIcon={isDropdownOpen ? <UpOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} /> : <DownOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} />} // Toggle icon
-        onDropdownVisibleChange={(open: boolean) => setIsDropdownOpen(open)} // Track dropdown visibility
+        onDropdownVisibleChange={(open: boolean) => setAllocation(open)} // Track dropdown visibility
       />
     </Flex>
   );

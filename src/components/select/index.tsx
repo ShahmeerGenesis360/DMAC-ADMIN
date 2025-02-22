@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Flex } from "antd";
 import { DropdownOption, DropdownOptions, InputNumber, StyledSelect, Text } from "./styles";
-import { DownOutlined, UpOutlined } from "@ant-design/icons";
+import { CloseOutlined, DownOutlined, UpOutlined } from "@ant-design/icons";
 import { Option } from "antd/es/mentions";
 
 
@@ -54,7 +54,7 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
     return (
         <Flex>
             <StyledSelect
-                placeholder="Collectors"
+                placeholder="Enter Fees Collection Wallet"
                 mode="tags"
                 open={isDropdownOpen}
                 value={selectedOptions}
@@ -71,11 +71,12 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
                             <Text>
                                 {option.collector} - {option.weight}%
                             </Text>
+                            <CloseOutlined onClick={() => handleDeselect(option.collector)} />
                         </Flex>
                     ),
                 }))}
                 onSelect={handleSelect}
-                onDeselect={handleDeselect}
+                // onDeselect={handleDeselect}
                 dropdownRender={(menu) => (
                     <DropdownOptions>
                         {options.map((option) => (
@@ -98,7 +99,7 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
                         {menu}
                     </DropdownOptions>
                 )}
-                suffixIcon={isDropdownOpen ? <UpOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} /> : <DownOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)}/>} // Toggle icon
+                suffixIcon={isDropdownOpen ? <UpOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} /> : <DownOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} />} // Toggle icon
                 onDropdownVisibleChange={(open: boolean) => setIsDropdownOpen(open)} // Track dropdown visibility
             >
                 {(options || []).map((option) => (
