@@ -336,11 +336,11 @@ const Dashboard = () => {
         labels:
           selectedUsers === "month"
             ? [
-                ...formattedLabels,
-                `${new Date().toLocaleString("en-US", {
-                  month: "short",
-                })} ${new Date().getFullYear()}`,
-              ]
+              ...formattedLabels,
+              `${new Date().toLocaleString("en-US", {
+                month: "short",
+              })} ${new Date().getFullYear()}`,
+            ]
             : monthLabels, // Months as labels
         datasets: [
           {
@@ -372,18 +372,25 @@ const Dashboard = () => {
     const data = await buySellChart(
       TransactionRange[selectedTransactions as keyof typeof TransactionRange]
     );
+    const formatDate = (dateStr: string) => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+      });
+    };
     const formatData = (
       transactions: any,
       key: "totaldeposit" | "totalwithdrawl"
     ) => {
       return transactions?.map((txn: any) => ({
-        x: new Date(txn.startDate),
+        x: formatDate(txn.date),
         y: txn[key],
       }));
     };
 
     setTransactionData({
-      labels: data?.map((item: any) => item.startDate),
+      labels: data?.map((item: any) => formatDate(item.date)),
       datasets: [
         {
           label: "Buy",
