@@ -398,6 +398,18 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
               </div>
           ))}
         </>
+        <div style={{ marginTop: 16 }}>
+          <Tooltip title="Enter a Fees Amount for the index">
+            <StyledInput
+              placeholder="Fees Amount"
+              value={addIndex.feeAmount}
+              showCount
+              maxLength={20}
+              name="feeAmount"
+              onChange={handleChange}
+            />
+          </Tooltip>
+        </div>
       </StyledModal>
     </div >
   );
