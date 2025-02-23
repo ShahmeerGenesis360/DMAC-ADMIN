@@ -36,7 +36,7 @@ declare global {
   }
 
   interface IGroupCoin extends IBase {
-    _id: string;
+    _id?: string;
     name: string;
     coins: ICoin[] | [];
     imageUrl?: string;
