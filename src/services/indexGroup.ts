@@ -1,3 +1,4 @@
+import axios from "axios";
 import { apiRequest } from "../utility/axios";
 import { getAuthToken } from "./auth";
 
@@ -75,7 +76,7 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
     "collectorDetailApi",
     JSON.stringify(groupIndex.collectorDetailApi)
   );
-  formData.append("pda", JSON.stringify(groupIndex.IndexPda.toString()));
+  formData.append("pda", JSON.stringify(groupIndex.programAuthorityPda.toString()));
   console.log(groupIndex.feeAmount);
   formData.append("feeAmount", JSON.stringify(groupIndex.feeAmount));
   for (let [key, value] of formData.entries()) {
@@ -119,17 +120,18 @@ export const updateIndex = async (groupIndex: IGroupCoin) => {
   };
 
   try {
-    const response = await apiRequest<GetGroupCoinResponse>(
-      `/index/${groupIndex._id}`,
-      "PUT",
-      JSON.stringify(payload),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    // const response = await apiRequest<GetGroupCoinResponse>(
+    //   `/index/${groupIndex._id}`,
+    //   "PUT",
+    //   JSON.stringify(payload),
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //   }
+    // );
+    const response = await axios.post("http://localhost:5001/api/rebalance", {id: groupIndex._id, coins:groupIndex.coins});
     return response;
   } catch (error: any) {
     throw error;

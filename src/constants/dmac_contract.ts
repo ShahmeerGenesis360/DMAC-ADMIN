@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/dmac_contracts.json`.
  */
 export type DmacContracts = {
-  "address": "4W1nE9xgGUrPXdjBVjuxMGvMFaRqQdKwE2oXT1Qf2JvA",
+  "address": "3iV7RjTsb2iYrc4Jjp49VBM37BpxktiP7sRW41LX7idQ",
   "metadata": {
     "name": "dmac_contracts",
     "version": "0.1.0",
@@ -447,10 +447,6 @@ export type DmacContracts = {
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "program_authority_pda",
-          "writable": true
         }
       ],
       "args": [
@@ -675,10 +671,6 @@ export type DmacContracts = {
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "wsol_token_account",
@@ -1971,10 +1963,6 @@ export type DmacContracts = {
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "wsol_token_account",
