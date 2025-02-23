@@ -198,20 +198,19 @@ const columns = (editIndex: Function) => [
   },
   {
     title: "TVL",
-    dataIndex: "totalValueLocked",
-    key: "totalValueLocked",
+    dataIndex: "indexWorth",
+    key: "indexWorth",
     render: (text: number) => (
       <IndexText>{text && formatNumber(Math.max(0, text))}</IndexText>
     ),
   },
   {
     title: "Holders",
-    dataIndex: "totalHolder",
-    key: "totalHolder",
-    render: (text: number) => (
+    dataIndex: "index.holders",
+    key: "index.holders",
+    render: (_: any, record: { index: IGroupCoin }) => (
       <IndexText>
-        {text}
-        {/* {record?.totalBuy && formatNumber(record?.totalBuy - record?.totalSell)} */}
+        {record?.index?.holders}
       </IndexText>
     ),
   },
@@ -535,10 +534,8 @@ const Dashboard = () => {
           <AntdTitle level={4} style={{ color: "#4caf50" }}>
             {lockedData &&
               formatNumber(
-                lockedData.datasets[0]?.data?.reduce(
-                  (total: number, point: any) => total + (point.y || 0),
-                  0
-                ) || 0
+                lockedData.datasets[0]?.data?.[lockedData.datasets[0]?.data?.length - 1]
+                  ?.y || 0
               )}{" "}
           </AntdTitle>
           {lockedData && <LineChart data={lockedData || {}} />}
