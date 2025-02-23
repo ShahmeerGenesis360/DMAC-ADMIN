@@ -383,14 +383,14 @@ const Dashboard = () => {
       transactions: any,
       key: "totaldeposit" | "totalwithdrawl"
     ) => {
-      return transactions?.map((txn: any) => ({
+      return transactions?.reverse()?.map((txn: any) => ({
         x: formatDate(txn.date),
         y: txn[key],
       }));
     };
 
     setTransactionData({
-      labels: data?.map((item: any) => formatDate(item.date)),
+      labels: data?.reverse()?.map((item: any) => formatDate(item.date)),
       datasets: [
         {
           label: "Buy",
