@@ -587,7 +587,7 @@ const Dashboard = () => {
       <div style={{ padding: "0 0 20px 0" }}>
         <StyledCard>
           <CardHeader>
-            <CardText>Transactions</CardText>
+            <CardText>Volume</CardText>
             <StyledSelect
               open={isTransactionOpen}
               value={selectedTransactions}
@@ -615,8 +615,8 @@ const Dashboard = () => {
             />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#fff" }}>
-            Transactions in past week{" "}
-            <span style={{ color: "#4caf50" }}>Jan</span>
+            {/* Transactions in past week{" "}
+            <span style={{ color: "#4caf50" }}>Jan</span> */}
           </AntdTitle>
           {transactionData && (
             <LineChart legend={true} data={transactionData} />
