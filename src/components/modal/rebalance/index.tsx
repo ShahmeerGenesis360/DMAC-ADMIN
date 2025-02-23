@@ -28,6 +28,7 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   console.log("collectorDetail", collectorDetail)
   useEffect(() => {
+    console.log(editIndex, "editIndex")
     let totalProportion = (editIndex.coins as ICoin[] || []).reduce((sum: number, coin: ICoin) => sum + coin.proportion, 0);
     // @ts-ignore
     const isFormValid =

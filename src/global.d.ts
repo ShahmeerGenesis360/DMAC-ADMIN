@@ -36,6 +36,7 @@ declare global {
   }
 
   interface IGroupCoin extends IBase {
+    _id: string;
     name: string;
     coins: ICoin[] | [];
     imageUrl?: string;
@@ -54,7 +55,7 @@ declare global {
     category: string;
     symbol: string;
     imageUri: string;
-    IndexPda:PublicKeys;
+    programAuthorityPda:PublicKeys;
   }
 
   interface IFaq {

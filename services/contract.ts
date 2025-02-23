@@ -20,9 +20,9 @@ function getProgramId() {
   );
 }
 
-function getProgramAuthority() {
+function getProgramAuthority(mintPublicKey: PublicKey) {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from("program_authority")],
+    [Buffer.from("program_authority"), mintPublicKey.toBuffer()],
     getProgramId()
   )[0];
 }
@@ -100,7 +100,7 @@ export async function createIndex(
 
   console.log("Program State:", programState);
   console.log(metadataUri, "metadataUri")
-  const programAuthorityPda = getProgramAuthority();
+  const programAuthorityPda = getProgramAuthority(mintKeypair.publicKey);
   const platformFeePercentage = 1;
   // --- Instruction 1: Create Index ---
   const createIndexInstruction = await program.methods
@@ -163,5 +163,5 @@ export async function createIndex(
   );
 
   console.log("Transaction Hash:", txHash);
-  return{ txHash,IndexPda: IndexPda };
+  return{ txHash,programAuthorityPda: programAuthorityPda };
 }

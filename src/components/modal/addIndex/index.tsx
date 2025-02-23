@@ -169,7 +169,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     console.log("Submitting index...");
 
     try {
-      const { txHash, IndexPda } = await createIndexContract(
+      const { txHash, programAuthorityPda } = await createIndexContract(
         program,
         connection,
         publicKey,
@@ -200,7 +200,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
         tokenAllocations,
         collectorDetailApi,
         imageUri,
-        IndexPda,
+        programAuthorityPda,
       }).then(() => {
         toast.success("Index Added Sucessful!");
       })
