@@ -139,7 +139,7 @@ const items = (editIndex: Function, record: object): MenuProps["items"] => [
     icon: <EditOutlined />,
     onClick: () => editIndex(record),
   },
-  { key: "2", label: "View", icon: <EyeOutlined />, onClick: () => window.open(`https://dmac.digitriatech.com/coin/${record._id}`, "_blank")},
+  { key: "2", label: "View", icon: <EyeOutlined />, onClick: () => window.open(`https://dmac.digitriatech.com/coin/${(record as { _id: string })?._id}`, "_blank")},
 ];
 
 const data = Array.from({ length: 5 }, (_, i) => ({
