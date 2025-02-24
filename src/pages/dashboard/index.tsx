@@ -139,7 +139,7 @@ const items = (editIndex: Function, record: object): MenuProps["items"] => [
     icon: <EditOutlined />,
     onClick: () => editIndex(record),
   },
-  { key: "2", label: "View", icon: <EyeOutlined /> },
+  { key: "2", label: "View", icon: <EyeOutlined />, onClick: () => window.open(`https://dmac.digitriatech.com/coin/${record._id}`, "_blank")},
 ];
 
 const data = Array.from({ length: 5 }, (_, i) => ({
@@ -411,16 +411,24 @@ const Dashboard = () => {
   };
 
   const getFees = async () => {
-    const data = await feesChart("monthly");
+    const data = await feesChart(selectedRevenue.toLowerCase());
+
+    const formatDate = (dateStr: string) => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+      });
+    };
     const formatData = (transactions: any[]) => {
-      return transactions?.map((txn) => ({
-        x: new Date(txn.date), // Using `date` instead of `startDate`
+      return transactions?.reverse()?.map((txn) => ({
+        x: formatDate(txn.date), // Using `date` instead of `startDate`
         y: txn.totalAmount, // Ensuring the correct key
       }));
     };
 
     setFeesData({
-      labels: data.buyRewards.map((item: any) => item.date),
+      labels: data?.buyRewards?.reverse()?.map((item: any) => formatDate(item.date)),
       datasets: [
         {
           label: "Buy",
@@ -623,7 +631,7 @@ const Dashboard = () => {
       <StyledCard>
         <CardHeader>
           <CardText>Total Fee Revenue</CardText>
-          {/* <StyledSelect open={isRevenueOpen} value={selectedRevenue} size="small" dropdownClassName="range_popup" dropdownRender={() => (
+          <StyledSelect open={isRevenueOpen} value={selectedRevenue} size="small" dropdownClassName="range_popup" dropdownRender={() => (
             <Flex vertical>
               {["Monthly", "Weekly", "Daily"].map((item) => (
                 <Text key={item} style={{ cursor: "pointer" }}
@@ -634,10 +642,10 @@ const Dashboard = () => {
               ))}
             </Flex>
           )}
-            onDropdownVisibleChange={(open: boolean) => setIsRevenueOpen(open)} /> */}
+            onDropdownVisibleChange={(open: boolean) => setIsRevenueOpen(open)} />
         </CardHeader>
         <AntdTitle level={4} style={{ color: "#4caf50" }}>
-          {feesData &&
+          {"$"}{feesData &&
             formatNumber(
               feesData?.datasets?.reduce(
                 (acc: number, dataset: any) =>

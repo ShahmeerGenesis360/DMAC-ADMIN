@@ -44,7 +44,7 @@ export const StyledInput = styled(Input)`
     color: #828282;
     padding: 15px 12px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 400;
     &::placeholder {
       color: #828282 !important; /* Placeholder color */
     }
@@ -90,7 +90,7 @@ export const StyledTextArea = styled(TextArea)`
     color: #828282;
     padding: 15px 12px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 400;
     &::placeholder {
       color: #828282 !important; /* Placeholder color */
     }

@@ -19,7 +19,7 @@ export const StyledSelect = styled(Select)`
       border: 1px solid #ffffff63 !important;
       padding: 15px 12px;
       border-radius: 20px;
-      font-weight: 500;
+      font-weight: 400;
       color: #828282;
     }
     .ant-select-arrow {
@@ -30,7 +30,7 @@ export const StyledSelect = styled(Select)`
     .ant-select-selection-placeholder {
       color: #828282;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 400;
     }
     .ant-select-selection-item {
       background: transparent;
