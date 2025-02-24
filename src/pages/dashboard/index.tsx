@@ -176,7 +176,6 @@ const columns = (editIndex: Function) => [
     title: "Rank",
     dataIndex: "rank",
     key: "rank",
-    render: () => "Loreum",
   },
   {
     title: "Volume",
@@ -198,10 +197,12 @@ const columns = (editIndex: Function) => [
   },
   {
     title: "TVL",
-    dataIndex: "indexWorth",
-    key: "indexWorth",
-    render: (text: number) => (
-      <IndexText>{text && formatNumber(Math.max(0, text))}</IndexText>
+    dataIndex: "index.marketCap",
+    key: "index.marketCap",
+    render: (_: any, record: { index: IGroupCoin }) => (
+      <IndexText>
+        {record?.index?.marketCap && record?.index?.marketCap?.toFixed(2)}
+      </IndexText>
     ),
   },
   {
@@ -209,9 +210,7 @@ const columns = (editIndex: Function) => [
     dataIndex: "index.holders",
     key: "index.holders",
     render: (_: any, record: { index: IGroupCoin }) => (
-      <IndexText>
-        {record?.index?.holders}
-      </IndexText>
+      <IndexText>{record?.index?.holders}</IndexText>
     ),
   },
   {
