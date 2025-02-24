@@ -85,14 +85,16 @@ export const Text = styled.span`
 
 export const InputNumber = styled(Input)`
   &.ant-input-outlined {
+    padding: 0 5px;
     background: #FFFFFF1A;
     border-width: 1px;
     border-style: solid;
     border-color: #828282;
     border-radius: 20px;
-    color: #fff;
-    width: 80px;
-    margin-left: 10px;
+    font-size: 16px;
+    color: #fff !important;
+    width: 55px;
+    // margin-left: 10px;
   }
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button {

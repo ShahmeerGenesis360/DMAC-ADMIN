@@ -69,19 +69,25 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
   const keypair = Keypair.generate(); // Generate mint keypair
   const [mintKeypair] = useState(keypair);
 
+  const getTotalProportion = () =>
+    options.reduce((sum, option) => sum + option.proportion, 0);
+
   useEffect(() => {
+    const totalProportion = getTotalProportion();
+    const selectedTokens = options.filter(option => selectedOptions.includes(option.value));
+    const hasZeroProportion = selectedTokens.some(token => token.proportion === 0);
     const isFormValid =
       addIndex.name.trim() !== "" &&
       addIndex.description.trim() !== "" &&
       addIndex.category.trim() !== "" &&
       faq.every((item) => item.answer.trim() !== "") &&
-      selectedOptions.length > 0 &&
-      addIndex.file &&
+      selectedOptions.length > 0 && totalProportion === 100 && !hasZeroProportion
+    addIndex.file &&
       !(addIndex.file as any)?.status &&
       typeof addIndex.file !== "undefined";
 
     setIsButtonDisabled(!isFormValid);
-  }, [addIndex, faq]);
+  }, [addIndex, faq, options]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

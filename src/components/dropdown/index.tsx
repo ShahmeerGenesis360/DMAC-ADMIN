@@ -90,8 +90,27 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
           label: (
             <Flex gap={10} align="center">
               <Avatar src={option.icon} size="small" />
-              <Text>{option.label} - {option.proportion}%</Text>
-              <CloseOutlined onClick={() => handleDeselect(option.value)} />
+              <Text>{option.label} -</Text>
+              <InputNumber
+                type="number"
+                suffix={"%"}
+                placeholder="Enter %"
+                value={option.proportion}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  e.stopPropagation()
+                  handleProportionChange(option.value, Number(e.target.value))
+                }
+                }
+                onPressEnter={() => handleProportionSubmit(option.value)}
+              />
+              <CloseOutlined
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDeselect(option.value)
+                }} />
             </Flex>
           ),
         }))}
@@ -126,7 +145,15 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
         )}
         optionLabelProp="label"
         suffixIcon={isDropdownOpen ? <UpOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} /> : <DownOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} />} // Toggle icon
-        onDropdownVisibleChange={(open: boolean) => setAllocation(open)} // Track dropdown visibility
+        onDropdownVisibleChange={(open: boolean) => {
+          setTimeout(() => {
+            const activeElement = document.activeElement as HTMLElement;
+            if (activeElement?.tagName === "INPUT") {
+              return; // Prevent opening/closing if an input is active
+            }
+            setAllocation(open);
+          }, 0);
+        }}
       />
     </Flex>
   );

@@ -70,18 +70,18 @@ const AllocationToken: React.FC<IProps> = ({ visible, onClose, options, setOptio
             message.error("Atleast Select One Token");
             return;
         }
-        if (hasZeroProportion) {
-            message.error("Each token must have a proportion greater than 0%");
-            return;
-        }
-        if (totalProportion > 100) {
-            message.error("Total proportion cannot exceed 100%");
-            return;
-        }
-        if (totalProportion < 100) {
-            message.error("Total proportion lesser than 100%");
-            return;
-        }
+        // if (hasZeroProportion) {
+        //     message.error("Each token must have a proportion greater than 0%");
+        //     return;
+        // }
+        // if (totalProportion > 100) {
+        //     message.error("Total proportion cannot exceed 100%");
+        //     return;
+        // }
+        // if (totalProportion < 100) {
+        //     message.error("Total proportion lesser than 100%");
+        //     return;
+        // }
         onClose()
     }
     const handleCancel = () => {
@@ -113,7 +113,7 @@ const AllocationToken: React.FC<IProps> = ({ visible, onClose, options, setOptio
                                             <TokenText>{token.label}</TokenText>
                                         </Flex>
                                         <Flex gap={5}>
-                                            <InputNumber
+                                            {/* <InputNumber
                                                 type="number"
                                                 placeholder="Enter %"
                                                 value={token.proportion}
@@ -123,7 +123,7 @@ const AllocationToken: React.FC<IProps> = ({ visible, onClose, options, setOptio
                                                 }
                                                 }
                                                 onPressEnter={() => handleProportionSubmit(token.value)}
-                                            />
+                                            /> */}
                                             <CloseCircleOutlined onClick={() => handleDeselect(token.value)} />
                                         </Flex>
                                     </PopularToken>
@@ -261,7 +261,7 @@ const PopularToken = styled.div`
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  width: 49%;
+  width: auto;
   justify-content: space-between;
 `;
 
