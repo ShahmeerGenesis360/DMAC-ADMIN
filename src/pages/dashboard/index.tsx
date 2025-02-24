@@ -411,7 +411,7 @@ const Dashboard = () => {
   };
 
   const getFees = async () => {
-    const data = await feesChart();
+    const data = await feesChart("monthly");
     const formatData = (transactions: any[]) => {
       return transactions?.map((txn) => ({
         x: new Date(txn.date), // Using `date` instead of `startDate`

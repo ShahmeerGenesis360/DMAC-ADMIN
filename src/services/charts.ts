@@ -57,11 +57,11 @@ export const buySellChart = async (type: string):Promise<any> => {
   }
 };
 
-export const feesChart = async ():Promise<any> => {
+export const feesChart = async (period: string): Promise<any> => {
   const token = await getAuthToken();
   try {
     const response = await apiRequest<any>(
-      `/transaction/transaction-monthly`,
+      `/transaction/transaction-monthly?period=${period}`,
       "GET",
       {},
       {
