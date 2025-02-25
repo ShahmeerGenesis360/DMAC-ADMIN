@@ -539,7 +539,7 @@ const Dashboard = () => {
             />
           </CardHeader>
           <AntdTitle level={4} style={{ color: "#4caf50" }}>
-            {lockedData &&
+            {"$"}{lockedData &&
               formatNumber(
                 lockedData.datasets[0]?.data?.[0]
                   ?.y || 0
