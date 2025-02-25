@@ -20,6 +20,9 @@ export const StyledSelect = styled(Select)`
       font-weight: 400;
       color: #828282;
     }
+    .ant-select-selection-search {
+      margin-inline-start: 0px;
+    }
     .ant-select-arrow {
       color: #fff;
       inset-inline-end: 15px;
@@ -29,6 +32,7 @@ export const StyledSelect = styled(Select)`
       color: #828282;
       font-size: 16px;
       font-weight: 400;
+      inset-inline-start: 0px;
     }
     .ant-select-selection-item {
       background: #ffffff12;
