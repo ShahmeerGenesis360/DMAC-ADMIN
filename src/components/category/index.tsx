@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Divider, Flex, Space } from "antd";
-import { DropdownOption, DropdownOptions, StyledSelect, Text } from "./styles";
+import { DropdownOption, DropdownOptions, DropdownOptionsTag, StyledSelect, Text } from "./styles";
 import { DownOutlined, PlusOutlined, UpOutlined } from "@ant-design/icons";
 import Button from "../button";
 import { StyledInput } from "../modal/addIndex/styles";
@@ -61,15 +61,17 @@ const CategorySelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions 
                 }))}
                 open={isDropdownOpen}
                 dropdownRender={() => (
-                    <DropdownOptions>
-                        {options.map((option) => (
-                            <DropdownOption
-                                key={option}
-                                onClick={() => handleOptionClick(option)}
-                            >
-                                <Text>{option}</Text>
-                            </DropdownOption>
-                        ))}
+                    <DropdownOptionsTag>
+                        <DropdownOptions>
+                            {options.map((option) => (
+                                <DropdownOption
+                                    key={option}
+                                    onClick={() => handleOptionClick(option)}
+                                >
+                                    <Text>{option}</Text>
+                                </DropdownOption>
+                            ))}
+                        </DropdownOptions>
                         <Divider style={{ margin: '8px 0' }} />
                         <Space style={{ padding: '0 8px 4px' }}>
                             <StyledInput
@@ -80,8 +82,7 @@ const CategorySelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions 
                             />
                             <Button text="Add Category" icon={<PlusOutlined />} onClick={addItem} />
                         </Space>
-
-                    </DropdownOptions>
+                    </DropdownOptionsTag>
                 )}
                 optionLabelProp="label"
                 suffixIcon={isDropdownOpen ? <UpOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} /> : <DownOutlined onClick={() => setIsDropdownOpen(!isDropdownOpen)} />} // Toggle icon

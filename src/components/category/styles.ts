@@ -54,14 +54,21 @@ export const StyledSelect = styled(Select)`
 
 export const DropdownOptions = styled.div`
   overflow-y: scroll;
-//   height: 310px;
+  max-height: 270px;
   padding: 20px;
-  border: 1px solid #ffffff63;
-  background: #ffffff0d;
+  // border: 1px solid #ffffff63;
+  // background: #ffffff0d;
   border-radius: 20px;
   &::-webkit-scrollbar {
     display: none;
 }
+`;
+
+export const DropdownOptionsTag = styled.div`
+  padding: 20px;
+  border: 1px solid #ffffff63;
+  background: #ffffff0d;
+  border-radius: 20px;
 `;
 
 export const DropdownOption = styled.div`
