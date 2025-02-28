@@ -1,4 +1,4 @@
-import { Input, Select } from "antd";
+import { Flex, Input, Select } from "antd";
 import styled from "styled-components";
 
 export const StyledSelect = styled(Select)`
@@ -53,14 +53,14 @@ export const StyledSelect = styled(Select)`
 
 export const DropdownOptions = styled.div`
   overflow-y: scroll;
-  height: 310px;
+  max-height: 310px;
   padding: 20px;
   border: 1px solid #ffffff63;
   background: #ffffff0d;
   border-radius: 20px;
   &::-webkit-scrollbar {
     display: none;
-}
+  }
 `;
 
 export const DropdownOption = styled.div`
@@ -71,10 +71,21 @@ export const DropdownOption = styled.div`
   padding: 4px;
   border-bottom: 1px solid #333;
   cursor: pointer;
-  &:hover {
-    background: #ffffff63;
-    border-radius: 100px;
+  // &:hover {
+  //   background: #ffffff63;
+  //   border-radius: 100px;
+  // }
+  .anticon {
+    color: #ffffff63;
+    font-size: 24px;
   }
+`;
+
+export const Token = styled(Flex)`
+  width: 40%;
+  border: 2px solid #ffffff63;
+  border-radius: 8px;
+  padding: 5px 10px;
 `;
 
 export const Text = styled.span`
@@ -85,15 +96,17 @@ export const Text = styled.span`
 
 export const InputNumber = styled(Input)`
   &.ant-input-outlined {
+    height: 100%;
     padding: 0 5px;
     background: #FFFFFF1A;
     border-width: 1px;
     border-style: solid;
     border-color: #828282;
-    border-radius: 20px;
+    border-radius: 8px;
     font-size: 16px;
+    padding: 5px 10px;
     color: #fff !important;
-    width: 55px;
+    width: 100px;
     // margin-left: 10px;
   }
   &::-webkit-inner-spin-button,

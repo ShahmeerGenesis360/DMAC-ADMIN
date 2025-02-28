@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Flex } from "antd";
-import { DropdownOption, DropdownOptions, InputNumber, StyledSelect, Text } from "./styles";
+import { Flex, message } from "antd";
+import { DropdownOption, DropdownOptions, InputNumber, StyledSelect, Text, Token } from "./styles";
 import { CloseOutlined, DownOutlined, UpOutlined } from "@ant-design/icons";
 import { Option } from "antd/es/mentions";
 
@@ -16,6 +16,9 @@ interface IProps {
 const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options, setOptions }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     console.log(selectedOptions, "selected", options)
+
+    const getTotalProportion = () =>
+        options.reduce((sum, option) => sum + option.weight, 0);
 
     const handleDeselect = (value: string | unknown) => {
         setSelectedOptions(selectedOptions.filter((item) => item !== value));
@@ -40,8 +43,14 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
 
 
     const handleProportionChange = (value: string, weight: number) => {
-        console.log("value", value);
-        console.log("weight", weight);
+        const totalProportion = getTotalProportion();
+        const currentOption = options.find((option) => option.collector === value);
+        const newTotal = totalProportion - (currentOption?.weight || 0) + weight;
+
+        if (newTotal > 100) {
+            message.error("Total Weight cannot exceed 100%");
+            return;
+        }
         // Calculate the total weight after the change
 
         setOptions(
@@ -79,14 +88,26 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
                 // onDeselect={handleDeselect}
                 dropdownRender={(menu) => (
                     <DropdownOptions>
+                        {
+                            options.length > 0 &&
+                            <DropdownOption>
+                                <Token style={{ borderColor: 'transparent' }} align="center">
+                                    <Text style={{ fontWeight: 600 }}>Address</Text>
+                                </Token>
+                                <Text style={{ fontWeight: 600, width: 80 }}>Share</Text>
+                            </DropdownOption>
+                        }
                         {options.map((option) => (
                             <DropdownOption
                                 key={option.collector}
                             // onClick={() => handleOptionClick(option.value)}
                             >
-                                <Text>{option.collector}</Text>
+                                <Token>
+                                    <Text>{option.collector}</Text>
+                                </Token>
                                 <InputNumber
                                     type="number"
+                                    suffix="%"
                                     placeholder="Enter %"
                                     value={option.weight}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
