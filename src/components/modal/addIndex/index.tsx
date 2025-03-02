@@ -79,7 +79,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     const isFormValid =
       addIndex.name.trim() !== "" &&
       addIndex.description.trim() !== "" &&
-      addIndex.category.trim() !== "" &&
+      addIndex?.category?.length > 0 &&
       faq.every((item) => item.answer.trim() !== "") &&
       selectedOptions.length > 0 && totalProportion === 100 && !hasZeroProportion
     addIndex.file &&
@@ -243,6 +243,9 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
 
   console.log(addIndex, optionTags);
   const isUploaded = fileList.length > 0;
+
+  console.log(addIndex, "addIndex")
+
 
   return (
     <div>

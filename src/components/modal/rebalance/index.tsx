@@ -33,7 +33,7 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
     // @ts-ignore
     const isFormValid =
       editIndex.symbol !== "" &&
-      editIndex.category !== "" &&
+      editIndex.category.length > 0 &&
       editIndex.name.trim() !== "" &&
       editIndex.description.trim() !== "" &&
       faq.every((item: any) => item.answer.trim() !== "") &&

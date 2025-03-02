@@ -52,10 +52,10 @@ declare global {
     mintPublickey: PublicKey;
     collectorDetail: Array<ICollectorDetail>;
     feeAmount: string;
-    category: string;
+    category: any;
     symbol: string;
     imageUri: string;
-    programAuthorityPda:PublicKeys;
+    programAuthorityPda: PublicKeys;
   }
 
   interface IFaq {

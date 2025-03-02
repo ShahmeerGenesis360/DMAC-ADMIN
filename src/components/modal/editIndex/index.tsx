@@ -25,6 +25,7 @@ const initialIndex = {
   name: "",
   description: "",
   file: "",
+  category: ""
 };
 
 // const BASE_URL = import.meta.env.VITE_UPLOAD_URL;
@@ -258,7 +259,11 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
             <span>
               <CategorySelect
                 setSelectedOptions={setAddIndex}
-                selectedOptions={addIndex?.category as string}
+                selectedOptions={Array.isArray(addIndex?.category)
+                  ? addIndex.category
+                  : typeof addIndex?.category === "string"
+                    ? [addIndex.category]
+                    : [] as any}
               />
             </span>
           </Tooltip>
@@ -268,53 +273,53 @@ const EditIndexModal: React.FC<IEditIndexModal> = ({
           {faq.length > 0 &&
             faq.map((item: IFaq, index) => (
               item.question === "Risks" ?
-              <>
+                <>
+                  <div style={{ marginTop: 16 }}>
+                    <Tooltip title={`Enter the detail of ${item.question}`}>
+                      <StyledTextArea
+                        placeholder={item.question}
+                        value={item.answer}
+                        showCount={true}
+                        maxLength={200}
+                        style={{ resize: "none" }}
+                        name={item.question}
+                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                          handleFaqChange(e, index)
+                        }
+                        autoSize={{ minRows: 1, maxRows: 3 }}
+                      />
+                    </Tooltip>
+                  </div>
+                  <div style={{ marginTop: 16 }}>
+                    <Tooltip title="Enter the address and Enter its proportion" getPopupContainer={(triggerNode: any) => triggerNode.parentNode}>
+                      <span>
+                        <Select
+                          setSelectedOptions={setSelectedOptionTags}
+                          selectedOptions={selectedOptionTags}
+                          setOptions={setOptionTags}
+                          options={optionTags}
+                        />
+                      </span>
+                    </Tooltip>
+                  </div>
+                </>
+                :
                 <div style={{ marginTop: 16 }}>
                   <Tooltip title={`Enter the detail of ${item.question}`}>
                     <StyledTextArea
                       placeholder={item.question}
                       value={item.answer}
-                      showCount={true}
+                      showCount={item.question === "Fees" ? false : true}
                       maxLength={200}
                       style={{ resize: "none" }}
                       name={item.question}
                       onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
                         handleFaqChange(e, index)
                       }
-                      autoSize={{ minRows: 1, maxRows: 3 }}
+                      autoSize={{ minRows: 1, maxRows: item.question === "Fees" ? 1 : 3 }}
                     />
                   </Tooltip>
                 </div>
-                <div style={{ marginTop: 16 }}>
-                  <Tooltip title="Enter the address and Enter its proportion" getPopupContainer={(triggerNode: any) => triggerNode.parentNode}>
-                    <span>
-                      <Select
-                        setSelectedOptions={setSelectedOptionTags}
-                        selectedOptions={selectedOptionTags}
-                        setOptions={setOptionTags}
-                        options={optionTags}
-                      />
-                    </span>
-                  </Tooltip>
-                </div>
-              </>
-              :
-              <div style={{ marginTop: 16 }}>
-                <Tooltip title={`Enter the detail of ${item.question}`}>
-                  <StyledTextArea
-                    placeholder={item.question}
-                    value={item.answer}
-                    showCount={item.question === "Fees" ? false : true}
-                    maxLength={200}
-                    style={{ resize: "none" }}
-                    name={item.question}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                      handleFaqChange(e, index)
-                    }
-                    autoSize={{ minRows: 1, maxRows: item.question === "Fees" ? 1 : 3 }}
-                  />
-                </Tooltip>
-              </div>
             ))}
         </>
       </StyledModal>

@@ -33,7 +33,7 @@ export const StyledSelect = styled(Select)`
       font-weight: 400;
     }
     .ant-select-selection-item {
-      background: transparent;
+      background: #fff;
     //   border-radius: 20px;
       padding-inline-start: 4px;
       padding-inline-end: 7px;
@@ -42,6 +42,7 @@ export const StyledSelect = styled(Select)`
       font-weight: 500;
     }
     .ant-select-selection-item-remove {
+      display: none;
       color: #828282;
       font-size: 14px;
       padding-left: 5px;
@@ -81,7 +82,11 @@ export const DropdownOption = styled.div`
   cursor: pointer;
   &:hover {
     background: #ffffff63;
-    border-radius: 100px;
+    border-radius: 8px;
+  }
+  .anticon {
+    color: #ffffff63;
+    font-size: 20px;
   }
 `;
 

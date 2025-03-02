@@ -57,7 +57,7 @@ export const createIndex = async (groupIndex: IGroupCoin) => {
   formData.append("name", groupIndex.name);
   formData.append("symbol", groupIndex.symbol);
   formData.append("description", groupIndex.description);
-  formData.append("category", groupIndex.category);
+  formData.append("category", JSON.stringify(groupIndex.category));
   formData.append("faq", JSON.stringify(groupIndex.faq));
   formData.append("coins", JSON.stringify(groupIndex.coins));
   formData.append(

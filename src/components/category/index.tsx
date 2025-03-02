@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Divider, Flex, Space } from "antd";
 import { DropdownOption, DropdownOptions, DropdownOptionsTag, StyledSelect, Text } from "./styles";
-import { DownOutlined, PlusOutlined, UpOutlined } from "@ant-design/icons";
+import { DeleteOutlined, DownOutlined, PlusOutlined, UpOutlined } from "@ant-design/icons";
 import Button from "../button";
 import { StyledInput } from "../modal/addIndex/styles";
-import { createCategory, getAllCategory } from "../../services/indexGroup";
+import { createCategory, deleteCategory, getAllCategory } from "../../services/indexGroup";
 import { toast } from "react-toastify";
 
 
 
 interface IProps {
-    selectedOptions: string;
+    selectedOptions: string[] | [];
     setSelectedOptions: (item: any) => void;
 }
 
@@ -18,6 +18,7 @@ const CategorySelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [options, setOptions] = useState([])
     const [name, setName] = useState('');
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         getAllCategory().then((res) => {
@@ -40,16 +41,39 @@ const CategorySelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions 
         })
     };
 
-    const handleOptionClick = (value: string) => {
-        setSelectedOptions((prev: any) => ({ ...prev, category: value }))
-        setIsDropdownOpen(false)
-    }
+    const deleteItem = async (id: string) => {
+        await deleteCategory(id.toString()).then((res) => {
+            setOptions(options.filter((option) => option !== id));
+            toast.success("Category Deleted Successful")
+        }).catch((err) => {
+            toast.error(err.message)
+        })
+    };
+
+    const handleOptionClick = (value: never) => {
+        if (selectedOptions.includes(value)) {
+            setSelectedOptions((prev: any) => ({ ...prev, category: selectedOptions.filter((item) => item !== value) }))
+            // setSelectedOptions(selectedOptions.filter((item) => item !== value));
+        } else {
+            // setSelectedOptions([...selectedOptions, value]); 
+            setSelectedOptions((prev: any) => ({ ...prev, category: [...selectedOptions, value]}))
+
+        }
+        // setSelectedOptions((prev: any) => ({ ...prev, category: value }))
+        // setIsDropdownOpen(false)
+    };
+
+    const filteredOptions = options.filter(option =>
+        option.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <Flex>
             <StyledSelect
+                mode="tags"
                 placeholder="Categories"
-                value={selectedOptions === "" ? undefined : selectedOptions}
+                value={selectedOptions.length === 0 ? undefined : selectedOptions}
+                // value={["AI", "Depins"]}
                 dropdownStyle={{
                     backgroundColor: "#242931",
                     borderRadius: "20px",
@@ -59,16 +83,26 @@ const CategorySelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions 
                     value: option,
                     label: option
                 }))}
+                showSearch
+                searchValue={searchTerm}
+                onSearch={(value) => setSearchTerm(value)}
                 open={isDropdownOpen}
                 dropdownRender={() => (
                     <DropdownOptionsTag>
+                        <Flex style={{ borderColor: 'transparent' }}>
+                            <Text style={{ fontWeight: 600 }}>Categories</Text>
+                        </Flex>
                         <DropdownOptions>
-                            {options.map((option) => (
+                            {filteredOptions.map((option) => (
                                 <DropdownOption
                                     key={option}
                                     onClick={() => handleOptionClick(option)}
                                 >
                                     <Text>{option}</Text>
+                                    <DeleteOutlined onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteItem(option)
+                                    }} />
                                 </DropdownOption>
                             ))}
                         </DropdownOptions>
