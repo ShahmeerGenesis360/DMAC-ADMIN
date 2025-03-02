@@ -414,6 +414,8 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
               maxLength={20}
               name="feeAmount"
               onChange={handleChange}
+              onWheel={(e) => e.currentTarget.blur()}
+              inputMode="numeric"
             />
           </Tooltip>
         </div>

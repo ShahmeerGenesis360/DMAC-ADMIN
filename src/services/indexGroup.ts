@@ -157,3 +157,14 @@ export const createCategory = async (value: string) => {
     throw error;
   }
 };
+
+export const deleteCategory = async (value: string) => {
+  try {
+    const response = await apiRequest<any>(`/category/${value}`, "DELETE", {
+      value,
+    });
+    return response;
+  } catch (error: any) {
+    throw error;
+  }
+};

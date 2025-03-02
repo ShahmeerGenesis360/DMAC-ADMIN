@@ -87,7 +87,7 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
 
 
   return (
-    <Flex >
+    <Flex vertical gap={15}>
       <StyledSelect
         onSelect={() => {
           setIsDropdownOpen(false)
@@ -197,11 +197,11 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
         optionLabelProp="label"
         suffixIcon={isDropdownOpen ? <UpOutlined onClick={(e) => {
           e.stopPropagation();
-          setIsDropdownOpen(!isDropdownOpen);
+          // setIsDropdownOpen(!isDropdownOpen);
         }} /> :
           <DownOutlined onClick={(e) => {
             e.stopPropagation();
-            setIsDropdownOpen(!isDropdownOpen)
+            // setIsDropdownOpen(!isDropdownOpen)
           }} />} // Toggle icon
         onDropdownVisibleChange={(open: boolean) => {
           // setTimeout(() => {
@@ -213,6 +213,62 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
           setAllocation(open);
         }}
       />
+      {
+        selectedOptions.length > 0 &&
+        <DropdownOptions
+          ref={dropdownRef}
+        >
+          {
+            selectedOptions.length > 0 &&
+            <DropdownOption>
+              <Token style={{ borderColor: 'transparent' }}>
+                <Text style={{ fontWeight: 600 }}>Total Allocations Proportion</Text>
+              </Token>
+              <InputNumber
+                type="number"
+                placeholder="Total %"
+                suffix={"%"}
+                value={getTotalProportion()}
+                disabled={true}
+              />
+              <CloseCircleOutlined style={{ opacity: 0 }} />
+            </DropdownOption>
+          }
+          {filteredOptions
+            .filter((option) => selectedOptions.includes(option.value))
+            .map((option) => (
+              <DropdownOption key={option.value} onClick={(e) => {
+                e.preventDefault();
+                // Prevent onClick from firing when interacting with InputNumber
+                if ((e.target as HTMLElement).tagName !== "INPUT") {
+                  handleOptionClick(option.value);
+                  setSearchTerm("");
+                }
+              }}>
+                <Token gap={10} align="center">
+                  <Avatar src={option.icon} size="large" />
+                  <Text>{option.label}</Text>
+                </Token>
+                <InputNumber
+                  type="number"
+                  placeholder="Enter %"
+                  suffix={"%"}
+                  value={option.proportion}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    e.stopPropagation()
+                    handleProportionChange(option.value, Number(e.target.value))
+                  }
+                  }
+                  onPressEnter={() => handleProportionSubmit(option.value)}
+                />
+                <CloseCircleOutlined onClick={(e) => {
+                  e.stopPropagation()
+                  handleDeselect(option.value)
+                }} />
+              </DropdownOption>
+            ))}
+        </DropdownOptions>
+      }
     </Flex>
   );
 };
