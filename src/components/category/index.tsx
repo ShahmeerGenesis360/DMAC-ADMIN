@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 
 interface IProps {
-    selectedOptions: string[] | [];
+    selectedOptions: any;
     setSelectedOptions: (item: any) => void;
 }
 
@@ -96,7 +96,7 @@ const CategorySelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions 
                             {filteredOptions.map((option) => (
                                 <DropdownOption
                                     key={option}
-                                    onClick={() => handleOptionClick(option)}
+                                    onClick={() => handleOptionClick(option as never)}
                                 >
                                     <Text>{option}</Text>
                                     <DeleteOutlined onClick={(e) => {
