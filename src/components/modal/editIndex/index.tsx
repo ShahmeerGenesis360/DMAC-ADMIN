@@ -14,6 +14,7 @@ import RebalanceIndex from "../rebalance";
 import { UploadChangeParam } from "antd/es/upload";
 import Select from "../../select";
 import CategorySelect from "../../category";
+import axios from "axios";
 
 interface IEditIndexModal {
   isModalOpen: boolean;

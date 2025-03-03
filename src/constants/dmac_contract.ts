@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/dmac_contracts.json`.
  */
 export type DmacContracts = {
-  "address": "3iV7RjTsb2iYrc4Jjp49VBM37BpxktiP7sRW41LX7idQ",
+  "address": "GCdkE5Anj4D29sgLwZVdZvqEZL6C5WmSLsZKLKVssnPf",
   "metadata": {
     "name": "dmac_contracts",
     "version": "0.1.0",
@@ -1017,9 +1017,6 @@ export type DmacContracts = {
               }
             ]
           }
-        },
-        {
-          "name": "price_update"
         },
         {
           "name": "program_authority_pda",
@@ -2874,14 +2871,6 @@ export type DmacContracts = {
     },
     {
       "code": 6015,
-      "name": "InvalidReturnData"
-    },
-    {
-      "code": 6016,
-      "name": "InvalidJupiterProgram"
-    },
-    {
-      "code": 6017,
       "name": "IncorrectOwner"
     }
   ],

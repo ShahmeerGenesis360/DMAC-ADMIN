@@ -120,18 +120,18 @@ export const updateIndex = async (groupIndex: IGroupCoin) => {
   };
 
   try {
-    // const response = await apiRequest<GetGroupCoinResponse>(
-    //   `/index/${groupIndex._id}`,
-    //   "PUT",
-    //   JSON.stringify(payload),
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //       "Content-Type": "application/json",
-    //     },
-    //   }
-    // );
-    const response = await axios.post("http://localhost:5001/api/rebalance", {id: groupIndex._id, coins:groupIndex.coins});
+    const response = await apiRequest<GetGroupCoinResponse>(
+      `/index/${groupIndex._id}`,
+      "PUT",
+      JSON.stringify(payload),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    
     return response;
   } catch (error: any) {
     throw error;

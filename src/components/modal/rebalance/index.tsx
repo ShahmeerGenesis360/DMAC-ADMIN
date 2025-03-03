@@ -8,6 +8,7 @@ import { updateIndex } from "../../../services/indexGroup";
 import { allocationList } from "../../../constants";
 import { uploadImageToPinata, uploadMetadataToPinata } from "../../../../services/pinata";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 interface IRebalanceModal {
   isModalOpen: boolean;
@@ -52,23 +53,33 @@ const RebalanceIndex: React.FC<IRebalanceModal> = ({
       const metadataUri = await uploadMetadataToPinata(imageUri, editIndex.name, editIndex.description);
       const response = await fetch(metadataUri)
       const data = await response.json()
-      await updateIndex({ ...editIndex, faq, collectorDetail, imageUrl: data.image }).then(() => { 
+      const apiUrl = process.env.VITE_EVENT_URL;
+      const API_BASE_URL = apiUrl || "http://localhost:5001/api/rebalance";
+      const response1 = await axios.post(API_BASE_URL, {id: editIndex._id, coins:editIndex.coins});
+      console.log(response1, "Response")
         toast.success("Index Updated Sucessful!");
-        window.location.reload() 
-      })
-        .catch(() => {
-          toast.error("Getting Error!!")
-        })
+      window.location.reload() 
+      // await updateIndex({ ...editIndex, faq, collectorDetail, imageUrl: data.image }).then(() => { 
+      //   toast.success("Index Updated Sucessful!");
+      //   window.location.reload() 
+      // })
+      //   .catch(() => {
+      //     toast.error("Getting Error!!")
+      //   })
+        
 
     }
     else {
-      await updateIndex({ ...editIndex, faq, collectorDetail }).then(() => { 
-        toast.success("Index Updated Sucessful!");
-        window.location.reload() 
-      })
-        .catch(() => {
-          toast.error("Getting Error!!")
-        })
+      const response = await axios.post("http://localhost:5001/api/rebalance", {id: editIndex._id, coins:editIndex.coins});
+      console.log(response, "Response")
+      // await updateIndex({ ...editIndex, faq, collectorDetail }).then(() => { 
+      //   toast.success("Index Updated Sucessful!");
+      //   window.location.reload() 
+      // })
+      //   .catch(() => {
+      //     toast.error("Getting Error!!")
+      // })
+      
     }
 
   }
