@@ -22,6 +22,12 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    host: "0.0.0.0",
+    port: 5173,
+    cors: {
+      origin: ["https://admin.medley.money"], // ✅ Allow this domain
+      credentials: true,
+    },
     proxy: {
       "/socket.io": {
         target: `${ process.env.VITE_PUBLIC_SOCKET}`, // WebSocket server URL
