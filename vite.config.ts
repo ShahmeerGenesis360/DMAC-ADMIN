@@ -22,7 +22,7 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    host: "0.0.0.0",
+    allowedHosts: ["admin.medley.money"],
     port: 5173,
     cors: {
       origin: ["https://admin.medley.money"], // ✅ Allow this domain
