@@ -1,4 +1,4 @@
-import { Input } from "antd";
+import { Form, Input } from "antd";
 import styled from "styled-components";
 
 export const LoginContainer = styled.div`
@@ -7,7 +7,7 @@ export const LoginContainer = styled.div`
   width: 100vw;
 `;
 
-export const LoginWrapper = styled.div`
+export const LoginWrapper = styled(Form)`
   width: 450px;
   display: flex;
   flex-direction: column;

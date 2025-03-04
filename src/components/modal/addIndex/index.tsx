@@ -95,7 +95,7 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
     const { name, value } = e.target;
     setAddIndex((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: Math.abs(parseFloat(value)),
     }));
   };
 
@@ -418,6 +418,11 @@ const AddIndexModal: React.FC<IAddIndexModal> = ({
               name="feeAmount"
               onChange={handleChange}
               onWheel={(e) => e.currentTarget.blur()}
+              onKeyDown={(e) => {
+                if (["ArrowDown", "ArrowUp"].includes(e.key))
+                  e.preventDefault()
+              }
+              }
               inputMode="numeric"
             />
           </Tooltip>

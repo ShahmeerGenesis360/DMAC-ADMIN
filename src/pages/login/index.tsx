@@ -22,7 +22,7 @@ const Login = () => {
             <LoginWrapper>
                 <StyledInput type="email" placeholder="Enter Email" value={auth?.email} onChange={(e: ChangeEvent<HTMLInputElement>) => setAuth((prev) => ({ ...prev, email: e.target.value }))} />
                 <StyledPassword placeholder="Enter Password" value={auth?.password} onChange={(e: ChangeEvent<HTMLInputElement>) => setAuth((prev) => ({ ...prev, password: e.target.value }))} />
-                <Button text="Login" onClick={loginHandler} />
+                <Button text="Login" htmlType="submit" onClick={loginHandler} />
             </LoginWrapper>
         </LoginContainer>
     )

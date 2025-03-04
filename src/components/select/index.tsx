@@ -114,6 +114,11 @@ const Select: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, options
                                         handleProportionChange(option.collector, Number(e.target.value))
                                     }
                                     onPressEnter={() => setIsDropdownOpen(false)}
+                                    onKeyDown={(e) => {
+                                        if (["ArrowDown", "ArrowUp"].includes(e.key))
+                                            e.preventDefault()
+                                    }
+                                    }   
                                 />
                             </DropdownOption>
                         ))}

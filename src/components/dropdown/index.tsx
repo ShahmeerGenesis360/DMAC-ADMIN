@@ -99,7 +99,7 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
         placeholder="Allocations"
         open={isDropdownOpen}
         mode="multiple"
-        value={selectedOptions}
+        // value={selectedOptions}
         // open={false}
         showSearch={false}
         // searchValue={searchTerm}
@@ -257,6 +257,11 @@ const CustomSelect: React.FC<IProps> = ({ selectedOptions, setSelectedOptions, s
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     e.stopPropagation()
                     handleProportionChange(option.value, Number(e.target.value))
+                  }
+                  }
+                  onKeyDown={(e) => {
+                    if (["ArrowDown", "ArrowUp"].includes(e.key))
+                      e.preventDefault()
                   }
                   }
                   onPressEnter={() => handleProportionSubmit(option.value)}

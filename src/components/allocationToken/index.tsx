@@ -5,115 +5,124 @@ import { CloseCircleOutlined, SearchOutlined } from "@ant-design/icons";
 
 
 interface IProps {
-    visible: boolean;
-    onClose: () => void;
-    selectedOptions: string[];
-    setSelectedOptions: (item: string[]) => void;
-    options: Option[];
-    setOptions: (item: Option[]) => void;
+  visible: boolean;
+  onClose: () => void;
+  selectedOptions: string[];
+  setSelectedOptions: (item: string[]) => void;
+  options: Option[];
+  setOptions: (item: Option[]) => void;
 }
 
 const AllocationToken: React.FC<IProps> = ({ visible, onClose, options, setOptions, selectedOptions, setSelectedOptions, }) => {
-    const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-    const getTotalProportion = () =>
-        options.reduce((sum, option) => sum + option.proportion, 0);
+  const getTotalProportion = () =>
+    options.reduce((sum, option) => sum + option.proportion, 0);
 
-    const handleProportionChange = (value: string, proportion: number) => {
-        const currentOption = options.find((option) => option.value === value);
-        setOptions(
-            options.map((option) =>
-                option.value === value ? { ...option, proportion } : option
-            )
-        );
-    };
-    const truncateAddress = (address, startLength = 6, endLength = 6) => {
-        if (!address) return "";
-        if (address.length <= startLength + endLength) return address;
-        return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
-    };
-
-    const handleProportionSubmit = (value: string) => {
-        const option = options.find((opt) => opt.value === value);
-        if (option && option.proportion > 0 && !selectedOptions.includes(value)) {
-            setSelectedOptions([...selectedOptions, value]);
-        }
-    };
-
-    const handleOptionClick = (value: string) => {
-        if (!selectedOptions.includes(value)) {
-            setSelectedOptions([...selectedOptions, value]);
-        }
-        setSearchTerm("")
-    };
-
-    const handleDeselect = (value: string) => {
-        setSelectedOptions(selectedOptions.filter((item) => item !== value));
-        setOptions(
-            options.map((option) =>
-                option.value === value ? { ...option, proportion: 0 } : option
-            )
-        );
-    };
-
-    const filteredOptions = options.filter(option =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        option.value.toLowerCase() === searchTerm.toLowerCase()
+  const handleProportionChange = (value: string, proportion: number) => {
+    const currentOption = options.find((option) => option.value === value);
+    setOptions(
+      options.map((option) =>
+        option.value === value ? { ...option, proportion } : option
+      )
     );
+  };
+  const truncateAddress = (address, startLength = 6, endLength = 6) => {
+    if (!address) return "";
+    if (address.length <= startLength + endLength) return address;
+    return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
+  };
 
-    const handleAdd = () => {
-        const totalProportion = getTotalProportion();
-        const selectedTokens = options.filter(option => selectedOptions.includes(option.value));
-        const hasZeroProportion = selectedTokens.some(token => token.proportion === 0);
-        console.log(hasZeroProportion, "haszero")
-        if (selectedOptions.length === 0) {
-            message.error("Atleast Select One Token");
-            return;
+  const handleProportionSubmit = (value: string) => {
+    const option = options.find((opt) => opt.value === value);
+    if (option && option.proportion > 0 && !selectedOptions.includes(value)) {
+      setSelectedOptions([...selectedOptions, value]);
+    }
+  };
+
+  const handleOptionClick = (value: string) => {
+    if (!selectedOptions.includes(value)) {
+      setSelectedOptions([...selectedOptions, value]);
+    }
+    setSearchTerm("")
+  };
+
+  const handleDeselect = (value: string) => {
+    setSelectedOptions(selectedOptions.filter((item) => item !== value));
+    setOptions(
+      options.map((option) =>
+        option.value === value ? { ...option, proportion: 0 } : option
+      )
+    );
+  };
+
+  const filteredOptions = options.filter(option =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    option.value.toLowerCase() === searchTerm.toLowerCase()
+  );
+
+  const handleAdd = () => {
+    const totalProportion = getTotalProportion();
+    const selectedTokens = options.filter(option => selectedOptions.includes(option.value));
+    const hasZeroProportion = selectedTokens.some(token => token.proportion === 0);
+    console.log(hasZeroProportion, "haszero")
+    if (selectedOptions.length === 0) {
+      message.error("Atleast Select One Token");
+      return;
+    }
+    // if (hasZeroProportion) {
+    //     message.error("Each token must have a proportion greater than 0%");
+    //     return;
+    // }
+    // if (totalProportion > 100) {
+    //     message.error("Total proportion cannot exceed 100%");
+    //     return;
+    // }
+    // if (totalProportion < 100) {
+    //     message.error("Total proportion lesser than 100%");
+    //     return;
+    // }
+    onClose()
+  }
+  const handleCancel = () => {
+    // setSelectedOptions([]);
+    // const updatedOptions = options.map(option => ({
+    //   ...option,
+    //   proportion: 0
+    // }));
+
+    // setOptions(updatedOptions);
+    onClose()
+  }
+  const handleEnter = () => {
+    if (filteredOptions.length > 0) {
+      handleOptionClick(filteredOptions[0].value)
+    }
+  }
+
+  return (
+    <StyledModal open={visible} onCancel={handleCancel} footer={null}>
+      <Title>Select a token</Title>
+      <SearchInput placeholder="Search by token or paste address" suffix={<SearchOutlined />} value={searchTerm} onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          handleEnter()
         }
-        // if (hasZeroProportion) {
-        //     message.error("Each token must have a proportion greater than 0%");
-        //     return;
-        // }
-        // if (totalProportion > 100) {
-        //     message.error("Total proportion cannot exceed 100%");
-        //     return;
-        // }
-        // if (totalProportion < 100) {
-        //     message.error("Total proportion lesser than 100%");
-        //     return;
-        // }
-        onClose()
-    }
-    const handleCancel = () => {
-        setSelectedOptions([]);
-        const updatedOptions = options.map(option => ({
-            ...option,
-            proportion: 0
-        }));
-
-        setOptions(updatedOptions);
-        onClose()
-    }
-
-    return (
-        <StyledModal open={visible} onCancel={handleCancel} footer={null}>
-            <Title>Select a token</Title>
-            <SearchInput placeholder="Search by token or paste address" suffix={<SearchOutlined />} value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
-            <PopularTokensContainer>
-                {options.filter((token) => selectedOptions.includes(token.value)).length > 0 &&
-                    <>
-                        <PopularTitle>Popular tokens</PopularTitle>
-                        <PopularList>
-                            {options
-                                .filter((token) => selectedOptions.includes(token.value))
-                                .map((token) => (
-                                    <PopularToken key={token.label}>
-                                        <Flex gap={5} align="center">
-                                            <Avatar size={24} src={token.icon} />
-                                            <TokenText>{token.label}</TokenText>
-                                        </Flex>
-                                        <Flex gap={5}>
-                                            {/* <InputNumber
+      }} onChange={(event) => setSearchTerm(event.target.value)} />
+      <PopularTokensContainer>
+        {options.filter((token) => selectedOptions.includes(token.value)).length > 0 &&
+          <>
+            <PopularTitle>Popular tokens</PopularTitle>
+            <PopularList>
+              {options
+                .filter((token) => selectedOptions.includes(token.value))
+                .map((token) => (
+                  <PopularToken key={token.label}>
+                    <Flex gap={5} align="center">
+                      <Avatar size={24} src={token.icon} />
+                      <TokenText>{token.label}</TokenText>
+                    </Flex>
+                    <Flex gap={5}>
+                      {/* <InputNumber
                                                 type="number"
                                                 placeholder="Enter %"
                                                 value={token.proportion}
@@ -124,37 +133,37 @@ const AllocationToken: React.FC<IProps> = ({ visible, onClose, options, setOptio
                                                 }
                                                 onPressEnter={() => handleProportionSubmit(token.value)}
                                             /> */}
-                                            <CloseCircleOutlined onClick={() => handleDeselect(token.value)} />
-                                        </Flex>
-                                    </PopularToken>
-                                ))}
-                        </PopularList>
-                    </>
-                }
-            </PopularTokensContainer>
-            <TokenList>
-                {filteredOptions.map((token) => (
-                    <ListItem key={token.label} onClick={() => handleOptionClick(token.value)}>
-                        <AvatarWrapper>
-                            <Avatar size={40} src={token.icon} />
-                        </AvatarWrapper>
-                        <TokenInfo>
-                            <TokenName>{token.label}</TokenName>
-                            {/* <TokenDesc>{token.value}</TokenDesc> */}
-                        </TokenInfo>
-                        <Flex>
-                            <TokenBalance>{truncateAddress(token.value)}</TokenBalance>
-                        </Flex>
-                    </ListItem>
+                      <CloseCircleOutlined onClick={() => handleDeselect(token.value)} />
+                    </Flex>
+                  </PopularToken>
                 ))}
-            </TokenList>
-            <FooterText>Can’t find the token you’re looking for? Try entering the mint address.</FooterText>
-            <Flex gap={5}>
-                <AddButton onClick={handleAdd}>Add</AddButton>
-                <CancelButton onClick={handleCancel}>Cancel</CancelButton>
+            </PopularList>
+          </>
+        }
+      </PopularTokensContainer>
+      <TokenList>
+        {filteredOptions.map((token) => (
+          <ListItem key={token.label} onClick={() => handleOptionClick(token.value)}>
+            <AvatarWrapper>
+              <Avatar size={40} src={token.icon} />
+            </AvatarWrapper>
+            <TokenInfo>
+              <TokenName>{token.label}</TokenName>
+              {/* <TokenDesc>{token.value}</TokenDesc> */}
+            </TokenInfo>
+            <Flex>
+              <TokenBalance>{truncateAddress(token.value)}</TokenBalance>
             </Flex>
-        </StyledModal>
-    );
+          </ListItem>
+        ))}
+      </TokenList>
+      <FooterText>Can’t find the token you’re looking for? Try entering the mint address.</FooterText>
+      <Flex gap={5}>
+        <AddButton onClick={handleAdd}>Add</AddButton>
+        <CancelButton onClick={handleCancel}>Cancel</CancelButton>
+      </Flex>
+    </StyledModal>
+  );
 };
 
 const StyledModal = styled(Modal)`
